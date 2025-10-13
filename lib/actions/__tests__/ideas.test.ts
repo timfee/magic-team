@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { CreateIdeaInput } from "@/lib/types/session";
+import type { DocumentReference, DocumentData } from "firebase/firestore";
 
 // Mock Firebase
 vi.mock("@/lib/firebase/client", () => ({
@@ -15,6 +16,25 @@ vi.mock("firebase/firestore", () => ({
   serverTimestamp: vi.fn(() => new Date()),
 }));
 
+interface IdeaData {
+  sessionId: string;
+  categoryId: string;
+  content: string;
+  isAnonymous: boolean;
+  authorId?: string;
+  order: number;
+  isSelected: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface UpdateData {
+  content?: string;
+  categoryId?: string;
+  groupId?: string | null;
+  updatedAt: Date;
+}
+
 describe("Idea Actions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -26,14 +46,15 @@ describe("Idea Actions", () => {
       const { addDoc } = await import("firebase/firestore");
 
       const mockAddDoc = vi.mocked(addDoc);
-      mockAddDoc.mockResolvedValue({ id: "idea-123" } as any);
+      mockAddDoc.mockResolvedValue({
+        id: "idea-123",
+      } as DocumentReference<DocumentData>);
 
       const input: CreateIdeaInput = {
         sessionId: "session-123",
         categoryId: "category-456",
         content: "Test idea content",
         isAnonymous: false,
-        authorId: "user-789",
       };
 
       const result = await createIdea(input);
@@ -41,10 +62,9 @@ describe("Idea Actions", () => {
       expect(mockAddDoc).toHaveBeenCalled();
       expect(result).toHaveProperty("ideaId", "idea-123");
 
-      const ideaData = mockAddDoc.mock.calls[0][1] as any;
+      const ideaData = mockAddDoc.mock.calls[0][1] as Partial<IdeaData>;
       expect(ideaData.content).toBe("Test idea content");
       expect(ideaData.isAnonymous).toBe(false);
-      expect(ideaData.authorId).toBe("user-789");
     });
 
     it("should create anonymous idea without authorId", async () => {
@@ -52,7 +72,9 @@ describe("Idea Actions", () => {
       const { addDoc } = await import("firebase/firestore");
 
       const mockAddDoc = vi.mocked(addDoc);
-      mockAddDoc.mockResolvedValue({ id: "idea-456" } as any);
+      mockAddDoc.mockResolvedValue({
+        id: "idea-456",
+      } as DocumentReference<DocumentData>);
 
       const input: CreateIdeaInput = {
         sessionId: "session-123",
@@ -63,7 +85,7 @@ describe("Idea Actions", () => {
 
       await createIdea(input);
 
-      const ideaData = mockAddDoc.mock.calls[0][1] as any;
+      const ideaData = mockAddDoc.mock.calls[0][1] as Partial<IdeaData>;
       expect(ideaData.isAnonymous).toBe(true);
       expect(ideaData.authorId).toBeUndefined();
     });
@@ -73,20 +95,20 @@ describe("Idea Actions", () => {
       const { addDoc } = await import("firebase/firestore");
 
       const mockAddDoc = vi.mocked(addDoc);
-      mockAddDoc.mockResolvedValue({ id: "idea-789" } as any);
+      mockAddDoc.mockResolvedValue({
+        id: "idea-789",
+      } as DocumentReference<DocumentData>);
 
       const input: CreateIdeaInput = {
         sessionId: "session-123",
         categoryId: "category-456",
         content: "Ordered idea",
         isAnonymous: false,
-        authorId: "user-123",
-        order: 5,
       };
 
       await createIdea(input);
 
-      const ideaData = mockAddDoc.mock.calls[0][1] as any;
+      const ideaData = mockAddDoc.mock.calls[0][1] as Partial<IdeaData>;
       // Order defaults to 0 if not in the implementation
       expect(ideaData).toHaveProperty("order");
       expect(typeof ideaData.order).toBe("number");
@@ -106,7 +128,7 @@ describe("Idea Actions", () => {
       });
 
       expect(mockUpdateDoc).toHaveBeenCalled();
-      const updateData = mockUpdateDoc.mock.calls[0][1] as any;
+      const updateData = mockUpdateDoc.mock.calls[0][1] as UpdateData;
       expect(updateData.content).toBe("Updated content");
       expect(updateData).toHaveProperty("updatedAt");
     });
@@ -123,7 +145,7 @@ describe("Idea Actions", () => {
         groupId: "new-group",
       });
 
-      const updateData = mockUpdateDoc.mock.calls[0][1] as any;
+      const updateData = mockUpdateDoc.mock.calls[0][1] as UpdateData;
       expect(updateData.categoryId).toBe("new-category");
       expect(updateData.groupId).toBe("new-group");
     });

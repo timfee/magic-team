@@ -37,7 +37,6 @@ describe("IdeaCard", () => {
     author: {
       id: "user-123",
       name: "Test User",
-      email: "test@example.com",
       image: null,
     },
     group: null,

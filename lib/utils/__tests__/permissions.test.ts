@@ -17,12 +17,12 @@ describe("Permissions Utilities", () => {
     owner: {
       id: "owner-123",
       name: "Owner User",
-      email: "owner@example.com",
       image: null,
     },
     admins: [
       {
         id: "admin-doc-1",
+        sessionId: "session-123",
         userId: "admin-456",
         role: "admin",
         addedAt: new Date(),
