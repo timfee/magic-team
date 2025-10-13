@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { IdeaCard } from "@/components/idea-card";
 import {
   createIdeaGroup,
   deleteIdeaGroup,
@@ -25,7 +26,6 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 
@@ -84,103 +84,7 @@ const GhostPlaceholder = ({ text }: { text: string }) => (
   </div>
 );
 
-// Draggable Idea Card Component
-const DraggableIdeaCard = ({
-  idea,
-  categoryColor,
-  isOverlay = false,
-  isDraggedOver = false,
-  dropIndicator,
-}: {
-  idea: IdeaWithDetails;
-  categoryColor: string;
-  isOverlay?: boolean;
-  isDraggedOver?: boolean;
-  dropIndicator?: "create-group" | "join-group" | "move-to-group" | null;
-}) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: idea.id, data: { type: "idea", idea } });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging && !isOverlay ? 0.3 : 1,
-    cursor: isDragging ? "grabbing" : "grab",
-  };
-
-  const getDropIndicatorText = () => {
-    switch (dropIndicator) {
-      case "create-group":
-        return "Will create group";
-      case "join-group":
-        return "Will join this group";
-      case "move-to-group":
-        return "Will move to this group";
-      default:
-        return null;
-    }
-  };
-
-  const indicatorText = getDropIndicatorText();
-  const showGlow = dropIndicator === "create-group";
-
-  return (
-    <div className="relative">
-      {showGlow && (
-        <div className="absolute -inset-1 rounded-lg bg-gradient-to-r from-blue-400 to-purple-500 opacity-75 blur" />
-      )}
-      <div
-        ref={setNodeRef}
-        style={style}
-        {...attributes}
-        {...listeners}
-        className={`group relative rounded-lg border bg-white p-4 transition-all hover:shadow-md ${
-          isDraggedOver || dropIndicator
-            ? "border-2 border-blue-500 ring-4 ring-blue-200 dark:ring-blue-900"
-            : "border-zinc-200 dark:border-zinc-800"
-        } ${isOverlay ? "shadow-2xl" : ""} dark:bg-zinc-900`}>
-        <div
-          className="absolute left-0 top-0 h-full w-1 rounded-l-lg"
-          style={{ backgroundColor: categoryColor }}
-        />
-        <p className="ml-3 text-sm text-zinc-900 dark:text-zinc-50">
-          {idea.content}
-        </p>
-        <div className="ml-3 mt-2 flex items-center justify-between text-xs text-zinc-500">
-          {!idea.isAnonymous && idea.author && (
-            <span className="font-medium text-zinc-700 dark:text-zinc-300">
-              {idea.author.name ?? "Unknown"}
-            </span>
-          )}
-          {idea.isAnonymous && <span className="italic">Anonymous</span>}
-        </div>
-        {indicatorText && (
-          <div className="ml-3 mt-2 flex items-center gap-1 text-xs font-medium text-blue-600 dark:text-blue-400">
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-              />
-            </svg>
-            {indicatorText}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
+// Removed DraggableIdeaCard - now using unified IdeaCard from @/components/idea-card
 
 // Droppable Group Component
 const DroppableGroup = ({
@@ -272,14 +176,16 @@ const DroppableGroup = ({
         ) : (
           <>
             {ideas.map((idea) => (
-              <DraggableIdeaCard
+              <IdeaCard
                 key={idea.id}
                 idea={idea}
                 categoryColor={getCategoryColor(idea.categoryId)}
+                draggable
                 isDraggedOver={dragOverId === idea.id}
                 dropIndicator={
                   dragOverId === idea.id ? getDropIndicator(idea) : null
                 }
+                showVotes={false}
               />
             ))}
             {showGhostPlaceholder && <GhostPlaceholder text="Will add here" />}
@@ -354,14 +260,16 @@ const UngroupedDropZone = ({
       ) : (
         <>
           {ideas.map((idea) => (
-            <DraggableIdeaCard
+            <IdeaCard
               key={idea.id}
               idea={idea}
               categoryColor={categoryColor}
+              draggable
               isDraggedOver={dragOverId === idea.id}
               dropIndicator={
                 dragOverId === idea.id ? getDropIndicator(idea) : null
               }
+              showVotes={false}
             />
           ))}
           {isDragging && ideas.length === 0 && (
@@ -724,13 +632,15 @@ export const IdeaGrouping = ({
       {/* Drag Overlay */}
       <DragOverlay>
         {activeIdea && (
-          <DraggableIdeaCard
+          <IdeaCard
             idea={activeIdea}
             categoryColor={
               categories.find((c) => c.id === activeIdea.categoryId)?.color ??
               "#000"
             }
+            draggable
             isOverlay
+            showVotes={false}
           />
         )}
       </DragOverlay>

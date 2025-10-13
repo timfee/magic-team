@@ -4,7 +4,7 @@ import { useSession } from "@/lib/contexts/firebase-session-context";
 import type { Category, IdeaWithDetails } from "@/lib/types/session";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { IdeaCard } from "../idea-card";
+import { IdeaCard } from "@/components/idea-card";
 
 // Simple client-side idea creation - will be replaced with proper Firebase client SDK
 import { db } from "@/lib/firebase/client";

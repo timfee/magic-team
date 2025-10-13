@@ -5,7 +5,7 @@ import { useSession } from "@/lib/contexts/firebase-session-context";
 import type { Category, SessionSettings } from "@/lib/types/session";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
-import { IdeaCard } from "../idea-card";
+import { IdeaCard } from "@/components/idea-card";
 
 interface VoteData {
   ideaId: string;
