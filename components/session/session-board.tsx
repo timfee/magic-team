@@ -5,6 +5,7 @@ import { GreenRoom } from "@/components/session/stages/green-room";
 import { IdeaCollection } from "@/components/session/stages/idea-collection";
 import { IdeaGrouping } from "@/components/session/stages/idea-grouping";
 import { IdeaVoting } from "@/components/session/stages/idea-voting";
+import { Facepile } from "@/components/ui/facepile";
 import { useSession } from "@/lib/contexts/firebase-session-context";
 import Link from "next/link";
 
@@ -62,18 +63,7 @@ export default function SessionBoard() {
                 currentUserId={userId}
                 trigger={
                   <div className="flex items-center gap-2 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 cursor-pointer transition-colors hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800">
-                    <svg
-                      className="h-4 w-4 text-zinc-600 dark:text-zinc-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                      />
-                    </svg>
+                    <Facepile users={activeUsers} maxVisible={4} size="sm" />
                     <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
                       {userCount}{" "}
                       {userCount === 1 ? "participant" : "participants"}

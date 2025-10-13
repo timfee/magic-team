@@ -97,7 +97,7 @@ export const ParticipantsList = ({
       {isVisible && (
         <div className="absolute top-full right-0 z-50 mt-2 w-64 rounded-lg border border-zinc-200 bg-white p-4 shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
           <h3 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-            Active Participants ({userCount})
+            Participants ({userCount})
           </h3>
           <div className="max-h-[200px] space-y-2 overflow-y-auto">
             {sortedUsers.map((user) => {
@@ -127,12 +127,6 @@ export const ParticipantsList = ({
                           (You)
                         </span>
                       )}
-                    </div>
-                    <div className="text-xs text-zinc-600 dark:text-zinc-400">
-                      <div className="flex items-center gap-1">
-                        <div className="h-1.5 w-1.5 rounded-full bg-green-500" />
-                        Online
-                      </div>
                     </div>
                   </div>
                 </div>

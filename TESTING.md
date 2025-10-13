@@ -139,6 +139,22 @@ View coverage report at `coverage/index.html`
 
 For CI environments, use the `test:emulators` command which handles starting/stopping emulators automatically.
 
+## End-to-End Tests
+
+For E2E testing with Playwright, see **[E2E_TESTING.md](./E2E_TESTING.md)** for detailed documentation.
+
+Quick start for E2E tests:
+```bash
+# Run E2E tests
+npm run test:e2e
+
+# Run E2E tests with UI
+npm run test:e2e:ui
+
+# Debug E2E tests
+npm run test:e2e:debug
+```
+
 ## Troubleshooting
 
 ### "Cannot find module" errors
