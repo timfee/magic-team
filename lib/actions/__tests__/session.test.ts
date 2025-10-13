@@ -281,9 +281,11 @@ describe("Session Actions", () => {
         query: {} as never,
         size: 2,
         empty: false,
-        forEach: () => {},
+        forEach: () => {
+          // Mock implementation - not used in this test
+        },
         docChanges: () => [],
-      } as QuerySnapshot<DocumentData>);
+      } as unknown as QuerySnapshot<DocumentData>);
 
       const sessions = await getUserSessions("user-123");
 
