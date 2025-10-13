@@ -23,7 +23,7 @@ export const IdeaVoting = ({
   sessionId,
   categories,
   settings,
-  userId: _userId,
+  userId,
 }: IdeaVotingProps) => {
   const { ideas } = useSession();
   const [myVotes, setMyVotes] = useState<VoteData[]>([]);
@@ -34,10 +34,10 @@ export const IdeaVoting = ({
   // Load user's votes
   useEffect(() => {
     startTransition(async () => {
-      const votes = await getUserVotes(sessionId);
+      const votes = await getUserVotes(sessionId, userId);
       setMyVotes(votes.map((v) => ({ ideaId: v.ideaId ?? "", voteId: v.id })));
     });
-  }, [sessionId]);
+  }, [sessionId, userId]);
 
   const handleVote = async (ideaId: string, categoryId: string) => {
     setError(null);
@@ -48,7 +48,7 @@ export const IdeaVoting = ({
           sessionId,
           categoryId,
           ideaId,
-        });
+        }, userId);
 
         setMyVotes((prev) => [...prev, { ideaId, voteId: result.voteId }]);
         router.refresh();
@@ -63,7 +63,7 @@ export const IdeaVoting = ({
 
     startTransition(async () => {
       try {
-        await removeVote(voteId);
+        await removeVote(voteId, sessionId);
         setMyVotes((prev) => prev.filter((v) => v.voteId !== voteId));
         router.refresh();
       } catch (err) {

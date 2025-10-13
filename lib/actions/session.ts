@@ -16,6 +16,7 @@ import {
   getDocs,
   query,
   serverTimestamp,
+  setDoc,
   Timestamp,
   updateDoc,
   where,
@@ -26,14 +27,56 @@ export const createSession = async (
   ownerId: string,
 ) => {
   try {
+    // Create the session document without categories
+    const { categories, settings, ...sessionData } = input;
     const sessionRef = await addDoc(collection(db, "sessions"), {
-      ...input,
+      ...sessionData,
       ownerId,
       currentStage: "pre_session" as SessionStage,
+      visibility: input.visibility ?? "public",
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
-    return { sessionId: sessionRef.id };
+
+    const sessionId = sessionRef.id;
+
+    // Create categories in subcollection
+    if (categories && categories.length > 0) {
+      const categoryPromises = categories.map((category, index) =>
+        addDoc(collection(db, "sessions", sessionId, "categories"), {
+          sessionId,
+          name: category.name,
+          color: category.color ?? "#3b82f6",
+          order: index,
+          maxEntriesPerPerson: category.maxEntriesPerPerson,
+        }),
+      );
+      await Promise.all(categoryPromises);
+    }
+
+    // Create default settings in subcollection
+    const defaultSettings = {
+      allowAnonymousIdeas: settings?.allowAnonymousIdeas ?? true,
+      allowComments: settings?.allowComments ?? true,
+      allowVoting: settings?.allowVoting ?? true,
+      votesPerUser: settings?.votesPerUser ?? null,
+      maxVotesPerIdea: settings?.maxVotesPerIdea ?? null,
+      maxVotesPerCategory: settings?.maxVotesPerCategory ?? null,
+      allowVotingOnGroups: settings?.allowVotingOnGroups ?? true,
+      allowVotingOnIdeas: settings?.allowVotingOnIdeas ?? true,
+      autoGroupSimilarIdeas: settings?.autoGroupSimilarIdeas ?? false,
+      maxIdeasPerPerson: settings?.maxIdeasPerPerson ?? null,
+      enableTimer: settings?.enableTimer ?? false,
+      timerDuration: settings?.timerDuration ?? null,
+      updatedAt: serverTimestamp(),
+    };
+
+    await setDoc(
+      doc(db, "sessions", sessionId, "settings", "config"),
+      defaultSettings,
+    );
+
+    return { sessionId };
   } catch (error) {
     console.error("Error creating session:", error);
     throw error;

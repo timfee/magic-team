@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createSession } from "@/lib/actions/session";
 import type { CreateMagicSessionInput } from "@/lib/types/session";
+import { useAuth } from "@/lib/contexts/auth-context";
 
 const DEFAULT_CATEGORIES = [
   { name: "What went well", color: "#10b981" },
@@ -24,6 +25,7 @@ const COLOR_OPTIONS = [
 
 export default function CreateSessionForm() {
   const router = useRouter();
+  const { userId, user, isLoading, signIn } = useAuth();
   const [isPending, startTransition] = useTransition();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -64,6 +66,11 @@ export default function CreateSessionForm() {
     e.preventDefault();
     setError(null);
 
+    if (!userId) {
+      setError("You must be signed in to create a session");
+      return;
+    }
+
     if (!name.trim()) {
       setError("Session name is required");
       return;
@@ -87,13 +94,49 @@ export default function CreateSessionForm() {
 
     startTransition(async () => {
       try {
-        const result = await createSession(input);
+        const result = await createSession(input, userId);
         router.push(`/session/${result.sessionId}`);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to create session");
       }
     });
   };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center dark:border-zinc-800 dark:bg-zinc-900">
+        <p className="text-zinc-600 dark:text-zinc-400">Loading...</p>
+      </div>
+    );
+  }
+
+  // Show sign-in prompt if not authenticated
+  if (!user) {
+    return (
+      <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center dark:border-zinc-800 dark:bg-zinc-900">
+        <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+          Sign In Required
+        </h2>
+        <p className="mt-2 text-zinc-600 dark:text-zinc-400">
+          You must be signed in to create a session.
+        </p>
+        <button
+          onClick={async () => {
+            try {
+              await signIn();
+            } catch {
+              setError("Failed to sign in");
+            }
+          }}
+          type="button"
+          className="mt-6 rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+        >
+          Sign In with Google
+        </button>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">

@@ -1,8 +1,11 @@
-import Link from "next/link";
+"use client";
 
-export default async function Home() {
-  // Simplified - no authentication for now, just show create session option
-  
+import Link from "next/link";
+import { useAuth } from "@/lib/contexts/auth-context";
+
+export default function Home() {
+  const { user, isLoading, signIn, signOut } = useAuth();
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -15,13 +18,35 @@ export default async function Home() {
               Collaborative retrospective sessions powered by Firebase
             </p>
           </div>
-          <div className="flex gap-4">
-            <Link
-              href="/session/create"
-              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
-            >
-              Create Session
-            </Link>
+          <div className="flex gap-4 items-center">
+            {isLoading ? (
+              <span className="text-sm text-zinc-600 dark:text-zinc-400">Loading...</span>
+            ) : user ? (
+              <>
+                <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                  {user.displayName ?? user.email}
+                </span>
+                <Link
+                  href="/session/create"
+                  className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+                >
+                  Create Session
+                </Link>
+                <button
+                  onClick={() => signOut()}
+                  className="rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 transition-colors"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => signIn()}
+                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+              >
+                Sign In
+              </button>
+            )}
           </div>
         </div>
 

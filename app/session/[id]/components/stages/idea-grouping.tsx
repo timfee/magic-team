@@ -586,7 +586,7 @@ export const IdeaGrouping = ({
       if (activeIdea.groupId && !overIdea.groupId) {
         startTransition(async () => {
           try {
-            await moveIdeaToGroup(overIdea.id, activeIdea.groupId);
+            await moveIdeaToGroup(overIdea.id, activeIdea.groupId ?? null, sessionId);
             router.refresh();
           } catch (error) {
             console.error("Failed to add to group:", error);
@@ -603,7 +603,7 @@ export const IdeaGrouping = ({
 
         startTransition(async () => {
           try {
-            await moveIdeaToGroup(activeIdea.id, overIdea.groupId);
+            await moveIdeaToGroup(activeIdea.id, overIdea.groupId ?? null, sessionId);
 
             // Check if source group is empty and delete it
             const remainingInGroup = ideas.filter(
@@ -611,7 +611,7 @@ export const IdeaGrouping = ({
             );
 
             if (remainingInGroup.length === 0) {
-              await deleteIdeaGroup(fromGroupId);
+              await deleteIdeaGroup(fromGroupId ?? "", sessionId);
             }
 
             router.refresh();
@@ -632,7 +632,7 @@ export const IdeaGrouping = ({
 
       startTransition(async () => {
         try {
-          await moveIdeaToGroup(activeIdea.id, overGroup.id);
+          await moveIdeaToGroup(activeIdea.id, overGroup.id, sessionId);
 
           // Check if source group is empty and delete it
           if (fromGroupId) {
@@ -641,7 +641,7 @@ export const IdeaGrouping = ({
             );
 
             if (remainingInGroup.length === 0) {
-              await deleteIdeaGroup(fromGroupId);
+              await deleteIdeaGroup(fromGroupId, sessionId);
             }
           }
 
@@ -656,7 +656,7 @@ export const IdeaGrouping = ({
   const handleDeleteGroup = async (groupId: string) => {
     startTransition(async () => {
       try {
-        await deleteIdeaGroup(groupId);
+        await deleteIdeaGroup(groupId, sessionId);
         router.refresh();
       } catch (error) {
         console.error("Failed to delete group:", error);
