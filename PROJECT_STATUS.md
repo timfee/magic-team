@@ -2,13 +2,12 @@
 
 **Last Updated:** 2025-10-13
 
-A real-time multiplayer retrospective application built with Next.js 15, Firebase Firestore, and PostgreSQL.
+A real-time multiplayer retrospective application built with Next.js 15, Firebase Firestore.
 
 ## Tech Stack
 
 - Next.js 15 (App Router, Turbopack), React 19
 - NextAuth.js v5 (Google OAuth)
-- PostgreSQL (GCP Cloud SQL) + Drizzle ORM
 - Firebase Firestore (real-time subscriptions)
 - TailwindCSS 4, Framer Motion, @dnd-kit
 - TypeScript, Zod
