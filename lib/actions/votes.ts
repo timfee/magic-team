@@ -1,5 +1,3 @@
-"use server";
-
 import { db } from "@/lib/firebase/client";
 import type { CastVoteInput, Vote } from "@/lib/types/session";
 import {

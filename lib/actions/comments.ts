@@ -1,5 +1,3 @@
-"use server";
-
 import { db } from "@/lib/firebase/client";
 import type { Comment, CreateCommentInput } from "@/lib/types/session";
 import {

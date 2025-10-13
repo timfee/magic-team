@@ -1,5 +1,3 @@
-"use server";
-
 import { db } from "@/lib/firebase/client";
 import type { Category, CreateCategoryInput } from "@/lib/types/session";
 import {
@@ -14,15 +12,21 @@ import {
 
 export const createCategory = async (input: CreateCategoryInput) => {
   try {
+    const categoryData: Record<string, unknown> = {
+      sessionId: input.sessionId,
+      name: input.name,
+      color: input.color ?? "#3b82f6",
+      order: input.order ?? 0,
+    };
+
+    // Only include maxEntriesPerPerson if it's defined
+    if (input.maxEntriesPerPerson !== undefined) {
+      categoryData.maxEntriesPerPerson = input.maxEntriesPerPerson;
+    }
+
     const categoryRef = await addDoc(
       collection(db, "sessions", input.sessionId, "categories"),
-      {
-        sessionId: input.sessionId,
-        name: input.name,
-        color: input.color ?? "#3b82f6",
-        order: input.order ?? 0,
-        maxEntriesPerPerson: input.maxEntriesPerPerson,
-      },
+      categoryData,
     );
     return { categoryId: categoryRef.id };
   } catch (error) {

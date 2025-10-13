@@ -1,5 +1,3 @@
-"use server";
-
 import { db } from "@/lib/firebase/client";
 import type {
   CreateMagicSessionInput,
@@ -42,15 +40,21 @@ export const createSession = async (
 
     // Create categories in subcollection
     if (categories && categories.length > 0) {
-      const categoryPromises = categories.map((category, index) =>
-        addDoc(collection(db, "sessions", sessionId, "categories"), {
+      const categoryPromises = categories.map((category, index) => {
+        const categoryData: Record<string, unknown> = {
           sessionId,
           name: category.name,
           color: category.color ?? "#3b82f6",
           order: index,
-          maxEntriesPerPerson: category.maxEntriesPerPerson,
-        }),
-      );
+        };
+
+        // Only include maxEntriesPerPerson if it's defined
+        if (category.maxEntriesPerPerson !== undefined) {
+          categoryData.maxEntriesPerPerson = category.maxEntriesPerPerson;
+        }
+
+        return addDoc(collection(db, "sessions", sessionId, "categories"), categoryData);
+      });
       await Promise.all(categoryPromises);
     }
 

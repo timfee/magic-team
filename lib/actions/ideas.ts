@@ -1,5 +1,3 @@
-"use server";
-
 import { db } from "@/lib/firebase/client";
 import type {
   CreateIdeaGroupInput,
@@ -29,8 +27,6 @@ export const createIdea = async (input: CreateIdeaInput) => {
         ...input,
         order: 0,
         isSelected: false,
-        priority: undefined,
-        assignedToId: undefined,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       },
