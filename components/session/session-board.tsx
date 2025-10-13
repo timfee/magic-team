@@ -1,11 +1,12 @@
 "use client";
 
-import { useSession } from "@/lib/contexts/firebase-session-context";
-import Link from "next/link";
+import { ParticipantsList } from "@/components/participants-list";
 import { GreenRoom } from "@/components/session/stages/green-room";
 import { IdeaCollection } from "@/components/session/stages/idea-collection";
 import { IdeaGrouping } from "@/components/session/stages/idea-grouping";
 import { IdeaVoting } from "@/components/session/stages/idea-voting";
+import { useSession } from "@/lib/contexts/firebase-session-context";
+import Link from "next/link";
 
 export default function SessionBoard() {
   const {
@@ -16,6 +17,7 @@ export default function SessionBoard() {
     userCount,
     isConnected,
     userId,
+    activeUsers,
   } = useSession();
 
   return (
@@ -27,8 +29,7 @@ export default function SessionBoard() {
             <div>
               <Link
                 href="/"
-                className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-              >
+                className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50">
                 ← Back to Sessions
               </Link>
               <h1 className="mt-2 text-2xl font-bold text-zinc-900 dark:text-zinc-50">
@@ -55,24 +56,31 @@ export default function SessionBoard() {
               </div>
 
               {/* User Count */}
-              <div className="flex items-center gap-2 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900">
-                <svg
-                  className="h-4 w-4 text-zinc-600 dark:text-zinc-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
-                </svg>
-                <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
-                  {userCount} {userCount === 1 ? "participant" : "participants"}
-                </span>
-              </div>
+              <ParticipantsList
+                activeUsers={activeUsers}
+                userCount={userCount}
+                currentUserId={userId}
+                trigger={
+                  <div className="flex items-center gap-2 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 cursor-pointer transition-colors hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800">
+                    <svg
+                      className="h-4 w-4 text-zinc-600 dark:text-zinc-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                      />
+                    </svg>
+                    <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                      {userCount}{" "}
+                      {userCount === 1 ? "participant" : "participants"}
+                    </span>
+                  </div>
+                }
+              />
 
               {/* Current Stage */}
               <div className="rounded-md border border-blue-200 bg-blue-50 px-3 py-2 dark:border-blue-900 dark:bg-blue-950">
@@ -84,8 +92,7 @@ export default function SessionBoard() {
               {/* Admin Button */}
               <Link
                 href={`/session/${session.id}/admin`}
-                className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
-              >
+                className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200">
                 Admin Controls
               </Link>
             </div>

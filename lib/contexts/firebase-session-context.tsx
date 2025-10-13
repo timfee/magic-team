@@ -80,6 +80,7 @@ interface SessionProviderProps {
   sessionId: string;
   userId: string;
   userName: string;
+  userPhoto: string | null;
 }
 
 export const SessionProvider: React.FC<SessionProviderProps> = ({
@@ -87,6 +88,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
   sessionId,
   userId,
   userName,
+  userPhoto,
 }) => {
   const [session, setSession] = useState<MagicSessionWithDetails | null>(null);
   const [ideas, setIdeas] = useState<IdeaWithDetails[]>([]);
@@ -137,9 +139,10 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
     return () => unsubscribe();
   }, [sessionId, userName]);
 
-  // Set up presence tracking
+  // Set up presence tracking (only for authenticated users)
   useEffect(() => {
-    if (!userId) return;
+    // Don't track presence for anonymous users since it requires authentication
+    if (!userId || userId === "anonymous") return;
 
     const presenceRef = doc(db, "sessions", sessionId, "presence", userId);
 
@@ -149,6 +152,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
         await setDoc(presenceRef, {
           userId,
           userName,
+          userPhoto,
           isActive: true,
           lastSeenAt: serverTimestamp(),
         });
@@ -163,7 +167,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
     const interval = setInterval(() => {
       setDoc(
         presenceRef,
-        { userId, userName, isActive: true, lastSeenAt: serverTimestamp() },
+        { userId, userName, userPhoto, isActive: true, lastSeenAt: serverTimestamp() },
         { merge: true },
       ).catch(console.error);
     }, 30000); // Update every 30 seconds
@@ -177,7 +181,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
         { merge: true },
       ).catch(console.error);
     };
-  }, [sessionId, userId, userName]);
+  }, [sessionId, userId, userName, userPhoto]);
 
   // Listen to presence updates
   useEffect(() => {
@@ -192,7 +196,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
         return {
           id: data.userId as string,
           name: data.userName as string | null,
-          image: null, // We'll need to fetch this from users collection if needed
+          image: data.userPhoto as string | null,
           lastSeenAt:
             data.lastSeenAt instanceof Timestamp
               ? data.lastSeenAt.toDate()

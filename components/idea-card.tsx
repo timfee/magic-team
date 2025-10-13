@@ -126,6 +126,12 @@ export const IdeaCard = ({
   );
 
   if (draggable) {
+    /*
+     * Callback refs from dnd-kit are safe to use during render.
+     * The ESLint rule incorrectly flags these as unsafe, but they are
+     * callback functions that React calls, not ref.current accesses.
+     */
+    /* eslint-disable react-hooks/refs */
     return (
       <div className="relative">
         {showGlow && (
@@ -141,6 +147,7 @@ export const IdeaCard = ({
         </div>
       </div>
     );
+    /* eslint-enable react-hooks/refs */
   }
 
   return cardContent;

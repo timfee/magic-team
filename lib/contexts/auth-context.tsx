@@ -2,10 +2,10 @@
 
 import { auth } from "@/lib/firebase/client";
 import {
+  signOut as firebaseSignOut,
   GoogleAuthProvider,
   onAuthStateChanged,
   signInWithPopup,
-  signOut as firebaseSignOut,
   type User,
 } from "firebase/auth";
 import React, { createContext, useContext, useEffect, useState } from "react";
@@ -15,6 +15,7 @@ interface AuthContextValue {
   userId: string | null;
   userEmail: string | null;
   userName: string | null;
+  userPhoto: string | null;
   isLoading: boolean;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -71,6 +72,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     userId: user?.uid ?? null,
     userEmail: user?.email ?? null,
     userName: user?.displayName ?? null,
+    userPhoto: user?.photoURL ?? null,
     isLoading,
     signIn,
     signOut,
