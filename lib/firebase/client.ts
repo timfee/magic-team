@@ -14,7 +14,11 @@ const firebaseConfig = {
 
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 
-export const db = getFirestore(app, env.NEXT_PUBLIC_FIREBASE_DATABASE_ID);
+// Use (default) database - don't pass databaseId parameter for default database
+export const db =
+  env.NEXT_PUBLIC_FIREBASE_DATABASE_ID === "(default)"
+    ? getFirestore(app)
+    : getFirestore(app, env.NEXT_PUBLIC_FIREBASE_DATABASE_ID);
 
 export const auth = getAuth(app);
 export { app };

@@ -40,7 +40,7 @@ export const env = createEnv({
     NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: z.string(),
     NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: z.string(),
     NEXT_PUBLIC_FIREBASE_APP_ID: z.string(),
-    NEXT_PUBLIC_FIREBASE_DATABASE_ID: z.string().default("cep-db"),
+    NEXT_PUBLIC_FIREBASE_DATABASE_ID: z.string().default("(default)"),
   },
 
   /**

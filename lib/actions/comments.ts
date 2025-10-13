@@ -15,14 +15,14 @@ import {
 
 export const createComment = async (
   input: CreateCommentInput,
-  authorId: string,
+  userId: string, // Changed from authorId to match security rules
 ) => {
   try {
     const commentRef = await addDoc(
       collection(db, "sessions", input.sessionId, "comments"),
       {
         ...input,
-        authorId,
+        userId, // Changed from authorId
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       },

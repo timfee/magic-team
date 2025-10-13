@@ -26,8 +26,7 @@ export type MagicSession = {
   ownerId: string;
   createdAt: Date;
   updatedAt: Date;
-  categories: Category[];
-  settings?: SessionSettings;
+  // Note: categories and settings are in subcollections, not in this document
 };
 
 export type SessionAdmin = {
@@ -79,7 +78,7 @@ export type Comment = {
   id: string;
   sessionId: string;
   content: string;
-  authorId: string;
+  userId: string; // Changed from authorId to match Firestore security rules
   ideaId?: string;
   groupId?: string;
   createdAt: Date;
@@ -97,7 +96,7 @@ export type Vote = {
 };
 
 export type SessionSettings = {
-  sessionId: string;
+  // sessionId is omitted - it's implicit from the document path: /sessions/{sessionId}/settings/config
   allowAnonymousIdeas: boolean;
   allowComments: boolean;
   allowVoting: boolean;
@@ -114,14 +113,13 @@ export type SessionSettings = {
 };
 
 export type UserPresence = {
-  id: string;
-  sessionId: string;
+  // Document ID is the userId itself: /sessions/{sessionId}/presence/{userId}
   userId: string;
   userName?: string;
   userImage?: string;
   isActive: boolean;
   lastSeenAt: Date;
-  joinedAt: Date;
+  joinedAt?: Date; // Optional since we might not always store it
 };
 
 // ============================================================
@@ -129,8 +127,8 @@ export type UserPresence = {
 // ============================================================
 
 export type MagicSessionWithDetails = MagicSession & {
-  categories: Category[];
-  settings: SessionSettings | null;
+  categories: Category[]; // Loaded separately from subcollection
+  settings: SessionSettings | null; // Loaded separately from subcollection
   owner: {
     id: string;
     name: string | null;
@@ -200,7 +198,7 @@ export type CreateMagicSessionInput = {
     color?: string;
     maxEntriesPerPerson?: number;
   }[];
-  settings?: Partial<Omit<SessionSettings, "sessionId" | "updatedAt">>;
+  settings?: Partial<Omit<SessionSettings, "updatedAt">>;
 };
 
 export type UpdateMagicSessionInput = Partial<{
@@ -260,7 +258,7 @@ export type CastVoteInput = {
 );
 
 export type UpdateSessionSettingsInput = Partial<
-  Omit<SessionSettings, "sessionId" | "updatedAt">
+  Omit<SessionSettings, "updatedAt">
 >;
 
 // ============================================================
