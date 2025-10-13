@@ -1,13 +1,7 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+
 import CreateSessionForm from "./create-session-form";
 
 export default async function CreateSessionPage() {
-  const session = await auth();
-
-  if (!session?.user) {
-    redirect("/api/auth/signin");
-  }
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">

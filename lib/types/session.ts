@@ -1,16 +1,3 @@
-import type { InferSelectModel } from "drizzle-orm";
-import type {
-  categories,
-  comments,
-  ideaGroups,
-  ideas,
-  magicSessions,
-  sessionAdmins,
-  sessionSettings,
-  userPresence,
-  votes,
-} from "@/lib/db/schema";
-
 // ============================================================
 // Stage Types
 // ============================================================
@@ -27,18 +14,115 @@ export type SessionStage =
 export type SessionVisibility = "public" | "private" | "protected";
 
 // ============================================================
-// Database Model Types
+// Firebase Model Types
 // ============================================================
 
-export type MagicSession = InferSelectModel<typeof magicSessions>;
-export type SessionAdmin = InferSelectModel<typeof sessionAdmins>;
-export type Category = InferSelectModel<typeof categories>;
-export type Idea = InferSelectModel<typeof ideas>;
-export type IdeaGroup = InferSelectModel<typeof ideaGroups>;
-export type Comment = InferSelectModel<typeof comments>;
-export type Vote = InferSelectModel<typeof votes>;
-export type SessionSettings = InferSelectModel<typeof sessionSettings>;
-export type UserPresence = InferSelectModel<typeof userPresence>;
+export type MagicSession = {
+  id: string;
+  name: string;
+  description?: string;
+  visibility: SessionVisibility;
+  currentStage: SessionStage;
+  ownerId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  categories: Category[];
+  settings?: SessionSettings;
+};
+
+export type SessionAdmin = {
+  id: string;
+  sessionId: string;
+  userId: string;
+  role: "admin";
+  addedAt: Date;
+  addedById: string;
+};
+
+export type Category = {
+  id: string;
+  sessionId: string;
+  name: string;
+  color: string;
+  order: number;
+  maxEntriesPerPerson?: number;
+};
+
+export type Idea = {
+  id: string;
+  sessionId: string;
+  categoryId: string;
+  content: string;
+  authorId?: string;
+  isAnonymous: boolean;
+  groupId?: string;
+  order: number;
+  isSelected: boolean;
+  priority?: number;
+  assignedToId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type IdeaGroup = {
+  id: string;
+  sessionId: string;
+  categoryId: string;
+  title?: string;
+  order: number;
+  maxCards?: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type Comment = {
+  id: string;
+  sessionId: string;
+  content: string;
+  authorId: string;
+  ideaId?: string;
+  groupId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type Vote = {
+  id: string;
+  sessionId: string;
+  userId: string;
+  categoryId: string;
+  ideaId?: string;
+  groupId?: string;
+  createdAt: Date;
+};
+
+export type SessionSettings = {
+  sessionId: string;
+  allowAnonymousIdeas: boolean;
+  allowComments: boolean;
+  allowVoting: boolean;
+  votesPerUser?: number;
+  maxVotesPerIdea?: number;
+  maxVotesPerCategory?: number;
+  allowVotingOnGroups: boolean;
+  allowVotingOnIdeas: boolean;
+  autoGroupSimilarIdeas: boolean;
+  maxIdeasPerPerson?: number;
+  enableTimer: boolean;
+  timerDuration?: number;
+  updatedAt: Date;
+};
+
+export type UserPresence = {
+  id: string;
+  sessionId: string;
+  userId: string;
+  userName?: string;
+  userImage?: string;
+  isActive: boolean;
+  lastSeenAt: Date;
+  joinedAt: Date;
+};
 
 // ============================================================
 // Extended Types with Relations

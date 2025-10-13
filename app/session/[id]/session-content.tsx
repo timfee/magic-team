@@ -1,14 +1,11 @@
 "use client";
 
 import { PresenceTracker } from "@/components/presence-tracker";
-import { useSessionEvent, useSessionRoom } from "@/lib/socket/client";
-import type {
-  MagicSessionWithDetails,
-  SessionStage,
-} from "@/lib/types/session";
+import { useSession } from "@/lib/contexts/firebase-session-context";
+import type { MagicSessionWithDetails } from "@/lib/types/session";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect } from "react";
 
 interface SessionContentProps {
   sessionId: string;
@@ -25,26 +22,13 @@ export const SessionContent = ({
   isAdmin,
   userId,
 }: SessionContentProps) => {
-  const [currentStage, setCurrentStage] = useState<string>(
-    initialSession.currentStage,
-  );
   const router = useRouter();
+  const { currentStage, userCount, ideas } = useSession();
 
-  // Join the session room
-  useSessionRoom(sessionId, userId);
-
-  // Listen for stage changes
-  useSessionEvent<{ sessionId: string; newStage: SessionStage }>(
-    "stage:changed",
-    (data) => {
-      if (data.sessionId === sessionId) {
-        setCurrentStage(data.newStage);
-        // Optionally refresh to get updated server data
-        router.refresh();
-      }
-    },
-    [sessionId],
-  );
+  // Refresh on stage changes to get updated server data
+  useEffect(() => {
+    router.refresh();
+  }, [currentStage, router]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -124,7 +108,7 @@ export const SessionContent = ({
           {currentStage === "pre_session" &&
             "The facilitator will start the session soon."}
           {currentStage === "green_room" &&
-            `${initialSession._count?.presence ?? 0} participants are here. Waiting for the facilitator to begin.`}
+            `${userCount} participants are here. Waiting for the facilitator to begin.`}
           {currentStage === "idea_collection" &&
             "Share your ideas anonymously."}
           {currentStage === "idea_grouping" && "Organize ideas into groups."}
@@ -147,7 +131,7 @@ export const SessionContent = ({
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
         <div className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
           <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-            {initialSession._count?.presence ?? 0}
+            {userCount}
           </div>
           <div className="text-sm text-zinc-600 dark:text-zinc-400">
             Active Participants
@@ -155,7 +139,7 @@ export const SessionContent = ({
         </div>
         <div className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
           <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-            {initialSession._count?.ideas ?? 0}
+            {ideas.length}
           </div>
           <div className="text-sm text-zinc-600 dark:text-zinc-400">
             Ideas Submitted

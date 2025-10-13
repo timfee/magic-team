@@ -1,269 +1,174 @@
 "use server";
 
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { comments, ideaGroups, ideas } from "@/lib/db/schema";
+import { db } from "@/lib/firebase/client";
 import type {
   CreateIdeaGroupInput,
   CreateIdeaInput,
-  IdeaGroupWithDetails,
-  IdeaWithDetails,
+  Idea,
+  IdeaGroup,
   UpdateIdeaInput,
 } from "@/lib/types/session";
-import { desc, eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  query,
+  serverTimestamp,
+  Timestamp,
+  updateDoc,
+} from "firebase/firestore";
 
 export const createIdea = async (input: CreateIdeaInput) => {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
+  try {
+    const ideaRef = await addDoc(
+      collection(db, "sessions", input.sessionId, "ideas"),
+      {
+        ...input,
+        order: 0,
+        isSelected: false,
+        priority: undefined,
+        assignedToId: undefined,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      },
+    );
+    return { ideaId: ideaRef.id };
+  } catch (error) {
+    console.error("Error creating idea:", error);
+    throw error;
   }
-
-  const ideaId = crypto.randomUUID();
-
-  await db.insert(ideas).values({
-    id: ideaId,
-    sessionId: input.sessionId,
-    categoryId: input.categoryId,
-    content: input.content,
-    authorId: input.isAnonymous ? null : session.user.id,
-    isAnonymous: input.isAnonymous ?? true,
-    order: 0,
-  });
-
-  revalidatePath(`/session/${input.sessionId}`);
-  return { ideaId };
 };
 
-export const getSessionIdeas = async (
+export const updateIdea = async (
+  ideaId: string,
   sessionId: string,
-): Promise<IdeaWithDetails[]> => {
-  const result = await db.query.ideas.findMany({
-    where: eq(ideas.sessionId, sessionId),
-    with: {
-      author: {
-        columns: {
-          id: true,
-          name: true,
-          image: true,
-        },
-      },
-      group: true,
-      comments: {
-        with: {
-          user: {
-            columns: {
-              id: true,
-              name: true,
-              image: true,
-            },
-          },
-        },
-        orderBy: [desc(comments.createdAt)],
-      },
-      votes: true,
-    },
-    orderBy: [desc(ideas.createdAt)],
-  });
-
-  return result.map((idea) => ({
-    ...idea,
-    _count: {
-      votes: idea.votes.length,
-      comments: idea.comments.length,
-    },
-  }));
-};
-
-export const updateIdea = async (ideaId: string, input: UpdateIdeaInput) => {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
-  }
-
-  const idea = await db.query.ideas.findFirst({
-    where: eq(ideas.id, ideaId),
-  });
-
-  if (!idea) {
-    throw new Error("Idea not found");
-  }
-
-  // Check if user is the author (for non-anonymous ideas) or an admin
-  if (idea.authorId && idea.authorId !== session.user.id) {
-    // TODO: Check if user is admin
-  }
-
-  await db
-    .update(ideas)
-    .set({
-      ...input,
-      updatedAt: new Date(),
-    })
-    .where(eq(ideas.id, ideaId));
-
-  revalidatePath(`/session/${idea.sessionId}`);
-  return { success: true };
-};
-
-export const deleteIdea = async (ideaId: string) => {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
-  }
-
-  const idea = await db.query.ideas.findFirst({
-    where: eq(ideas.id, ideaId),
-  });
-
-  if (!idea) {
-    throw new Error("Idea not found");
-  }
-
-  // Check if user is the author or an admin
-  if (idea.authorId && idea.authorId !== session.user.id) {
-    // TODO: Check if user is admin
-    throw new Error("Unauthorized");
-  }
-
-  await db.delete(ideas).where(eq(ideas.id, ideaId));
-
-  revalidatePath(`/session/${idea.sessionId}`);
-  return { success: true };
-};
-
-// ============================================================
-// Idea Groups
-// ============================================================
-
-export const createIdeaGroup = async (input: CreateIdeaGroupInput) => {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
-  }
-
-  const groupId = crypto.randomUUID();
-
-  await db.insert(ideaGroups).values({
-    id: groupId,
-    sessionId: input.sessionId,
-    categoryId: input.categoryId,
-    title: input.title,
-    order: input.order ?? 0,
-    maxCards: input.maxCards,
-  });
-
-  revalidatePath(`/session/${input.sessionId}`);
-  return { groupId };
-};
-
-export const getSessionGroups = async (
-  sessionId: string,
-): Promise<IdeaGroupWithDetails[]> => {
-  const result = await db.query.ideaGroups.findMany({
-    where: eq(ideaGroups.sessionId, sessionId),
-    with: {
-      ideas: true,
-      comments: {
-        with: {
-          user: {
-            columns: {
-              id: true,
-              name: true,
-              image: true,
-            },
-          },
-        },
-        orderBy: [desc(comments.createdAt)],
-      },
-      votes: true,
-    },
-  });
-
-  return result.map((group) => ({
-    ...group,
-    _count: {
-      ideas: group.ideas.length,
-      votes: group.votes.length,
-      comments: group.comments.length,
-    },
-  }));
-};
-
-export const updateIdeaGroup = async (
-  groupId: string,
-  input: Partial<CreateIdeaGroupInput>,
+  updates: UpdateIdeaInput,
 ) => {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
+  try {
+    const ideaRef = doc(db, "sessions", sessionId, "ideas", ideaId);
+    await updateDoc(ideaRef, { ...updates, updatedAt: serverTimestamp() });
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating idea:", error);
+    throw error;
   }
-
-  const group = await db.query.ideaGroups.findFirst({
-    where: eq(ideaGroups.id, groupId),
-  });
-
-  if (!group) {
-    throw new Error("Group not found");
-  }
-
-  await db
-    .update(ideaGroups)
-    .set({
-      ...input,
-      updatedAt: new Date(),
-    })
-    .where(eq(ideaGroups.id, groupId));
-
-  revalidatePath(`/session/${group.sessionId}`);
-  return { success: true };
 };
 
-export const deleteIdeaGroup = async (groupId: string) => {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
+export const deleteIdea = async (ideaId: string, sessionId: string) => {
+  try {
+    const ideaRef = doc(db, "sessions", sessionId, "ideas", ideaId);
+    await deleteDoc(ideaRef);
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting idea:", error);
+    throw error;
   }
-
-  const group = await db.query.ideaGroups.findFirst({
-    where: eq(ideaGroups.id, groupId),
-  });
-
-  if (!group) {
-    throw new Error("Group not found");
-  }
-
-  await db.delete(ideaGroups).where(eq(ideaGroups.id, groupId));
-
-  revalidatePath(`/session/${group.sessionId}`);
-  return { success: true };
 };
 
 export const moveIdeaToGroup = async (
   ideaId: string,
   groupId: string | null,
+  sessionId: string,
 ) => {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
+  try {
+    const ideaRef = doc(db, "sessions", sessionId, "ideas", ideaId);
+    await updateDoc(ideaRef, { groupId, updatedAt: serverTimestamp() });
+    return { success: true };
+  } catch (error) {
+    console.error("Error moving idea:", error);
+    throw error;
   }
+};
 
-  const idea = await db.query.ideas.findFirst({
-    where: eq(ideas.id, ideaId),
-  });
-
-  if (!idea) {
-    throw new Error("Idea not found");
+export const getSessionIdeas = async (sessionId: string): Promise<Idea[]> => {
+  try {
+    const ideasQuery = query(collection(db, "sessions", sessionId, "ideas"));
+    const snapshot = await getDocs(ideasQuery);
+    return snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt:
+          data.createdAt instanceof Timestamp
+            ? data.createdAt.toDate()
+            : new Date(),
+        updatedAt:
+          data.updatedAt instanceof Timestamp
+            ? data.updatedAt.toDate()
+            : new Date(),
+      } as Idea;
+    });
+  } catch (error) {
+    console.error("Error getting session ideas:", error);
+    throw error;
   }
+};
 
-  await db
-    .update(ideas)
-    .set({
-      groupId,
-      updatedAt: new Date(),
-    })
-    .where(eq(ideas.id, ideaId));
+export const getSessionGroups = async (
+  sessionId: string,
+): Promise<IdeaGroup[]> => {
+  try {
+    const groupsQuery = query(collection(db, "sessions", sessionId, "groups"));
+    const snapshot = await getDocs(groupsQuery);
+    return snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt:
+          data.createdAt instanceof Timestamp
+            ? data.createdAt.toDate()
+            : new Date(),
+        updatedAt:
+          data.updatedAt instanceof Timestamp
+            ? data.updatedAt.toDate()
+            : new Date(),
+      } as IdeaGroup;
+    });
+  } catch (error) {
+    console.error("Error getting session groups:", error);
+    throw error;
+  }
+};
 
-  revalidatePath(`/session/${idea.sessionId}`);
-  return { success: true };
+export const createIdeaGroup = async (input: CreateIdeaGroupInput) => {
+  try {
+    const groupRef = await addDoc(
+      collection(db, "sessions", input.sessionId, "groups"),
+      { ...input, createdAt: serverTimestamp(), updatedAt: serverTimestamp() },
+    );
+    return { groupId: groupRef.id };
+  } catch (error) {
+    console.error("Error creating idea group:", error);
+    throw error;
+  }
+};
+
+export const updateIdeaGroup = async (
+  groupId: string,
+  sessionId: string,
+  updates: Partial<IdeaGroup>,
+) => {
+  try {
+    const groupRef = doc(db, "sessions", sessionId, "groups", groupId);
+    await updateDoc(groupRef, { ...updates, updatedAt: serverTimestamp() });
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating idea group:", error);
+    throw error;
+  }
+};
+
+export const deleteIdeaGroup = async (groupId: string, sessionId: string) => {
+  try {
+    const groupRef = doc(db, "sessions", sessionId, "groups", groupId);
+    await deleteDoc(groupRef);
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting idea group:", error);
+    throw error;
+  }
 };

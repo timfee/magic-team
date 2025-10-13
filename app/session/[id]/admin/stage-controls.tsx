@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { updateSessionStage } from "@/lib/actions/session";
-import { useEmitSessionEvent, useSessionEvent } from "@/lib/socket/client";
+import { useSession } from "@/lib/contexts/firebase-session-context";
 import type { SessionStage } from "@/lib/types/session";
 import { cn } from "@/lib/utils/cn";
+import { useState, useTransition } from "react";
 
 const STAGES: { value: SessionStage; label: string; description: string }[] = [
   {
@@ -51,25 +50,13 @@ interface StageControlsProps {
 }
 
 export const StageControls = ({
-  sessionId,
-  currentStage: initialStage,
-  userId,
+  sessionId: _sessionId,
+  currentStage: _initialStage,
+  userId: _userId,
 }: StageControlsProps) => {
-  const [currentStage, setCurrentStage] = useState<string>(initialStage);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const emitEvent = useEmitSessionEvent();
-
-  // Listen for stage changes from other admins
-  useSessionEvent<{ sessionId: string; newStage: string; changedBy: string }>(
-    "stage:changed",
-    (data) => {
-      if (data.sessionId === sessionId) {
-        setCurrentStage(data.newStage);
-      }
-    },
-    [sessionId],
-  );
+  const { currentStage, changeStage } = useSession();
 
   const handleStageChange = async (newStage: SessionStage) => {
     setError(null);
@@ -77,21 +64,9 @@ export const StageControls = ({
     startTransition(async () => {
       try {
         console.log("🎭 Admin changing stage to:", newStage);
-        await updateSessionStage(sessionId, newStage);
-        setCurrentStage(newStage);
-
-        // Broadcast to other participants
-        console.log("📡 Broadcasting stage:change event", {
-          sessionId,
-          newStage,
-          changedBy: userId,
-        });
-        const success = emitEvent("stage:change", {
-          sessionId,
-          newStage,
-          changedBy: userId,
-        });
-        console.log("📡 Emit success:", success);
+        // Use Firebase context method which handles both DB update and real-time sync
+        await changeStage(newStage);
+        console.log("✅ Stage changed successfully via Firebase");
       } catch (err) {
         console.error("🔴 Stage change error:", err);
         setError(err instanceof Error ? err.message : "Failed to change stage");
@@ -140,7 +115,7 @@ export const StageControls = ({
                 !isCurrent &&
                   !isPast &&
                   "border-zinc-200 bg-white hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700",
-                isPending && "opacity-50 cursor-not-allowed",
+                isPending && "cursor-not-allowed opacity-50",
               )}
             >
               <div className="flex items-center justify-between">
@@ -148,8 +123,7 @@ export const StageControls = ({
                   <div
                     className={cn(
                       "flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium",
-                      isCurrent &&
-                        "bg-blue-500 text-white",
+                      isCurrent && "bg-blue-500 text-white",
                       !isCurrent &&
                         isPast &&
                         "bg-zinc-300 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-300",
@@ -164,8 +138,7 @@ export const StageControls = ({
                     <div
                       className={cn(
                         "font-medium",
-                        isCurrent &&
-                          "text-blue-900 dark:text-blue-100",
+                        isCurrent && "text-blue-900 dark:text-blue-100",
                         !isCurrent && "text-zinc-900 dark:text-zinc-50",
                       )}
                     >
@@ -174,10 +147,8 @@ export const StageControls = ({
                     <div
                       className={cn(
                         "text-sm",
-                        isCurrent &&
-                          "text-blue-700 dark:text-blue-300",
-                        !isCurrent &&
-                          "text-zinc-600 dark:text-zinc-400",
+                        isCurrent && "text-blue-700 dark:text-blue-300",
+                        !isCurrent && "text-zinc-600 dark:text-zinc-400",
                       )}
                     >
                       {stage.description}
@@ -200,7 +171,7 @@ export const StageControls = ({
           <button
             onClick={() => handleStageChange(STAGES[currentIndex - 1].value)}
             disabled={isPending}
-            className="flex-1 rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 transition-colors"
+            className="flex-1 rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
           >
             ← Previous Stage
           </button>
@@ -209,7 +180,7 @@ export const StageControls = ({
           <button
             onClick={() => handleStageChange(STAGES[currentIndex + 1].value)}
             disabled={isPending}
-            className="flex-1 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="flex-1 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
           >
             Next Stage →
           </button>

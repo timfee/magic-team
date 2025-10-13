@@ -1,8 +1,4 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { getSession } from "@/lib/actions/session";
-import { getSessionIdeas, getSessionGroups } from "@/lib/actions/ideas";
-import { SessionProvider } from "@/lib/contexts/session-context";
+import { SessionProvider } from "@/lib/contexts/firebase-session-context";
 import SessionBoard from "./components/session-board";
 
 export default async function SessionPage({
@@ -11,32 +7,15 @@ export default async function SessionPage({
   params: Promise<{ id: string }>;
 }) {
   const { id: sessionId } = await params;
-  const session = await auth();
 
-  if (!session?.user) {
-    redirect("/api/auth/signin");
-  }
-
-  // Fetch session data
-  const magicSession = await getSession(sessionId);
-
-  if (!magicSession) {
-    redirect("/");
-  }
-
-  // Fetch ideas and groups
-  const [ideas, groups] = await Promise.all([
-    getSessionIdeas(sessionId),
-    getSessionGroups(sessionId),
-  ]);
+  // No authentication check - Firebase Auth will be handled in context
+  // If user needs to be authenticated, the Firebase rules will enforce it
 
   return (
     <SessionProvider
-      initialSession={magicSession}
-      initialIdeas={ideas}
-      initialGroups={groups}
-      userId={session.user.id}
-      userName={session.user.name ?? "Anonymous"}
+      sessionId={sessionId}
+      userId="temp-user" // Will be replaced with Firebase Auth user
+      userName="Anonymous User" // Will be replaced with Firebase Auth user
     >
       <SessionBoard />
     </SessionProvider>

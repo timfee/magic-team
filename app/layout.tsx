@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Roboto } from "next/font/google";
 import "./globals.css";
-import { SocketProvider } from "@/lib/socket/client";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -27,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${roboto.variable} ${geistMono.variable} antialiased`}>
-        <SocketProvider>{children}</SocketProvider>
+        {children}
       </body>
     </html>
   );

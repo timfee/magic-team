@@ -1,15 +1,14 @@
 "use client";
 
-import { createIdea } from "@/lib/actions/ideas";
-import { useEmitSessionEvent, useSessionEvent } from "@/lib/socket/client";
-import type {
-  Category,
-  IdeaCreatedEvent,
-  IdeaWithDetails,
-} from "@/lib/types/session";
+import { useSession } from "@/lib/contexts/firebase-session-context";
+import type { Category, IdeaWithDetails } from "@/lib/types/session";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { IdeaCard } from "../idea-card";
+
+// Simple client-side idea creation - will be replaced with proper Firebase client SDK
+import { db } from "@/lib/firebase/client";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 
 interface IdeaCollectionProps {
   sessionId: string;
@@ -21,10 +20,10 @@ interface IdeaCollectionProps {
 export const IdeaCollection = ({
   sessionId,
   categories,
-  initialIdeas,
+  initialIdeas: _initialIdeas,
   userId,
 }: IdeaCollectionProps) => {
-  const [ideas, setIdeas] = useState<IdeaWithDetails[]>(initialIdeas);
+  const { ideas } = useSession();
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>(
     categories[0]?.id ?? "",
   );
@@ -33,18 +32,6 @@ export const IdeaCollection = ({
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const emit = useEmitSessionEvent();
-
-  // Listen for new ideas from other users
-  useSessionEvent<IdeaCreatedEvent>(
-    "idea:created",
-    (data) => {
-      if (data.sessionId === sessionId) {
-        setIdeas((prev) => [...prev, data.idea]);
-      }
-    },
-    [sessionId],
-  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,46 +41,24 @@ export const IdeaCollection = ({
 
     startTransition(async () => {
       try {
-        const result = await createIdea({
+        // Create idea directly in Firebase
+        const ideaId = crypto.randomUUID();
+        const ideaRef = doc(db, "sessions", sessionId, "ideas", ideaId);
+        
+        await setDoc(ideaRef, {
+          id: ideaId,
           sessionId,
           categoryId: selectedCategoryId,
           content: content.trim(),
+          authorId: "anonymous-user",
           isAnonymous,
-        });
-
-        // Optimistically add the idea
-        const newIdea: IdeaWithDetails = {
-          id: result.ideaId,
-          sessionId,
-          categoryId: selectedCategoryId,
-          content: content.trim(),
-          isAnonymous,
-          authorId: isAnonymous ? null : userId,
           groupId: null,
           order: 0,
-          isSelected: false,
-          priority: null,
-          assignedToId: null,
-          createdAt: new Date(),
-          updatedAt: null,
-          author: isAnonymous
-            ? null
-            : { id: userId ?? "", name: null, image: null },
-          group: null,
-          comments: [],
-          votes: [],
-          _count: { comments: 0, votes: 0 },
-        };
-
-        setIdeas((prev) => [newIdea, ...prev]);
-
-        // Broadcast to other users
-        emit("idea:created", {
-          sessionId,
-          idea: newIdea,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
         });
 
-        // Reset form
+        // Reset form - Firebase context will handle real-time updates
         setContent("");
         router.refresh();
       } catch (err) {
@@ -135,7 +100,7 @@ export const IdeaCollection = ({
                 id="category"
                 value={selectedCategoryId}
                 onChange={(e) => setSelectedCategoryId(e.target.value)}
-                className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-zinc-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+                className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-zinc-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
               >
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
@@ -168,7 +133,7 @@ export const IdeaCollection = ({
                 placeholder="What would you like to share?"
                 rows={4}
                 maxLength={500}
-                className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-zinc-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+                className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-zinc-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
               />
               <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
                 {content.length} / 500 characters

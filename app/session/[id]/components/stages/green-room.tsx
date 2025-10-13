@@ -1,27 +1,17 @@
 "use client";
 
-import { useSessionEvent } from "@/lib/socket/client";
-import type { PresenceUpdateEvent } from "@/lib/types/session";
-import { useState } from "react";
+import { useSession } from "@/lib/contexts/firebase-session-context";
 
 interface GreenRoomProps {
   sessionId: string;
   initialUserCount: number;
 }
 
-export const GreenRoom = ({ sessionId, initialUserCount }: GreenRoomProps) => {
-  const [userCount, setUserCount] = useState(initialUserCount);
-
-  // Listen for presence updates
-  useSessionEvent<PresenceUpdateEvent>(
-    "presence:update",
-    (data) => {
-      if (data.sessionId === sessionId) {
-        setUserCount(data.count);
-      }
-    },
-    [sessionId],
-  );
+export const GreenRoom = ({
+  sessionId: _sessionId,
+  initialUserCount: _initialUserCount,
+}: GreenRoomProps) => {
+  const { userCount } = useSession();
 
   return (
     <div className="flex min-h-[400px] items-center justify-center">
@@ -59,9 +49,18 @@ export const GreenRoom = ({ sessionId, initialUserCount }: GreenRoomProps) => {
 
         {/* Animated waiting dots */}
         <div className="mt-8 flex justify-center gap-2">
-          <div className="h-2 w-2 animate-pulse rounded-full bg-blue-600 dark:bg-blue-400" style={{ animationDelay: "0s" }} />
-          <div className="h-2 w-2 animate-pulse rounded-full bg-blue-600 dark:bg-blue-400" style={{ animationDelay: "0.2s" }} />
-          <div className="h-2 w-2 animate-pulse rounded-full bg-blue-600 dark:bg-blue-400" style={{ animationDelay: "0.4s" }} />
+          <div
+            className="h-2 w-2 animate-pulse rounded-full bg-blue-600 dark:bg-blue-400"
+            style={{ animationDelay: "0s" }}
+          />
+          <div
+            className="h-2 w-2 animate-pulse rounded-full bg-blue-600 dark:bg-blue-400"
+            style={{ animationDelay: "0.2s" }}
+          />
+          <div
+            className="h-2 w-2 animate-pulse rounded-full bg-blue-600 dark:bg-blue-400"
+            style={{ animationDelay: "0.4s" }}
+          />
         </div>
       </div>
     </div>

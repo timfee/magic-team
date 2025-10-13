@@ -1,33 +1,33 @@
 "use client";
 
-import {
-  DndContext,
-  DragOverlay,
-  closestCorners,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  useDroppable,
-  type DragEndEvent,
-  type DragStartEvent,
-  type DragOverEvent,
-} from "@dnd-kit/core";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { Button } from "@/components/ui/button";
 import {
   createIdeaGroup,
-  moveIdeaToGroup,
   deleteIdeaGroup,
+  moveIdeaToGroup,
 } from "@/lib/actions/ideas";
 import type {
   Category,
   IdeaGroupWithDetails,
   IdeaWithDetails,
 } from "@/lib/types/session";
+import {
+  closestCorners,
+  DndContext,
+  DragOverlay,
+  KeyboardSensor,
+  PointerSensor,
+  useDroppable,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragOverEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
-import { Button } from "@/components/ui/button";
 
 interface IdeaGroupingProps {
   sessionId: string;
@@ -38,8 +38,26 @@ interface IdeaGroupingProps {
 
 // Generate random group title
 const generateGroupTitle = () => {
-  const adjectives = ["Amazing", "Brilliant", "Creative", "Dynamic", "Essential", "Fantastic", "Great", "Innovative"];
-  const nouns = ["Ideas", "Concepts", "Thoughts", "Solutions", "Insights", "Approaches", "Strategies", "Plans"];
+  const adjectives = [
+    "Amazing",
+    "Brilliant",
+    "Creative",
+    "Dynamic",
+    "Essential",
+    "Fantastic",
+    "Great",
+    "Innovative",
+  ];
+  const nouns = [
+    "Ideas",
+    "Concepts",
+    "Thoughts",
+    "Solutions",
+    "Insights",
+    "Approaches",
+    "Strategies",
+    "Plans",
+  ];
   const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
   const noun = nouns[Math.floor(Math.random() * nouns.length)];
   return `${adj} ${noun}`;
@@ -49,8 +67,17 @@ const generateGroupTitle = () => {
 const GhostPlaceholder = ({ text }: { text: string }) => (
   <div className="rounded-lg border-2 border-dashed border-blue-500 bg-blue-50 p-4 dark:bg-blue-950/30">
     <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
-      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+      <svg
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M12 4v16m8-8H4"
+        />
       </svg>
       <span className="text-sm font-medium">{text}</span>
     </div>
@@ -78,13 +105,7 @@ const DraggableIdeaCard = ({
     transform,
     transition,
     isDragging,
-  } = useSortable({
-    id: idea.id,
-    data: {
-      type: "idea",
-      idea,
-    },
-  });
+  } = useSortable({ id: idea.id, data: { type: "idea", idea } });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -123,8 +144,7 @@ const DraggableIdeaCard = ({
           isDraggedOver || dropIndicator
             ? "border-2 border-blue-500 ring-4 ring-blue-200 dark:ring-blue-900"
             : "border-zinc-200 dark:border-zinc-800"
-        } ${isOverlay ? "shadow-2xl" : ""} dark:bg-zinc-900`}
-      >
+        } ${isOverlay ? "shadow-2xl" : ""} dark:bg-zinc-900`}>
         <div
           className="absolute left-0 top-0 h-full w-1 rounded-l-lg"
           style={{ backgroundColor: categoryColor }}
@@ -142,8 +162,17 @@ const DraggableIdeaCard = ({
         </div>
         {indicatorText && (
           <div className="ml-3 mt-2 flex items-center gap-1 text-xs font-medium text-blue-600 dark:text-blue-400">
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              />
             </svg>
             {indicatorText}
           </div>
@@ -177,10 +206,7 @@ const DroppableGroup = ({
 }) => {
   const { setNodeRef } = useSortable({
     id: group.id,
-    data: {
-      type: "group",
-      group,
-    },
+    data: { type: "group", group },
   });
 
   // Get category colors for ideas
@@ -190,7 +216,9 @@ const DroppableGroup = ({
 
   const activeIdea = activeId ? allIdeas.find((i) => i.id === activeId) : null;
 
-  const getDropIndicator = (targetIdea: IdeaWithDetails): "create-group" | "join-group" | "move-to-group" | null => {
+  const getDropIndicator = (
+    targetIdea: IdeaWithDetails,
+  ): "create-group" | "join-group" | "move-to-group" | null => {
     if (!activeIdea || activeIdea.id === targetIdea.id) return null;
 
     const activeGrouped = !!activeIdea.groupId;
@@ -199,7 +227,12 @@ const DroppableGroup = ({
     if (!activeGrouped && !targetGrouped) return "create-group";
     if (targetGrouped && !activeGrouped) return "join-group";
     if (activeGrouped && !targetGrouped) return "join-group";
-    if (activeGrouped && targetGrouped && activeIdea.groupId !== targetIdea.groupId) return "move-to-group";
+    if (
+      activeGrouped &&
+      targetGrouped &&
+      activeIdea.groupId !== targetIdea.groupId
+    )
+      return "move-to-group";
 
     return null;
   };
@@ -211,8 +244,7 @@ const DroppableGroup = ({
         isOver
           ? "border-blue-500 bg-blue-50 ring-4 ring-blue-200 dark:bg-blue-950/30 dark:ring-blue-900"
           : "border-dashed border-zinc-300 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900/50"
-      }`}
-    >
+      }`}>
       <div className="mb-3 flex items-center justify-between">
         <h3 className="font-semibold text-zinc-900 dark:text-zinc-50">
           {group.title}
@@ -226,8 +258,7 @@ const DroppableGroup = ({
             variant="ghost"
             size="sm"
             onClick={() => onDeleteGroup(group.id)}
-            className="text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950"
-          >
+            className="text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950">
             Delete
           </Button>
         </div>
@@ -246,12 +277,12 @@ const DroppableGroup = ({
                 idea={idea}
                 categoryColor={getCategoryColor(idea.categoryId)}
                 isDraggedOver={dragOverId === idea.id}
-                dropIndicator={dragOverId === idea.id ? getDropIndicator(idea) : null}
+                dropIndicator={
+                  dragOverId === idea.id ? getDropIndicator(idea) : null
+                }
               />
             ))}
-            {showGhostPlaceholder && (
-              <GhostPlaceholder text="Will add here" />
-            )}
+            {showGhostPlaceholder && <GhostPlaceholder text="Will add here" />}
           </>
         )}
       </div>
@@ -281,16 +312,15 @@ const UngroupedDropZone = ({
 }) => {
   const { setNodeRef } = useDroppable({
     id: `ungrouped-${categoryId}`,
-    data: {
-      type: "ungrouped-zone",
-      categoryId,
-    },
+    data: { type: "ungrouped-zone", categoryId },
   });
 
   const isOver = dragOverId === `ungrouped-${categoryId}`;
   const activeIdea = activeId ? allIdeas.find((i) => i.id === activeId) : null;
 
-  const getDropIndicator = (targetIdea: IdeaWithDetails): "create-group" | "join-group" | "move-to-group" | null => {
+  const getDropIndicator = (
+    targetIdea: IdeaWithDetails,
+  ): "create-group" | "join-group" | "move-to-group" | null => {
     if (!activeIdea || activeIdea.id === targetIdea.id) return null;
 
     const activeGrouped = !!activeIdea.groupId;
@@ -299,7 +329,12 @@ const UngroupedDropZone = ({
     if (!activeGrouped && !targetGrouped) return "create-group";
     if (targetGrouped && !activeGrouped) return "join-group";
     if (activeGrouped && !targetGrouped) return "join-group";
-    if (activeGrouped && targetGrouped && activeIdea.groupId !== targetIdea.groupId) return "move-to-group";
+    if (
+      activeGrouped &&
+      targetGrouped &&
+      activeIdea.groupId !== targetIdea.groupId
+    )
+      return "move-to-group";
 
     return null;
   };
@@ -311,8 +346,7 @@ const UngroupedDropZone = ({
         isOver && isActiveIdeaGrouped
           ? "rounded-lg border-2 border-blue-500 bg-blue-50 p-2 ring-4 ring-blue-200 dark:bg-blue-950/30 dark:ring-blue-900"
           : ""
-      }`}
-    >
+      }`}>
       {ideas.length === 0 && !isDragging ? (
         <div className="flex h-24 items-center justify-center rounded-md border border-dashed border-zinc-200 dark:border-zinc-800">
           <p className="text-sm text-zinc-500">No ungrouped ideas</p>
@@ -325,13 +359,17 @@ const UngroupedDropZone = ({
               idea={idea}
               categoryColor={categoryColor}
               isDraggedOver={dragOverId === idea.id}
-              dropIndicator={dragOverId === idea.id ? getDropIndicator(idea) : null}
+              dropIndicator={
+                dragOverId === idea.id ? getDropIndicator(idea) : null
+              }
             />
           ))}
           {isDragging && ideas.length === 0 && (
             <div className="flex h-24 items-center justify-center rounded-md border-2 border-dashed border-zinc-300 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900">
               <p className="text-sm text-zinc-500">
-                {isActiveIdeaGrouped ? "Drop here to ungroup" : "Drop ideas here"}
+                {isActiveIdeaGrouped
+                  ? "Drop here to ungroup"
+                  : "Drop ideas here"}
               </p>
             </div>
           )}
@@ -362,12 +400,13 @@ const CategoryColumn = ({
 }) => {
   // Ungrouped ideas in this category
   const ungroupedIdeas = ideas.filter(
-    (i) => i.categoryId === category.id && !i.groupId
+    (i) => i.categoryId === category.id && !i.groupId,
   );
 
   const isDragging = !!activeId;
   const activeIdea = activeId ? ideas.find((i) => i.id === activeId) : null;
-  const isActiveIdeaGrouped = activeIdea?.groupId !== null && activeIdea?.groupId !== undefined;
+  const isActiveIdeaGrouped =
+    activeIdea?.groupId !== null && activeIdea?.groupId !== undefined;
 
   return (
     <div className="flex flex-col gap-4">
@@ -379,9 +418,7 @@ const CategoryColumn = ({
         <h3 className="font-semibold text-zinc-900 dark:text-zinc-50">
           {category.name}
         </h3>
-        <span className="text-sm text-zinc-500">
-          ({ungroupedIdeas.length})
-        </span>
+        <span className="text-sm text-zinc-500">({ungroupedIdeas.length})</span>
       </div>
 
       {/* Ungrouped Ideas */}
@@ -398,7 +435,9 @@ const CategoryColumn = ({
 
       {/* Groups containing ideas from this category */}
       {groups
-        .filter((g) => ideas.some((i) => i.groupId === g.id && i.categoryId === category.id))
+        .filter((g) =>
+          ideas.some((i) => i.groupId === g.id && i.categoryId === category.id),
+        )
         .map((group) => {
           const groupIdeas = ideas.filter((i) => i.groupId === group.id);
           return (
@@ -410,7 +449,9 @@ const CategoryColumn = ({
               categories={[category]}
               onDeleteGroup={onDeleteGroup}
               isOver={dragOverId === group.id}
-              showGhostPlaceholder={dragOverId === group.id && activeId !== null}
+              showGhostPlaceholder={
+                dragOverId === group.id && activeId !== null
+              }
               dragOverId={dragOverId}
               activeId={activeId}
             />
@@ -441,11 +482,7 @@ export const IdeaGrouping = ({
   }, []);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor),
   );
 
@@ -467,7 +504,9 @@ export const IdeaGrouping = ({
     const activeIdea = ideas.find((i) => i.id === active.id);
     if (!activeIdea) return;
 
-    const overData = over.data.current as { type: string; categoryId?: string } | undefined;
+    const overData = over.data.current as
+      | { type: string; categoryId?: string }
+      | undefined;
 
     // Dropped on ungrouped zone - ungroup the idea
     if (overData?.type === "ungrouped-zone") {
@@ -477,15 +516,15 @@ export const IdeaGrouping = ({
 
       startTransition(async () => {
         try {
-          await moveIdeaToGroup(activeIdea.id, null);
+          await moveIdeaToGroup(activeIdea.id, null, sessionId);
 
           // Check if source group is empty and delete it
           const remainingInGroup = ideas.filter(
-            (i) => i.groupId === fromGroupId && i.id !== activeIdea.id
+            (i) => i.groupId === fromGroupId && i.id !== activeIdea.id,
           );
 
           if (remainingInGroup.length === 0) {
-            await deleteIdeaGroup(fromGroupId);
+            await deleteIdeaGroup(fromGroupId, sessionId);
           }
 
           router.refresh();
@@ -514,8 +553,8 @@ export const IdeaGrouping = ({
             });
 
             await Promise.all([
-              moveIdeaToGroup(activeIdea.id, result.groupId),
-              moveIdeaToGroup(overIdea.id, result.groupId),
+              moveIdeaToGroup(activeIdea.id, result.groupId, sessionId),
+              moveIdeaToGroup(overIdea.id, result.groupId, sessionId),
             ]);
 
             router.refresh();
@@ -530,7 +569,11 @@ export const IdeaGrouping = ({
       if (overIdea.groupId && !activeIdea.groupId) {
         startTransition(async () => {
           try {
-            await moveIdeaToGroup(activeIdea.id, overIdea.groupId);
+            await moveIdeaToGroup(
+              activeIdea.id,
+              overIdea.groupId ?? null,
+              sessionId,
+            );
             router.refresh();
           } catch (error) {
             console.error("Failed to add to group:", error);
@@ -564,7 +607,7 @@ export const IdeaGrouping = ({
 
             // Check if source group is empty and delete it
             const remainingInGroup = ideas.filter(
-              (i) => i.groupId === fromGroupId && i.id !== activeIdea.id
+              (i) => i.groupId === fromGroupId && i.id !== activeIdea.id,
             );
 
             if (remainingInGroup.length === 0) {
@@ -594,7 +637,7 @@ export const IdeaGrouping = ({
           // Check if source group is empty and delete it
           if (fromGroupId) {
             const remainingInGroup = ideas.filter(
-              (i) => i.groupId === fromGroupId && i.id !== activeIdea.id
+              (i) => i.groupId === fromGroupId && i.id !== activeIdea.id,
             );
 
             if (remainingInGroup.length === 0) {
@@ -647,8 +690,7 @@ export const IdeaGrouping = ({
       collisionDetection={closestCorners}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
-    >
+      onDragEnd={handleDragEnd}>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -657,7 +699,8 @@ export const IdeaGrouping = ({
               Group Ideas
             </h2>
             <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-              Drag ideas onto each other to create groups, or onto existing groups to add them
+              Drag ideas onto each other to create groups, or onto existing
+              groups to add them
             </p>
           </div>
         </div>
@@ -676,7 +719,6 @@ export const IdeaGrouping = ({
             />
           ))}
         </div>
-
       </div>
 
       {/* Drag Overlay */}

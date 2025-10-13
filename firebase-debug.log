@@ -1,4 +1,94 @@
-[debug] [2025-10-13T19:18:35.075Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
-[debug] [2025-10-13T19:18:35.078Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
-[debug] [2025-10-13T19:18:39.302Z] Running auto auth
-[debug] [2025-10-13T19:18:39.302Z] Running auto auth
+[debug] [2025-10-13T22:39:17.548Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.549Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.549Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.549Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.550Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.550Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.550Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.550Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.550Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.550Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.551Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/ [none]
+[debug] [2025-10-13T22:39:17.551Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/ x-goog-quota-user=projects/cep-playground-dev
+[debug] [2025-10-13T22:39:17.567Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-13T22:39:17.567Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/cep-playground-dev
+[debug] [2025-10-13T22:39:17.567Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-10-13T22:39:17.567Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/cep-playground-dev
+[debug] [2025-10-13T22:39:17.568Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-13T22:39:17.568Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/cep-playground-dev
+[debug] [2025-10-13T22:39:17.568Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseio.com [none]
+[debug] [2025-10-13T22:39:17.568Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseio.com x-goog-quota-user=projects/cep-playground-dev
+[debug] [2025-10-13T22:39:17.575Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.575Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.575Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.575Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.576Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.576Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.576Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.576Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.576Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.576Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.576Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.576Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.576Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.576Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.576Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.576Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.576Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.576Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.576Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.576Z] Checked if tokens are valid: true, expires at: 1760396126225
+[debug] [2025-10-13T22:39:17.576Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/ [none]
+[debug] [2025-10-13T22:39:17.576Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/ x-goog-quota-user=projects/cep-playground-dev
+[debug] [2025-10-13T22:39:17.576Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-13T22:39:17.576Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/cep-playground-dev
+[debug] [2025-10-13T22:39:17.577Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-10-13T22:39:17.577Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/cep-playground-dev
+[debug] [2025-10-13T22:39:17.578Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-13T22:39:17.578Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/cep-playground-dev
+[debug] [2025-10-13T22:39:17.578Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseio.com [none]
+[debug] [2025-10-13T22:39:17.578Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseio.com x-goog-quota-user=projects/cep-playground-dev
+[debug] [2025-10-13T22:39:17.578Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/ [none]
+[debug] [2025-10-13T22:39:17.578Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/ x-goog-quota-user=projects/cep-playground-dev
+[debug] [2025-10-13T22:39:17.579Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-13T22:39:17.579Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/cep-playground-dev
+[debug] [2025-10-13T22:39:17.579Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-10-13T22:39:17.579Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/cep-playground-dev
+[debug] [2025-10-13T22:39:17.579Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-13T22:39:17.579Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/cep-playground-dev
+[debug] [2025-10-13T22:39:17.579Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseio.com [none]
+[debug] [2025-10-13T22:39:17.579Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseio.com x-goog-quota-user=projects/cep-playground-dev
+[debug] [2025-10-13T22:39:18.149Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseio.com 403
+[debug] [2025-10-13T22:39:18.150Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseio.com [omitted]
+[debug] [2025-10-13T22:39:18.166Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseio.com 403
+[debug] [2025-10-13T22:39:18.167Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseio.com [omitted]
+[debug] [2025-10-13T22:39:18.173Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseio.com 403
+[debug] [2025-10-13T22:39:18.173Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseio.com [omitted]
+[debug] [2025-10-13T22:39:18.186Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-10-13T22:39:18.186Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-10-13T22:39:18.190Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-10-13T22:39:18.190Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-10-13T22:39:18.197Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-13T22:39:18.198Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-13T22:39:18.200Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-13T22:39:18.200Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-13T22:39:18.208Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-13T22:39:18.208Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-13T22:39:18.213Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-13T22:39:18.213Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-13T22:39:18.223Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-13T22:39:18.223Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-13T22:39:18.228Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-10-13T22:39:18.228Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-10-13T22:39:18.239Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-13T22:39:18.239Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-13T22:39:18.460Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/ 200
+[debug] [2025-10-13T22:39:18.460Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/ [omitted]
+[debug] [2025-10-13T22:39:18.574Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/ 200
+[debug] [2025-10-13T22:39:18.574Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/ [omitted]
+[debug] [2025-10-13T22:39:18.612Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-10-13T22:39:18.612Z] > authorizing via signed-in user (timfee@google.com)
+[debug] [2025-10-13T22:39:18.664Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/ 200
+[debug] [2025-10-13T22:39:18.664Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cep-playground-dev/services/ [omitted]
+[debug] [2025-10-13T22:39:18.694Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-10-13T22:39:18.694Z] > authorizing via signed-in user (timfee@google.com)

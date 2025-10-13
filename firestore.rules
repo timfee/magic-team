@@ -1,0 +1,106 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(sessionData) {
+      return isAuthenticated() && request.auth.uid == sessionData.ownerId;
+    }
+
+    function isAdmin(sessionId) {
+      return isAuthenticated() &&
+             exists(/databases/$(database)/documents/sessions/$(sessionId)/admins/$(request.auth.uid));
+    }
+
+    function isOwnerOrAdmin(sessionData, sessionId) {
+      return isOwner(sessionData) || isAdmin(sessionId);
+    }
+
+    function canAccessSession(sessionData) {
+      // Public sessions are always accessible
+      return sessionData.visibility == 'public' ||
+             // Private sessions are accessible with link
+             sessionData.visibility == 'private' ||
+             // Protected sessions require auth and ownership/admin
+             (sessionData.visibility == 'protected' && isAuthenticated() &&
+              (isOwner(sessionData) || isAdmin(sessionData.id)));
+    }
+
+    // Sessions collection
+    match /sessions/{sessionId} {
+      allow read: if canAccessSession(resource.data);
+      allow create: if isAuthenticated() && request.resource.data.ownerId == request.auth.uid;
+      allow update: if isOwnerOrAdmin(resource.data, sessionId);
+      allow delete: if isOwner(resource.data);
+
+      // Session admins subcollection
+      match /admins/{adminId} {
+        allow read: if canAccessSession(get(/databases/$(database)/documents/sessions/$(sessionId)).data);
+        allow write: if isOwner(get(/databases/$(database)/documents/sessions/$(sessionId)).data);
+      }
+
+      // Categories subcollection
+      match /categories/{categoryId} {
+        allow read: if canAccessSession(get(/databases/$(database)/documents/sessions/$(sessionId)).data);
+        allow write: if isOwnerOrAdmin(get(/databases/$(database)/documents/sessions/$(sessionId)).data, sessionId);
+      }
+
+      // Ideas subcollection
+      match /ideas/{ideaId} {
+        allow read: if canAccessSession(get(/databases/$(database)/documents/sessions/$(sessionId)).data);
+        allow create: if canAccessSession(get(/databases/$(database)/documents/sessions/$(sessionId)).data) &&
+                        (request.resource.data.isAnonymous == true ||
+                         (isAuthenticated() && request.resource.data.authorId == request.auth.uid));
+        allow update: if isOwnerOrAdmin(get(/databases/$(database)/documents/sessions/$(sessionId)).data, sessionId) ||
+                        (isAuthenticated() && resource.data.authorId == request.auth.uid);
+        allow delete: if isOwnerOrAdmin(get(/databases/$(database)/documents/sessions/$(sessionId)).data, sessionId) ||
+                        (isAuthenticated() && resource.data.authorId == request.auth.uid);
+      }
+
+      // Groups subcollection
+      match /groups/{groupId} {
+        allow read: if canAccessSession(get(/databases/$(database)/documents/sessions/$(sessionId)).data);
+        allow write: if canAccessSession(get(/databases/$(database)/documents/sessions/$(sessionId)).data);
+      }
+
+      // Comments subcollection
+      match /comments/{commentId} {
+        allow read: if canAccessSession(get(/databases/$(database)/documents/sessions/$(sessionId)).data);
+        allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+        allow update, delete: if isAuthenticated() &&
+                                (resource.data.userId == request.auth.uid ||
+                                 isOwnerOrAdmin(get(/databases/$(database)/documents/sessions/$(sessionId)).data, sessionId));
+      }
+
+      // Votes subcollection
+      match /votes/{voteId} {
+        allow read: if canAccessSession(get(/databases/$(database)/documents/sessions/$(sessionId)).data);
+        allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+        allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      }
+
+      // User presence subcollection
+      match /presence/{userId} {
+        allow read: if canAccessSession(get(/databases/$(database)/documents/sessions/$(sessionId)).data);
+        allow write: if isAuthenticated() && userId == request.auth.uid;
+      }
+
+      // Session settings subcollection
+      match /settings/config {
+        allow read: if canAccessSession(get(/databases/$(database)/documents/sessions/$(sessionId)).data);
+        allow write: if isOwnerOrAdmin(get(/databases/$(database)/documents/sessions/$(sessionId)).data, sessionId);
+      }
+    }
+
+    // Users collection (for profile info)
+    match /users/{userId} {
+      allow read: if true; // Public profile info
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+  }
+}

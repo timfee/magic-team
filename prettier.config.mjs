@@ -1,5 +1,5 @@
+/** @type {import('prettier').Config} */
 export default {
-  plugins: {
-    "@tailwindcss/postcss": {},
-  },
+  objectWrap: "collapse",
+  bracketSameLine: true, 
 };

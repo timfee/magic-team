@@ -1,12 +1,8 @@
 "use client";
 
-import { castVote, removeVote, getUserVotes } from "@/lib/actions/votes";
-import { useSessionEvent } from "@/lib/socket/client";
-import type {
-  Category,
-  IdeaWithDetails,
-  SessionSettings,
-} from "@/lib/types/session";
+import { castVote, getUserVotes, removeVote } from "@/lib/actions/votes";
+import { useSession } from "@/lib/contexts/firebase-session-context";
+import type { Category, SessionSettings } from "@/lib/types/session";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { IdeaCard } from "../idea-card";
@@ -19,7 +15,6 @@ interface VoteData {
 interface IdeaVotingProps {
   sessionId: string;
   categories: Category[];
-  ideas: IdeaWithDetails[];
   settings: SessionSettings;
   userId: string;
 }
@@ -27,11 +22,10 @@ interface IdeaVotingProps {
 export const IdeaVoting = ({
   sessionId,
   categories,
-  ideas: initialIdeas,
   settings,
   userId: _userId,
 }: IdeaVotingProps) => {
-  const [ideas, setIdeas] = useState<IdeaWithDetails[]>(initialIdeas);
+  const { ideas } = useSession();
   const [myVotes, setMyVotes] = useState<VoteData[]>([]);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -41,46 +35,9 @@ export const IdeaVoting = ({
   useEffect(() => {
     startTransition(async () => {
       const votes = await getUserVotes(sessionId);
-      setMyVotes(
-        votes.map((v) => ({ ideaId: v.ideaId ?? "", voteId: v.id })),
-      );
+      setMyVotes(votes.map((v) => ({ ideaId: v.ideaId ?? "", voteId: v.id })));
     });
   }, [sessionId]);
-
-  // Listen for vote changes
-  useSessionEvent<{ sessionId: string; vote: { ideaId: string } }>(
-    "vote:cast",
-    (data) => {
-      if (data.sessionId === sessionId && data.vote.ideaId) {
-        // Increment vote count for this idea
-        setIdeas((prev) =>
-          prev.map((idea) =>
-            idea.id === data.vote.ideaId
-              ? { ...idea, _count: { ...idea._count, votes: idea._count.votes + 1 } }
-              : idea,
-          ),
-        );
-      }
-    },
-    [sessionId],
-  );
-
-  useSessionEvent<{ sessionId: string; ideaId: string }>(
-    "vote:removed",
-    (data) => {
-      if (data.sessionId === sessionId && data.ideaId) {
-        // Decrement vote count
-        setIdeas((prev) =>
-          prev.map((idea) =>
-            idea.id === data.ideaId
-              ? { ...idea, _count: { ...idea._count, votes: Math.max(0, idea._count.votes - 1) } }
-              : idea,
-          ),
-        );
-      }
-    },
-    [sessionId],
-  );
 
   const handleVote = async (ideaId: string, categoryId: string) => {
     setError(null);
@@ -94,16 +51,6 @@ export const IdeaVoting = ({
         });
 
         setMyVotes((prev) => [...prev, { ideaId, voteId: result.voteId }]);
-
-        // Optimistic update
-        setIdeas((prev) =>
-          prev.map((idea) =>
-            idea.id === ideaId
-              ? { ...idea, _count: { ...idea._count, votes: idea._count.votes + 1 } }
-              : idea,
-          ),
-        );
-
         router.refresh();
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to cast vote");
@@ -117,18 +64,7 @@ export const IdeaVoting = ({
     startTransition(async () => {
       try {
         await removeVote(voteId);
-
         setMyVotes((prev) => prev.filter((v) => v.voteId !== voteId));
-
-        // Optimistic update
-        setIdeas((prev) =>
-          prev.map((idea) =>
-            idea.id === ideaId
-              ? { ...idea, _count: { ...idea._count, votes: Math.max(0, idea._count.votes - 1) } }
-              : idea,
-          ),
-        );
-
         router.refresh();
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to remove vote");
@@ -137,14 +73,17 @@ export const IdeaVoting = ({
   };
 
   const hasVoted = (ideaId: string) => myVotes.some((v) => v.ideaId === ideaId);
-  const getVoteId = (ideaId: string) => myVotes.find((v) => v.ideaId === ideaId)?.voteId;
+  const getVoteId = (ideaId: string) =>
+    myVotes.find((v) => v.ideaId === ideaId)?.voteId;
 
   const votesRemaining = settings.votesPerUser
     ? settings.votesPerUser - myVotes.length
     : Infinity;
 
   // Sort ideas by vote count
-  const sortedIdeas = [...ideas].sort((a, b) => b._count.votes - a._count.votes);
+  const sortedIdeas = [...ideas].sort(
+    (a, b) => b._count.votes - a._count.votes,
+  );
 
   return (
     <div className="space-y-8">
@@ -161,7 +100,8 @@ export const IdeaVoting = ({
           </div>
           <div className="text-right">
             <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-              {settings.votesPerUser ? myVotes.length : "∞"} / {settings.votesPerUser ?? "∞"}
+              {settings.votesPerUser ? myVotes.length : "∞"} /{" "}
+              {settings.votesPerUser ?? "∞"}
             </div>
             <div className="text-sm text-zinc-600 dark:text-zinc-400">
               Votes Used
@@ -208,7 +148,7 @@ export const IdeaVoting = ({
                     <IdeaCard idea={idea} categoryColor={category.color} />
 
                     {/* Vote Button Overlay */}
-                    <div className="absolute bottom-3 right-3">
+                    <div className="absolute right-3 bottom-3">
                       {voted ? (
                         <button
                           onClick={() => handleUnvote(idea.id, voteId!)}

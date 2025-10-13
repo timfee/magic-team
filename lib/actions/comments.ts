@@ -1,81 +1,103 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { eq, and, desc } from "drizzle-orm";
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { comments } from "@/lib/db/schema";
-import type { CreateCommentInput } from "@/lib/types/session";
+import { db } from "@/lib/firebase/client";
+import type { Comment, CreateCommentInput } from "@/lib/types/session";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  query,
+  serverTimestamp,
+  Timestamp,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 
-export const createComment = async (input: CreateCommentInput) => {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
-  }
-
-  const commentId = crypto.randomUUID();
-
-  await db.insert(comments).values({
-    id: commentId,
-    sessionId: input.sessionId,
-    ideaId: input.ideaId,
-    groupId: input.groupId,
-    userId: session.user.id,
-    content: input.content,
-  });
-
-  revalidatePath(`/session/${input.sessionId}`);
-  return { commentId };
-};
-
-export const getComments = async (
-  sessionId: string,
-  targetId: string,
-  targetType: "idea" | "group",
+export const createComment = async (
+  input: CreateCommentInput,
+  authorId: string,
 ) => {
-  const result = await db.query.comments.findMany({
-    where: and(
-      eq(comments.sessionId, sessionId),
-      targetType === "idea"
-        ? eq(comments.ideaId, targetId)
-        : eq(comments.groupId, targetId),
-    ),
-    with: {
-      user: {
-        columns: {
-          id: true,
-          name: true,
-          image: true,
-        },
+  try {
+    const commentRef = await addDoc(
+      collection(db, "sessions", input.sessionId, "comments"),
+      {
+        ...input,
+        authorId,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
       },
-    },
-    orderBy: [desc(comments.createdAt)],
-  });
-
-  return result;
+    );
+    return { commentId: commentRef.id };
+  } catch (error) {
+    console.error("Error creating comment:", error);
+    throw error;
+  }
 };
 
-export const deleteComment = async (commentId: string) => {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
+export const updateComment = async (
+  commentId: string,
+  sessionId: string,
+  content: string,
+) => {
+  try {
+    const commentRef = doc(db, "sessions", sessionId, "comments", commentId);
+    await updateDoc(commentRef, { content, updatedAt: serverTimestamp() });
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating comment:", error);
+    throw error;
   }
+};
 
-  const comment = await db.query.comments.findFirst({
-    where: eq(comments.id, commentId),
-  });
-
-  if (!comment) {
-    throw new Error("Comment not found");
+export const deleteComment = async (commentId: string, sessionId: string) => {
+  try {
+    const commentRef = doc(db, "sessions", sessionId, "comments", commentId);
+    await deleteDoc(commentRef);
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    throw error;
   }
+};
 
-  if (comment.userId !== session.user.id) {
-    // TODO: Check if user is admin
-    throw new Error("Unauthorized");
+export const getSessionComments = async (
+  sessionId: string,
+  ideaId?: string,
+  groupId?: string,
+): Promise<Comment[]> => {
+  try {
+    let commentsQuery = query(
+      collection(db, "sessions", sessionId, "comments"),
+    );
+
+    if (ideaId) {
+      commentsQuery = query(commentsQuery, where("ideaId", "==", ideaId));
+    }
+    if (groupId) {
+      commentsQuery = query(commentsQuery, where("groupId", "==", groupId));
+    }
+
+    const snapshot = await getDocs(commentsQuery);
+
+    return snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt:
+          data.createdAt instanceof Timestamp
+            ? data.createdAt.toDate()
+            : new Date(),
+        updatedAt:
+          data.updatedAt instanceof Timestamp
+            ? data.updatedAt.toDate()
+            : new Date(),
+      } as Comment;
+    });
+  } catch (error) {
+    console.error("Error getting session comments:", error);
+    throw error;
   }
-
-  await db.delete(comments).where(eq(comments.id, commentId));
-
-  revalidatePath(`/session/${comment.sessionId}`);
-  return { success: true };
 };

@@ -1,18 +1,22 @@
 "use client";
 
-import { useSession } from "@/lib/contexts/session-context";
+import { useSession } from "@/lib/contexts/firebase-session-context";
 import Link from "next/link";
 import { GreenRoom } from "./stages/green-room";
 import { IdeaCollection } from "./stages/idea-collection";
-import { IdeaVoting } from "./stages/idea-voting";
 import { IdeaGrouping } from "./stages/idea-grouping";
-import { getUserRole } from "@/lib/utils/permissions";
+import { IdeaVoting } from "./stages/idea-voting";
 
 export default function SessionBoard() {
-  const { session, ideas, groups, currentStage, userCount, isConnected, userId } = useSession();
-
-  // Determine if user is admin
-  const userRole = getUserRole(session, userId);
+  const {
+    session,
+    ideas,
+    groups,
+    currentStage,
+    userCount,
+    isConnected,
+    userId,
+  } = useSession();
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
@@ -77,8 +81,8 @@ export default function SessionBoard() {
                 </span>
               </div>
 
-              {/* Admin Button */}
-              {(userRole === "owner" || userRole === "admin") && (
+              {/* Admin Button - disabled for now */}
+              {false && (
                 <Link
                   href={`/session/${session.id}/admin`}
                   className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
@@ -114,10 +118,7 @@ export default function SessionBoard() {
                 )}
                 <div className="mt-4 flex flex-wrap justify-center gap-4">
                   {session.categories.map((category) => (
-                    <div
-                      key={category.id}
-                      className="flex items-center gap-2"
-                    >
+                    <div key={category.id} className="flex items-center gap-2">
                       <div
                         className="h-3 w-3 rounded-full"
                         style={{ backgroundColor: category.color }}
@@ -150,7 +151,6 @@ export default function SessionBoard() {
           <IdeaVoting
             sessionId={session.id}
             categories={session.categories}
-            ideas={ideas}
             settings={session.settings}
             userId={userId}
           />

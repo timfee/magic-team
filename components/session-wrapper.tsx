@@ -1,9 +1,9 @@
 "use client";
 
-import { useSessionEvent } from "@/lib/socket/client";
+import { useSession } from "@/lib/contexts/firebase-session-context";
 import type { SessionStage } from "@/lib/types/session";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect } from "react";
 
 interface SessionWrapperProps {
   sessionId: string;
@@ -12,27 +12,17 @@ interface SessionWrapperProps {
 }
 
 export const SessionWrapper = ({
-  sessionId,
-  initialStage,
+  sessionId: _sessionId,
+  initialStage: _initialStage,
   children,
 }: SessionWrapperProps) => {
-  const [currentStage, setCurrentStage] = useState<SessionStage>(
-    initialStage as SessionStage,
-  );
   const router = useRouter();
+  const { currentStage } = useSession();
 
-  // Listen for stage changes
-  useSessionEvent<{ sessionId: string; newStage: SessionStage }>(
-    "stage:changed",
-    (data) => {
-      if (data.sessionId === sessionId) {
-        setCurrentStage(data.newStage);
-        // Refresh to get new server-rendered content
-        router.refresh();
-      }
-    },
-    [sessionId],
-  );
+  // Refresh on stage changes for server-rendered content
+  useEffect(() => {
+    router.refresh();
+  }, [currentStage, router]);
 
   return <>{children(currentStage)}</>;
 };

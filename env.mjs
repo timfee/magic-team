@@ -13,12 +13,18 @@ export const env = createEnv({
         : z.string().optional(),
     AUTH_GOOGLE_ID: z.string(),
     AUTH_GOOGLE_SECRET: z.string(),
-    NEXTAUTH_URL: z.string().url().optional(),
-    DATABASE_URL: z.string().url(),
-    CLOUD_SQL_INSTANCE: z.string().optional(),
+    NEXTAUTH_URL: z.url().optional(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+    // Firebase Admin SDK
+    FIREBASE_ADMIN_PROJECT_ID: z.string().default("cep-playground-dev"),
+    FIREBASE_ADMIN_CLIENT_EMAIL: z
+      .email()
+      .default(
+        "firebase-adminsdk-b2ixy@cep-playground-dev.iam.gserviceaccount.com",
+      ),
+    FIREBASE_ADMIN_PRIVATE_KEY: z.string().default("<YOUR_PRIVATE_KEY_HERE>"),
   },
 
   /**
@@ -27,7 +33,14 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
-    // NEXT_PUBLIC_CLIENTVAR: z.string(),
+    // Firebase Client SDK
+    NEXT_PUBLIC_FIREBASE_API_KEY: z.string(),
+    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: z.string(),
+    NEXT_PUBLIC_FIREBASE_PROJECT_ID: z.string(),
+    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: z.string(),
+    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: z.string(),
+    NEXT_PUBLIC_FIREBASE_APP_ID: z.string(),
+    NEXT_PUBLIC_FIREBASE_DATABASE_ID: z.string().default("cep-db"),
   },
 
   /**
@@ -42,6 +55,23 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     CLOUD_SQL_INSTANCE: process.env.CLOUD_SQL_INSTANCE,
     NODE_ENV: process.env.NODE_ENV,
+    // Firebase Admin
+    FIREBASE_ADMIN_PROJECT_ID: process.env.FIREBASE_ADMIN_PROJECT_ID,
+    FIREBASE_ADMIN_CLIENT_EMAIL: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
+    FIREBASE_ADMIN_PRIVATE_KEY: process.env.FIREBASE_ADMIN_PRIVATE_KEY,
+    // Firebase Client
+    NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN:
+      process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    NEXT_PUBLIC_FIREBASE_PROJECT_ID:
+      process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET:
+      process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID:
+      process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    NEXT_PUBLIC_FIREBASE_DATABASE_ID:
+      process.env.NEXT_PUBLIC_FIREBASE_DATABASE_ID,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

@@ -2,8 +2,7 @@ import { FlatCompat } from "@eslint/eslintrc";
 import { dirname } from "path";
 import tseslint from "typescript-eslint";
 import { fileURLToPath } from "url";
-// @ts-ignore -- no types for this plugin
-import drizzle from "eslint-plugin-drizzle";
+
 import { defineConfig } from "eslint/config";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -25,18 +24,13 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "dist/**",
+      "functions/**",
       "*.config.mjs",
       "*.config.js",
       "next-env.d.ts",
-      "server.js",
-      "server.ts",
-      "scripts/**/*.js",
     ],
   },
   {
-    plugins: {
-      drizzle,
-    },
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
@@ -58,14 +52,6 @@ const eslintConfig = [
       "@typescript-eslint/no-misused-promises": [
         "error",
         { checksVoidReturn: { attributes: false } },
-      ],
-      "drizzle/enforce-delete-with-where": [
-        "error",
-        { drizzleObjectName: ["db", "ctx.db"] },
-      ],
-      "drizzle/enforce-update-with-where": [
-        "error",
-        { drizzleObjectName: ["db", "ctx.db"] },
       ],
     },
   },
