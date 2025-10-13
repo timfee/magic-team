@@ -49,7 +49,7 @@ export const getSessionPermissions = (role: SessionRole): SessionPermissions => 
 export const canAccessSession = (
   session: MagicSession,
   userId: string | undefined,
-  isInvited: boolean = false,
+  isInvited = false,
 ): boolean => {
   // Public sessions are always accessible
   if (session.visibility === "public") return true;

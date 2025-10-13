@@ -382,7 +382,7 @@ export const sessionSettings = pgTable("session_settings", {
   ideaCollectionDuration: integer(), // in seconds, null = no timer
   votingDuration: integer(), // in seconds, null = no timer
   // Other settings
-  customSettings: json().$type<Record<string, any>>(), // for future extensibility
+  customSettings: json().$type<Record<string, unknown>>(), // for future extensibility
   updatedAt: timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
 });
 

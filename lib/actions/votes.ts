@@ -148,9 +148,9 @@ export const getVoteCounts = async (sessionId: string) => {
   return {
     ideas: Object.fromEntries(
       ideaVotes.map((v) => [v.ideaId, v.count]).filter(([id]) => id),
-    ),
+    ) as Record<string, number>,
     groups: Object.fromEntries(
       groupVotes.map((v) => [v.groupId, v.count]).filter(([id]) => id),
-    ),
+    ) as Record<string, number>,
   };
 };

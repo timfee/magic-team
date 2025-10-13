@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
-import { io, Socket } from "socket.io-client";
+import { io, type Socket } from "socket.io-client";
 
 type ConnectionStatus = "connecting" | "connected" | "disconnected" | "error";
 
@@ -27,7 +27,7 @@ interface SocketProviderProps {
 
 export const SocketProvider = ({ children }: SocketProviderProps) => {
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [status, setStatus] = useState<ConnectionStatus>("disconnected");
+  const [status, setStatus] = useState<ConnectionStatus>("connecting");
 
   useEffect(() => {
     const socketInstance = io({
@@ -42,6 +42,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
     socketInstance.on("connect", () => {
       console.log("Socket connected:", socketInstance.id);
       setStatus("connected");
+      setSocket(socketInstance);
     });
 
     socketInstance.on("disconnect", () => {
@@ -53,9 +54,6 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
       console.error("Socket connection error:", error);
       setStatus("error");
     });
-
-    setSocket(socketInstance);
-    setStatus("connecting");
 
     return () => {
       socketInstance.disconnect();
@@ -98,7 +96,7 @@ export const useSessionRoom = (sessionId: string | null, userId: string | null) 
 export const useSessionEvent = <T,>(
   event: string,
   handler: (data: T) => void,
-  deps: any[] = [],
+  deps: unknown[] = [],
 ) => {
   const { socket, isConnected } = useSocket();
 
@@ -112,6 +110,7 @@ export const useSessionEvent = <T,>(
     return () => {
       socket.off(event, handler);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket, isConnected, event, ...deps]);
 };
 
@@ -120,7 +119,7 @@ export const useEmitSessionEvent = () => {
   const { socket, isConnected } = useSocket();
 
   return useCallback(
-    (event: string, data: any) => {
+    (event: string, data: unknown) => {
       if (socket && isConnected) {
         socket.emit(event, data);
         return true;

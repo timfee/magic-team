@@ -23,12 +23,12 @@ export const useSocket = (sessionId?: string) => {
     });
 
     socketRef.current = newSocket;
-    setSocket(newSocket);
 
-    // Connection event handlers
+    // Connection event handlers - set state in callbacks, not synchronously
     newSocket.on("connect", () => {
       console.log("Socket connected:", newSocket.id);
       setConnected(true);
+      setSocket(newSocket);
     });
 
     newSocket.on("disconnect", () => {

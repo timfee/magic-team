@@ -3,6 +3,18 @@ import type { Server as HTTPServer } from "http";
 import { db } from "@/lib/db";
 import { userPresence } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
+import type {
+  SessionJoinEvent,
+  StageChangedEvent,
+  IdeaCreatedEvent,
+  IdeaUpdatedEvent,
+  IdeaMovedEvent,
+  GroupCreatedEvent,
+  GroupUpdatedEvent,
+  CommentCreatedEvent,
+  VoteCastEvent,
+  VoteRemovedEvent,
+} from "@/lib/types/session";
 
 let io: SocketIOServer | null = null;
 
@@ -27,7 +39,8 @@ export const initSocketServer = (httpServer: HTTPServer) => {
     console.log("Client connected:", socket.id);
 
     // Join session room
-    socket.on("session:join", async ({ sessionId, userId, userName }) => {
+    socket.on("session:join", async (data: SessionJoinEvent) => {
+      const { sessionId, userId, userName } = data;
       try {
         // Join the room
         await socket.join(`session:${sessionId}`);
@@ -86,7 +99,8 @@ export const initSocketServer = (httpServer: HTTPServer) => {
     });
 
     // Leave session room
-    socket.on("session:leave", async ({ sessionId, userId }) => {
+    socket.on("session:leave", async (data: { sessionId: string; userId: string }) => {
+      const { sessionId, userId } = data;
       try {
         // Leave the room
         await socket.leave(`session:${sessionId}`);
@@ -141,7 +155,8 @@ export const initSocketServer = (httpServer: HTTPServer) => {
     });
 
     // Presence heartbeat
-    socket.on("presence:heartbeat", async ({ sessionId, userId }) => {
+    socket.on("presence:heartbeat", async (data: { sessionId: string; userId: string }) => {
+      const { sessionId, userId } = data;
       try {
         await db
           .update(userPresence)
@@ -158,7 +173,8 @@ export const initSocketServer = (httpServer: HTTPServer) => {
     });
 
     // Stage change
-    socket.on("stage:change", ({ sessionId, newStage, changedBy }) => {
+    socket.on("stage:change", (data: StageChangedEvent) => {
+      const { sessionId, newStage, changedBy } = data;
       io?.to(`session:${sessionId}`).emit("stage:changed", {
         sessionId,
         newStage,
@@ -168,14 +184,16 @@ export const initSocketServer = (httpServer: HTTPServer) => {
     });
 
     // Idea events
-    socket.on("idea:created", ({ sessionId, idea }) => {
+    socket.on("idea:created", (data: IdeaCreatedEvent) => {
+      const { sessionId, idea } = data;
       socket.to(`session:${sessionId}`).emit("idea:created", {
         sessionId,
         idea,
       });
     });
 
-    socket.on("idea:updated", ({ sessionId, ideaId, updates }) => {
+    socket.on("idea:updated", (data: IdeaUpdatedEvent) => {
+      const { sessionId, ideaId, updates } = data;
       socket.to(`session:${sessionId}`).emit("idea:updated", {
         sessionId,
         ideaId,
@@ -183,14 +201,16 @@ export const initSocketServer = (httpServer: HTTPServer) => {
       });
     });
 
-    socket.on("idea:deleted", ({ sessionId, ideaId }) => {
+    socket.on("idea:deleted", (data: { sessionId: string; ideaId: string }) => {
+      const { sessionId, ideaId } = data;
       socket.to(`session:${sessionId}`).emit("idea:deleted", {
         sessionId,
         ideaId,
       });
     });
 
-    socket.on("idea:moved", ({ sessionId, ideaId, categoryId, groupId, order }) => {
+    socket.on("idea:moved", (data: IdeaMovedEvent) => {
+      const { sessionId, ideaId, categoryId, groupId, order } = data;
       socket.to(`session:${sessionId}`).emit("idea:moved", {
         sessionId,
         ideaId,
@@ -201,14 +221,16 @@ export const initSocketServer = (httpServer: HTTPServer) => {
     });
 
     // Group events
-    socket.on("group:created", ({ sessionId, group }) => {
+    socket.on("group:created", (data: GroupCreatedEvent) => {
+      const { sessionId, group } = data;
       socket.to(`session:${sessionId}`).emit("group:created", {
         sessionId,
         group,
       });
     });
 
-    socket.on("group:updated", ({ sessionId, groupId, updates }) => {
+    socket.on("group:updated", (data: GroupUpdatedEvent) => {
+      const { sessionId, groupId, updates } = data;
       socket.to(`session:${sessionId}`).emit("group:updated", {
         sessionId,
         groupId,
@@ -216,7 +238,8 @@ export const initSocketServer = (httpServer: HTTPServer) => {
       });
     });
 
-    socket.on("group:deleted", ({ sessionId, groupId }) => {
+    socket.on("group:deleted", (data: { sessionId: string; groupId: string }) => {
+      const { sessionId, groupId } = data;
       socket.to(`session:${sessionId}`).emit("group:deleted", {
         sessionId,
         groupId,
@@ -224,7 +247,8 @@ export const initSocketServer = (httpServer: HTTPServer) => {
     });
 
     // Comment events
-    socket.on("comment:created", ({ sessionId, comment }) => {
+    socket.on("comment:created", (data: CommentCreatedEvent) => {
+      const { sessionId, comment } = data;
       socket.to(`session:${sessionId}`).emit("comment:created", {
         sessionId,
         comment,
@@ -232,14 +256,16 @@ export const initSocketServer = (httpServer: HTTPServer) => {
     });
 
     // Vote events
-    socket.on("vote:cast", ({ sessionId, vote }) => {
+    socket.on("vote:cast", (data: VoteCastEvent) => {
+      const { sessionId, vote } = data;
       socket.to(`session:${sessionId}`).emit("vote:cast", {
         sessionId,
         vote,
       });
     });
 
-    socket.on("vote:removed", ({ sessionId, voteId }) => {
+    socket.on("vote:removed", (data: VoteRemovedEvent) => {
+      const { sessionId, voteId } = data;
       socket.to(`session:${sessionId}`).emit("vote:removed", {
         sessionId,
         voteId,
@@ -247,7 +273,8 @@ export const initSocketServer = (httpServer: HTTPServer) => {
     });
 
     // Settings update
-    socket.on("settings:updated", ({ sessionId }) => {
+    socket.on("settings:updated", (data: { sessionId: string }) => {
+      const { sessionId } = data;
       io?.to(`session:${sessionId}`).emit("settings:updated", {
         sessionId,
       });

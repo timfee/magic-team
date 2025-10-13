@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import Image from "next/image";
 import { useSessionRoom, useSessionEvent } from "@/lib/socket/client";
 import type { PresenceUpdateEvent } from "@/lib/types/session";
 
@@ -42,17 +43,19 @@ export const PresenceTracker = ({ sessionId, userId }: PresenceTrackerProps) => 
           <div
             key={user.id}
             className="h-8 w-8 rounded-full border-2 border-white bg-zinc-200 dark:border-zinc-800 dark:bg-zinc-700"
-            title={user.name || "Anonymous"}
+            title={user.name ?? "Anonymous"}
           >
             {user.image ? (
-              <img
+              <Image
                 src={user.image}
-                alt={user.name || "User"}
+                alt={user.name ?? "User"}
+                width={32}
+                height={32}
                 className="h-full w-full rounded-full object-cover"
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center text-xs font-medium text-zinc-600 dark:text-zinc-300">
-                {user.name?.charAt(0).toUpperCase() || "?"}
+                {user.name?.charAt(0).toUpperCase() ?? "?"}
               </div>
             )}
           </div>
