@@ -183,4 +183,95 @@ describe("Idea Actions", () => {
       );
     });
   });
+
+  describe("Unhappy Paths - Edge Cases and Error Scenarios", () => {
+    it("should handle concurrent modifications gracefully", async () => {
+      const { updateIdea } = await import("../ideas");
+      const { updateDoc } = await import("firebase/firestore");
+
+      const mockUpdateDoc = vi.mocked(updateDoc);
+      mockUpdateDoc.mockRejectedValue(new Error("Document was modified"));
+
+      await expect(
+        updateIdea("idea-123", "session-456", { content: "New content" }),
+      ).rejects.toThrow("Document was modified");
+    });
+
+    it("should handle network timeouts", async () => {
+      const { createIdea } = await import("../ideas");
+      const { addDoc } = await import("firebase/firestore");
+
+      const mockAddDoc = vi.mocked(addDoc);
+      mockAddDoc.mockRejectedValue(new Error("Network timeout"));
+
+      const input: CreateIdeaInput = {
+        sessionId: "session-123",
+        categoryId: "category-456",
+        content: "Test content",
+        isAnonymous: false,
+      };
+
+      await expect(createIdea(input)).rejects.toThrow("Network timeout");
+    });
+
+    it("should handle extremely long content", async () => {
+      const { createIdea } = await import("../ideas");
+      const { addDoc } = await import("firebase/firestore");
+
+      const mockAddDoc = vi.mocked(addDoc);
+      mockAddDoc.mockResolvedValue(createMockDocRef("idea-long"));
+
+      const input: CreateIdeaInput = {
+        sessionId: "session-123",
+        categoryId: "category-456",
+        content: "x".repeat(10000),
+        isAnonymous: false,
+      };
+
+      const result = await createIdea(input);
+
+      expect(result.ideaId).toBe("idea-long");
+      const ideaData = getCallArg<Partial<IdeaData>>(mockAddDoc, 0, 1);
+      expect(ideaData.content).toHaveLength(10000);
+    });
+
+    it("should handle special characters in content", async () => {
+      const { createIdea } = await import("../ideas");
+      const { addDoc } = await import("firebase/firestore");
+
+      const mockAddDoc = vi.mocked(addDoc);
+      mockAddDoc.mockResolvedValue(createMockDocRef("idea-special"));
+
+      const input: CreateIdeaInput = {
+        sessionId: "session-123",
+        categoryId: "category-456",
+        content: "<script>alert('xss')</script> & special chars: \u{1F4A1}",
+        isAnonymous: false,
+      };
+
+      const result = await createIdea(input);
+
+      expect(result.ideaId).toBe("idea-special");
+      const ideaData = getCallArg<Partial<IdeaData>>(mockAddDoc, 0, 1);
+      expect(ideaData.content).toContain("<script>");
+      expect(ideaData.content).toContain("\u{1F4A1}");
+    });
+
+    it("should handle rapid sequential updates", async () => {
+      const { updateIdea } = await import("../ideas");
+      const { updateDoc } = await import("firebase/firestore");
+
+      const mockUpdateDoc = vi.mocked(updateDoc);
+      mockUpdateDoc.mockResolvedValue(undefined);
+
+      // Simulate rapid updates
+      await Promise.all([
+        updateIdea("idea-123", "session-456", { content: "Update 1" }),
+        updateIdea("idea-123", "session-456", { content: "Update 2" }),
+        updateIdea("idea-123", "session-456", { content: "Update 3" }),
+      ]);
+
+      expect(mockUpdateDoc).toHaveBeenCalledTimes(3);
+    });
+  });
 });
