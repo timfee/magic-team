@@ -1,15 +1,12 @@
-import { Server as NetServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
-import type { Socket } from "socket.io";
+import type { Server as HTTPServer } from "http";
 import { db } from "@/lib/db";
 import { userPresence } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 
-export type SocketServer = SocketIOServer;
-
 let io: SocketIOServer | null = null;
 
-export const initSocketServer = (httpServer: NetServer): SocketIOServer => {
+export const initSocketServer = (httpServer: HTTPServer) => {
   if (io) {
     return io;
   }
@@ -18,25 +15,24 @@ export const initSocketServer = (httpServer: NetServer): SocketIOServer => {
     path: "/api/socket",
     addTrailingSlash: false,
     cors: {
-      origin: process.env.NODE_ENV === "production" ? false : ["http://localhost:3000"],
+      origin: process.env.NODE_ENV === "production"
+        ? process.env.NEXTAUTH_URL
+        : "http://localhost:3000",
       methods: ["GET", "POST"],
       credentials: true,
     },
-    transports: ["websocket", "polling"],
-    allowEIO3: true,
   });
 
-  io.on("connection", (socket: Socket) => {
+  io.on("connection", (socket) => {
     console.log("Client connected:", socket.id);
 
     // Join session room
-    socket.on("session:join", async (data: { sessionId: string; userId: string }) => {
-      const { sessionId, userId } = data;
-
-      await socket.join(`session:${sessionId}`);
-
-      // Update presence in database
+    socket.on("session:join", async ({ sessionId, userId, userName }) => {
       try {
+        // Join the room
+        await socket.join(`session:${sessionId}`);
+
+        // Update presence in database
         await db
           .insert(userPresence)
           .values({
@@ -53,11 +49,11 @@ export const initSocketServer = (httpServer: NetServer): SocketIOServer => {
             },
           });
 
-        // Broadcast presence update to room
-        const presenceList = await db.query.userPresence.findMany({
+        // Get all active users
+        const activeUsers = await db.query.userPresence.findMany({
           where: and(
             eq(userPresence.sessionId, sessionId),
-            eq(userPresence.isActive, true),
+            eq(userPresence.isActive, true)
           ),
           with: {
             user: {
@@ -70,31 +66,32 @@ export const initSocketServer = (httpServer: NetServer): SocketIOServer => {
           },
         });
 
+        // Broadcast updated presence
         io?.to(`session:${sessionId}`).emit("presence:update", {
           sessionId,
-          activeUsers: presenceList.map((p) => ({
+          activeUsers: activeUsers.map((p) => ({
             id: p.user.id,
             name: p.user.name,
             image: p.user.image,
             lastSeenAt: p.lastSeenAt,
           })),
-          count: presenceList.length,
+          count: activeUsers.length,
         });
 
-        console.log(`User ${userId} joined session ${sessionId}`);
+        console.log(`User ${userName} joined session ${sessionId}`);
       } catch (error) {
-        console.error("Failed to update presence:", error);
+        console.error("Error joining session:", error);
+        socket.emit("error", { message: "Failed to join session" });
       }
     });
 
     // Leave session room
-    socket.on("session:leave", async (data: { sessionId: string; userId: string }) => {
-      const { sessionId, userId } = data;
-
-      await socket.leave(`session:${sessionId}`);
-
-      // Update presence in database
+    socket.on("session:leave", async ({ sessionId, userId }) => {
       try {
+        // Leave the room
+        await socket.leave(`session:${sessionId}`);
+
+        // Update presence
         await db
           .update(userPresence)
           .set({
@@ -104,15 +101,15 @@ export const initSocketServer = (httpServer: NetServer): SocketIOServer => {
           .where(
             and(
               eq(userPresence.sessionId, sessionId),
-              eq(userPresence.userId, userId),
-            ),
+              eq(userPresence.userId, userId)
+            )
           );
 
-        // Broadcast presence update to room
-        const presenceList = await db.query.userPresence.findMany({
+        // Get remaining active users
+        const activeUsers = await db.query.userPresence.findMany({
           where: and(
             eq(userPresence.sessionId, sessionId),
-            eq(userPresence.isActive, true),
+            eq(userPresence.isActive, true)
           ),
           with: {
             user: {
@@ -125,39 +122,150 @@ export const initSocketServer = (httpServer: NetServer): SocketIOServer => {
           },
         });
 
+        // Broadcast updated presence
         io?.to(`session:${sessionId}`).emit("presence:update", {
           sessionId,
-          activeUsers: presenceList.map((p) => ({
+          activeUsers: activeUsers.map((p) => ({
             id: p.user.id,
             name: p.user.name,
             image: p.user.image,
             lastSeenAt: p.lastSeenAt,
           })),
-          count: presenceList.length,
+          count: activeUsers.length,
         });
 
-        console.log(`User ${userId} left session ${sessionId}`);
+        console.log(`User left session ${sessionId}`);
       } catch (error) {
-        console.error("Failed to update presence:", error);
+        console.error("Error leaving session:", error);
       }
     });
 
-    // Handle disconnection
+    // Presence heartbeat
+    socket.on("presence:heartbeat", async ({ sessionId, userId }) => {
+      try {
+        await db
+          .update(userPresence)
+          .set({ lastSeenAt: new Date() })
+          .where(
+            and(
+              eq(userPresence.sessionId, sessionId),
+              eq(userPresence.userId, userId)
+            )
+          );
+      } catch (error) {
+        console.error("Error updating heartbeat:", error);
+      }
+    });
+
+    // Stage change
+    socket.on("stage:change", ({ sessionId, newStage, changedBy }) => {
+      io?.to(`session:${sessionId}`).emit("stage:changed", {
+        sessionId,
+        newStage,
+        changedBy,
+      });
+      console.log(`Stage changed to ${newStage} in session ${sessionId}`);
+    });
+
+    // Idea events
+    socket.on("idea:created", ({ sessionId, idea }) => {
+      socket.to(`session:${sessionId}`).emit("idea:created", {
+        sessionId,
+        idea,
+      });
+    });
+
+    socket.on("idea:updated", ({ sessionId, ideaId, updates }) => {
+      socket.to(`session:${sessionId}`).emit("idea:updated", {
+        sessionId,
+        ideaId,
+        updates,
+      });
+    });
+
+    socket.on("idea:deleted", ({ sessionId, ideaId }) => {
+      socket.to(`session:${sessionId}`).emit("idea:deleted", {
+        sessionId,
+        ideaId,
+      });
+    });
+
+    socket.on("idea:moved", ({ sessionId, ideaId, categoryId, groupId, order }) => {
+      socket.to(`session:${sessionId}`).emit("idea:moved", {
+        sessionId,
+        ideaId,
+        categoryId,
+        groupId,
+        order,
+      });
+    });
+
+    // Group events
+    socket.on("group:created", ({ sessionId, group }) => {
+      socket.to(`session:${sessionId}`).emit("group:created", {
+        sessionId,
+        group,
+      });
+    });
+
+    socket.on("group:updated", ({ sessionId, groupId, updates }) => {
+      socket.to(`session:${sessionId}`).emit("group:updated", {
+        sessionId,
+        groupId,
+        updates,
+      });
+    });
+
+    socket.on("group:deleted", ({ sessionId, groupId }) => {
+      socket.to(`session:${sessionId}`).emit("group:deleted", {
+        sessionId,
+        groupId,
+      });
+    });
+
+    // Comment events
+    socket.on("comment:created", ({ sessionId, comment }) => {
+      socket.to(`session:${sessionId}`).emit("comment:created", {
+        sessionId,
+        comment,
+      });
+    });
+
+    // Vote events
+    socket.on("vote:cast", ({ sessionId, vote }) => {
+      socket.to(`session:${sessionId}`).emit("vote:cast", {
+        sessionId,
+        vote,
+      });
+    });
+
+    socket.on("vote:removed", ({ sessionId, voteId }) => {
+      socket.to(`session:${sessionId}`).emit("vote:removed", {
+        sessionId,
+        voteId,
+      });
+    });
+
+    // Settings update
+    socket.on("settings:updated", ({ sessionId }) => {
+      io?.to(`session:${sessionId}`).emit("settings:updated", {
+        sessionId,
+      });
+    });
+
+    // Disconnect
     socket.on("disconnect", () => {
       console.log("Client disconnected:", socket.id);
     });
   });
 
+  console.log("Socket.io server initialized");
   return io;
 };
 
-export const getSocketServer = (): SocketIOServer | null => {
-  return io;
-};
-
-// Broadcast helpers
-export const broadcastToSession = (sessionId: string, event: string, data: any) => {
-  if (io) {
-    io.to(`session:${sessionId}`).emit(event, data);
+export const getSocketServer = () => {
+  if (!io) {
+    throw new Error("Socket.io server not initialized");
   }
+  return io;
 };

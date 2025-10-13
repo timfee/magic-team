@@ -1,22 +1,22 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { eq, and, desc, sql, count } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import {
-  magicSessions,
   categories,
-  sessionSettings,
-  sessionAdmins,
   ideas,
+  magicSessions,
+  sessionAdmins,
+  sessionSettings,
   userPresence,
 } from "@/lib/db/schema";
 import type {
   CreateMagicSessionInput,
-  UpdateMagicSessionInput,
   MagicSessionWithDetails,
+  UpdateMagicSessionInput,
 } from "@/lib/types/session";
+import { and, count, desc, eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 export const createSession = async (input: CreateMagicSessionInput) => {
   const session = await auth();
@@ -34,7 +34,7 @@ export const createSession = async (input: CreateMagicSessionInput) => {
       name: input.name,
       description: input.description,
       ownerId: session.user.id,
-      visibility: input.visibility || "public",
+      visibility: input.visibility ?? "public",
       currentStage: "pre_session",
     });
 
@@ -43,7 +43,7 @@ export const createSession = async (input: CreateMagicSessionInput) => {
       id: crypto.randomUUID(),
       sessionId,
       name: cat.name,
-      color: cat.color || "#3b82f6",
+      color: cat.color ?? "#3b82f6",
       order: index,
       maxEntriesPerPerson: cat.maxEntriesPerPerson,
     }));
@@ -247,10 +247,7 @@ export const addSessionAdmin = async (sessionId: string, userId: string) => {
   return { success: true };
 };
 
-export const removeSessionAdmin = async (
-  sessionId: string,
-  userId: string,
-) => {
+export const removeSessionAdmin = async (sessionId: string, userId: string) => {
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error("Unauthorized");
@@ -282,10 +279,7 @@ export const removeSessionAdmin = async (
   return { success: true };
 };
 
-export const updateSessionStage = async (
-  sessionId: string,
-  stage: string,
-) => {
+export const updateSessionStage = async (sessionId: string, stage: string) => {
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error("Unauthorized");

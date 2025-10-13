@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useSessionEvent } from "@/lib/socket/client";
 import type { SessionStage } from "@/lib/types/session";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface SessionWrapperProps {
   sessionId: string;

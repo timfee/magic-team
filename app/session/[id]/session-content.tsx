@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { PresenceTracker } from "@/components/presence-tracker";
+import { useSessionEvent, useSessionRoom } from "@/lib/socket/client";
+import type {
+  MagicSessionWithDetails,
+  SessionStage,
+} from "@/lib/types/session";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSessionEvent, useSessionRoom } from "@/lib/socket/client";
-import { PresenceTracker } from "@/components/presence-tracker";
-import type { MagicSessionWithDetails, SessionStage } from "@/lib/types/session";
+import { useState } from "react";
 
 interface SessionContentProps {
   sessionId: string;
@@ -22,7 +25,9 @@ export const SessionContent = ({
   isAdmin,
   userId,
 }: SessionContentProps) => {
-  const [currentStage, setCurrentStage] = useState<string>(initialSession.currentStage);
+  const [currentStage, setCurrentStage] = useState<string>(
+    initialSession.currentStage,
+  );
   const router = useRouter();
 
   // Join the session room
@@ -72,7 +77,7 @@ export const SessionContent = ({
             {isAdmin && (
               <Link
                 href={`/session/${sessionId}/admin`}
-                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
               >
                 Admin Controls
               </Link>
@@ -119,11 +124,10 @@ export const SessionContent = ({
           {currentStage === "pre_session" &&
             "The facilitator will start the session soon."}
           {currentStage === "green_room" &&
-            `${initialSession._count?.presence || 0} participants are here. Waiting for the facilitator to begin.`}
+            `${initialSession._count?.presence ?? 0} participants are here. Waiting for the facilitator to begin.`}
           {currentStage === "idea_collection" &&
             "Share your ideas anonymously."}
-          {currentStage === "idea_grouping" &&
-            "Organize ideas into groups."}
+          {currentStage === "idea_grouping" && "Organize ideas into groups."}
           {currentStage === "idea_voting" &&
             "Vote on the most important ideas."}
           {currentStage === "idea_finalization" &&
@@ -143,7 +147,7 @@ export const SessionContent = ({
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
         <div className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
           <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-            {initialSession._count?.presence || 0}
+            {initialSession._count?.presence ?? 0}
           </div>
           <div className="text-sm text-zinc-600 dark:text-zinc-400">
             Active Participants
@@ -151,7 +155,7 @@ export const SessionContent = ({
         </div>
         <div className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
           <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-            {initialSession._count?.ideas || 0}
+            {initialSession._count?.ideas ?? 0}
           </div>
           <div className="text-sm text-zinc-600 dark:text-zinc-400">
             Ideas Submitted
@@ -161,7 +165,9 @@ export const SessionContent = ({
           <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
             {userRole}
           </div>
-          <div className="text-sm text-zinc-600 dark:text-zinc-400">Your Role</div>
+          <div className="text-sm text-zinc-600 dark:text-zinc-400">
+            Your Role
+          </div>
         </div>
       </div>
     </div>

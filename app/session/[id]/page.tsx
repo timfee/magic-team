@@ -1,41 +1,44 @@
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getSession } from "@/lib/actions/session";
-import { canAccessSession, getUserRole } from "@/lib/utils/permissions";
-import { ConnectionStatus } from "@/components/connection-status";
-import { SessionContent } from "./session-content";
+import { getSessionIdeas, getSessionGroups } from "@/lib/actions/ideas";
+import { SessionProvider } from "@/lib/contexts/session-context";
+import SessionBoard from "./components/session-board";
 
 export default async function SessionPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
-  const userSession = await auth();
-  const magicSession = await getSession(id);
+  const { id: sessionId } = await params;
+  const session = await auth();
 
-  if (!magicSession) {
-    notFound();
+  if (!session?.user) {
+    redirect("/api/auth/signin");
   }
 
-  // Check access permissions
-  if (!canAccessSession(magicSession, userSession?.user?.id)) {
+  // Fetch session data
+  const magicSession = await getSession(sessionId);
+
+  if (!magicSession) {
     redirect("/");
   }
 
-  const userRole = getUserRole(magicSession, userSession?.user?.id);
-  const isAdmin = userRole === "owner" || userRole === "admin";
+  // Fetch ideas and groups
+  const [ideas, groups] = await Promise.all([
+    getSessionIdeas(sessionId),
+    getSessionGroups(sessionId),
+  ]);
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-      <ConnectionStatus />
-      <SessionContent
-        sessionId={id}
-        initialSession={magicSession}
-        userRole={userRole}
-        isAdmin={isAdmin}
-        userId={userSession?.user?.id || null}
-      />
-    </div>
+    <SessionProvider
+      initialSession={magicSession}
+      initialIdeas={ideas}
+      initialGroups={groups}
+      userId={session.user.id}
+      userName={session.user.name ?? "Anonymous"}
+    >
+      <SessionBoard />
+    </SessionProvider>
   );
 }
