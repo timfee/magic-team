@@ -44,22 +44,32 @@ A real-time multiplayer retrospective application built with Next.js 15, Socket.
 - Admin page (`/session/[id]/admin`) with stage management controls
 - Real-time stage synchronization across all clients
 
+### Phase 4: Stage-Specific UIs (Partial)
+- Green Room stage - Waiting area with live participant count
+- Idea Collection stage - Anonymous idea submission with real-time display
+- Idea Card component - Display individual ideas with vote counts
+- Stage-based routing in SessionBoard
+- Category-filtered idea display
+- Per-category submission limits enforced
+- Optimistic UI updates for idea creation
+
 ## 🚧 TODO
 
 ### Stage-Specific UIs
 
-**Green Room (Waiting Area)**
-- [ ] User count with live updates
-- [ ] "Waiting for facilitator" message
+**Green Room (Waiting Area)** ✅
+- [x] User count with live updates
+- [x] "Waiting for facilitator" message
+- [x] Animated waiting indicator
 - [ ] Optional timer display
 
-**Idea Collection**
-- [ ] Anonymous idea submission form
-- [ ] Category selector
-- [ ] Real-time idea display grid
-- [ ] Character limit validation
-- [ ] Optimistic updates with rollback
-- [ ] Max entries per person enforcement
+**Idea Collection** ✅
+- [x] Anonymous idea submission form
+- [x] Category selector
+- [x] Real-time idea display grid
+- [x] Character limit validation (500 chars)
+- [x] Optimistic updates
+- [x] Max entries per person enforcement
 - [ ] Pre-submit functionality (if enabled)
 - [ ] Countdown timer
 
@@ -172,33 +182,37 @@ A real-time multiplayer retrospective application built with Next.js 15, Socket.
 
 ```
 app/
-├── api/auth/[...nextauth]/route.ts      ✅ NextAuth handler
-├── api/socket/route.ts                  ✅ Socket.io endpoint
-├── session/create/                      ✅ Create session form
-├── session/[id]/page.tsx                ✅ Session detail
-├── session/[id]/admin/page.tsx          ✅ Admin controls
-└── session/[id]/presentation/page.tsx   🚧 Presentation view
+├── api/auth/[...nextauth]/route.ts           ✅ NextAuth handler
+├── api/socket/route.ts                       ✅ Socket.io endpoint
+├── session/create/                           ✅ Create session form
+├── session/[id]/page.tsx                     ✅ Session detail
+├── session/[id]/admin/page.tsx               ✅ Admin controls
+├── session/[id]/components/
+│   ├── session-board.tsx                     ✅ Main board with stage routing
+│   ├── idea-card.tsx                         ✅ Individual idea display
+│   └── stages/
+│       ├── green-room.tsx                    ✅ Waiting room
+│       └── idea-collection.tsx               ✅ Idea submission stage
+└── session/[id]/presentation/page.tsx        🚧 Presentation view
 
 lib/
-├── actions/                             ✅ All Server Actions (session, ideas, comments, votes)
-├── auth/config.ts                       ✅ NextAuth config
-├── db/schema.ts                         ✅ Drizzle schema (14 tables)
-├── types/session.ts                     ✅ All TypeScript types
-├── utils/permissions.ts                 ✅ RBAC helpers
-├── hooks/use-socket.ts                  ✅ Socket.io hook
-├── hooks/use-presence.ts                ✅ Presence hook
-├── contexts/session-context.tsx         ✅ Session state provider
-└── socket/                              ✅ Socket client/server
+├── actions/                                  ✅ All Server Actions (session, ideas, comments, votes)
+├── auth/config.ts                            ✅ NextAuth config
+├── db/schema.ts                              ✅ Drizzle schema (14 tables)
+├── types/session.ts                          ✅ All TypeScript types
+├── utils/permissions.ts                      ✅ RBAC helpers
+├── contexts/session-context.tsx              ✅ Session state provider
+└── socket/client.tsx                         ✅ Socket hooks & provider
 
-server.js                                ✅ Custom Node server with Socket.io
+server.js                                     ✅ Custom Node server with Socket.io
 ```
 
 ## 🚀 Next Steps
 
-1. **Implement Idea Collection Stage** - Form, real-time grid, optimistic updates
-2. **Build Drag-and-Drop Grouping** - @dnd-kit integration, real-time sync, conflict handling
-3. **Create Voting System** - Vote allocation UI, rules engine, real-time updates
-4. **Build Presentation View** - Projector-optimized layout, follow admin's focus
+1. **Build Drag-and-Drop Grouping** - @dnd-kit integration, real-time sync, conflict handling
+2. **Create Voting System** - Vote allocation UI, rules engine, real-time updates
+3. **Build Presentation View** - Projector-optimized layout, follow admin's focus
+4. **Add Timers** - Countdown timers for idea collection and voting stages
 5. **Add Polish** - Animations, loading states, error handling, accessibility
 
 ## 🔧 Development Commands
@@ -217,6 +231,15 @@ npm run build            # Production build
 ✅ **ESLint**: Clean (0 errors, 0 warnings)
 ✅ **TypeScript**: Clean (0 errors)
 ✅ **Build**: Success (all routes compile)
+
+## 🐛 Recent Fixes
+
+### WebSocket Real-Time Updates (2025-10-13)
+- Consolidated to single socket system (removed duplicate socket implementations)
+- Fixed stage change events not propagating between admin and participants
+- Server transforms `stage:change` → `stage:changed` for clients
+- Added "Admin Controls" button for owners/admins
+- All components now use unified `SocketProvider` from `lib/socket/client.tsx`
 
 ## 🐛 Known Issues
 

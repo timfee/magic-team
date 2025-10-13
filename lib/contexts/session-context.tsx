@@ -1,8 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
-import { useSocket } from "@/lib/hooks/use-socket";
-import { usePresence } from "@/lib/hooks/use-presence";
+import { useSocket, useSessionRoom } from "@/lib/socket/client";
 import type {
   MagicSessionWithDetails,
   IdeaWithDetails,
@@ -25,6 +24,8 @@ interface SessionContextValue {
   activeUsers: ActiveUser[];
   userCount: number;
   isConnected: boolean;
+  userId: string;
+  userName: string;
   // Methods
   updateIdea: (ideaId: string, updates: Partial<IdeaWithDetails>) => void;
   deleteIdea: (ideaId: string) => void;
@@ -66,20 +67,44 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
   const [currentStage, setCurrentStage] = useState<SessionStage>(
     initialSession.currentStage as SessionStage
   );
+  const [activeUsers, setActiveUsers] = useState<ActiveUser[]>([]);
+  const [userCount, setUserCount] = useState(0);
 
-  const { connected, emit, on, off } = useSocket(initialSession.id);
-  const { activeUsers, userCount, isConnected } = usePresence(
-    initialSession.id,
-    userId,
-    userName
-  );
+  const { socket, isConnected } = useSocket();
+
+  // Join the session room
+  useSessionRoom(initialSession.id, userId);
+
+  // Listen for presence updates
+  useEffect(() => {
+    if (!socket || !isConnected) return;
+
+    const handlePresenceUpdate = (data: {
+      sessionId: string;
+      activeUsers: ActiveUser[];
+      count: number;
+    }) => {
+      if (data.sessionId === initialSession.id) {
+        console.log("👥 Presence update:", data);
+        setActiveUsers(data.activeUsers);
+        setUserCount(data.count);
+      }
+    };
+
+    socket.on("presence:update", handlePresenceUpdate);
+
+    return () => {
+      socket.off("presence:update", handlePresenceUpdate);
+    };
+  }, [socket, isConnected, initialSession.id]);
 
   // Idea event handlers
   useEffect(() => {
-    if (!connected) return;
+    if (!socket || !isConnected) return;
 
     const handleIdeaCreated = (data: unknown) => {
       const { idea } = data as { sessionId: string; idea: IdeaWithDetails };
+      console.log("💡 Idea created:", idea);
       setIdeas((prev) => [...prev, idea]);
     };
 
@@ -114,22 +139,22 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
       );
     };
 
-    on("idea:created", handleIdeaCreated);
-    on("idea:updated", handleIdeaUpdated);
-    on("idea:deleted", handleIdeaDeleted);
-    on("idea:moved", handleIdeaMoved);
+    socket.on("idea:created", handleIdeaCreated);
+    socket.on("idea:updated", handleIdeaUpdated);
+    socket.on("idea:deleted", handleIdeaDeleted);
+    socket.on("idea:moved", handleIdeaMoved);
 
     return () => {
-      off("idea:created", handleIdeaCreated);
-      off("idea:updated", handleIdeaUpdated);
-      off("idea:deleted", handleIdeaDeleted);
-      off("idea:moved", handleIdeaMoved);
+      socket.off("idea:created", handleIdeaCreated);
+      socket.off("idea:updated", handleIdeaUpdated);
+      socket.off("idea:deleted", handleIdeaDeleted);
+      socket.off("idea:moved", handleIdeaMoved);
     };
-  }, [connected, on, off]);
+  }, [socket, isConnected]);
 
   // Group event handlers
   useEffect(() => {
-    if (!connected) return;
+    if (!socket || !isConnected) return;
 
     const handleGroupCreated = (data: unknown) => {
       const { group } = data as {
@@ -155,62 +180,70 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
       setGroups((prev) => prev.filter((group) => group.id !== groupId));
     };
 
-    on("group:created", handleGroupCreated);
-    on("group:updated", handleGroupUpdated);
-    on("group:deleted", handleGroupDeleted);
+    socket.on("group:created", handleGroupCreated);
+    socket.on("group:updated", handleGroupUpdated);
+    socket.on("group:deleted", handleGroupDeleted);
 
     return () => {
-      off("group:created", handleGroupCreated);
-      off("group:updated", handleGroupUpdated);
-      off("group:deleted", handleGroupDeleted);
+      socket.off("group:created", handleGroupCreated);
+      socket.off("group:updated", handleGroupUpdated);
+      socket.off("group:deleted", handleGroupDeleted);
     };
-  }, [connected, on, off]);
+  }, [socket, isConnected]);
 
   // Stage change handler
   useEffect(() => {
-    if (!connected) return;
+    if (!socket || !isConnected) return;
 
     const handleStageChanged = (data: unknown) => {
-      const { newStage } = data as {
+      const { sessionId, newStage, changedBy } = data as {
         sessionId: string;
         newStage: SessionStage;
         changedBy: string;
       };
-      setCurrentStage(newStage);
+      console.log("🎭 Stage changed:", { sessionId, newStage, changedBy });
+      if (sessionId === initialSession.id) {
+        setCurrentStage(newStage);
+      }
     };
 
-    on("stage:changed", handleStageChanged);
+    console.log("👂 Listening for stage:changed events on session:", initialSession.id);
+    socket.on("stage:changed", handleStageChanged);
 
     return () => {
-      off("stage:changed", handleStageChanged);
+      console.log("👋 Stopped listening for stage:changed events");
+      socket.off("stage:changed", handleStageChanged);
     };
-  }, [connected, on, off]);
+  }, [socket, isConnected, initialSession.id]);
 
   // Methods
   const updateIdea = useCallback(
     (ideaId: string, updates: Partial<IdeaWithDetails>) => {
+      if (!socket) return;
       // Optimistic update
       setIdeas((prev) =>
         prev.map((idea) => (idea.id === ideaId ? { ...idea, ...updates } : idea))
       );
       // Broadcast
-      emit("idea:updated", { sessionId: initialSession.id, ideaId, updates });
+      socket.emit("idea:updated", { sessionId: initialSession.id, ideaId, updates });
     },
-    [emit, initialSession.id]
+    [socket, initialSession.id]
   );
 
   const deleteIdea = useCallback(
     (ideaId: string) => {
+      if (!socket) return;
       // Optimistic update
       setIdeas((prev) => prev.filter((idea) => idea.id !== ideaId));
       // Broadcast
-      emit("idea:deleted", { sessionId: initialSession.id, ideaId });
+      socket.emit("idea:deleted", { sessionId: initialSession.id, ideaId });
     },
-    [emit, initialSession.id]
+    [socket, initialSession.id]
   );
 
   const moveIdea = useCallback(
     (ideaId: string, categoryId: string, groupId: string | null, order: number) => {
+      if (!socket) return;
       // Optimistic update
       setIdeas((prev) =>
         prev.map((idea) =>
@@ -218,45 +251,48 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
         )
       );
       // Broadcast
-      emit("idea:moved", { sessionId: initialSession.id, ideaId, categoryId, groupId, order });
+      socket.emit("idea:moved", { sessionId: initialSession.id, ideaId, categoryId, groupId, order });
     },
-    [emit, initialSession.id]
+    [socket, initialSession.id]
   );
 
   const updateGroup = useCallback(
     (groupId: string, updates: Partial<IdeaGroupWithDetails>) => {
+      if (!socket) return;
       // Optimistic update
       setGroups((prev) =>
         prev.map((group) => (group.id === groupId ? { ...group, ...updates } : group))
       );
       // Broadcast
-      emit("group:updated", { sessionId: initialSession.id, groupId, updates });
+      socket.emit("group:updated", { sessionId: initialSession.id, groupId, updates });
     },
-    [emit, initialSession.id]
+    [socket, initialSession.id]
   );
 
   const deleteGroup = useCallback(
     (groupId: string) => {
+      if (!socket) return;
       // Optimistic update
       setGroups((prev) => prev.filter((group) => group.id !== groupId));
       // Broadcast
-      emit("group:deleted", { sessionId: initialSession.id, groupId });
+      socket.emit("group:deleted", { sessionId: initialSession.id, groupId });
     },
-    [emit, initialSession.id]
+    [socket, initialSession.id]
   );
 
   const changeStage = useCallback(
     (newStage: SessionStage) => {
+      if (!socket) return;
       // Optimistic update
       setCurrentStage(newStage);
       // Broadcast
-      emit("stage:change", {
+      socket.emit("stage:change", {
         sessionId: initialSession.id,
         newStage,
         changedBy: userId,
       });
     },
-    [emit, initialSession.id, userId]
+    [socket, initialSession.id, userId]
   );
 
   const value: SessionContextValue = {
@@ -267,6 +303,8 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
     activeUsers,
     userCount,
     isConnected,
+    userId,
+    userName,
     updateIdea,
     deleteIdea,
     moveIdea,

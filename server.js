@@ -49,9 +49,21 @@ app.prepare().then(() => {
       io.to(`session:${sessionId}`).emit("user:left", { userId });
     });
 
-    // Forward all session events to the room
+    // Stage change - transform to "stage:changed" for clients
+    socket.on("stage:change", (data) => {
+      console.log("Stage change:", data);
+      if (data.sessionId) {
+        // Emit to all clients in the room (including sender)
+        io.to(`session:${data.sessionId}`).emit("stage:changed", {
+          sessionId: data.sessionId,
+          newStage: data.newStage,
+          changedBy: data.changedBy,
+        });
+      }
+    });
+
+    // Forward other events to the room
     const forwardEvents = [
-      "stage:change",
       "idea:created",
       "idea:updated",
       "idea:deleted",
@@ -67,6 +79,7 @@ app.prepare().then(() => {
 
     forwardEvents.forEach((event) => {
       socket.on(event, (data) => {
+        console.log(`Event ${event}:`, data);
         if (data.sessionId) {
           socket.to(`session:${data.sessionId}`).emit(event, data);
         }

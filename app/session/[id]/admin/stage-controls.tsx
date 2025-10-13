@@ -76,16 +76,24 @@ export const StageControls = ({
 
     startTransition(async () => {
       try {
+        console.log("🎭 Admin changing stage to:", newStage);
         await updateSessionStage(sessionId, newStage);
         setCurrentStage(newStage);
 
         // Broadcast to other participants
-        emitEvent("stage:change", {
+        console.log("📡 Broadcasting stage:change event", {
           sessionId,
           newStage,
-          userId,
+          changedBy: userId,
         });
+        const success = emitEvent("stage:change", {
+          sessionId,
+          newStage,
+          changedBy: userId,
+        });
+        console.log("📡 Emit success:", success);
       } catch (err) {
+        console.error("🔴 Stage change error:", err);
         setError(err instanceof Error ? err.message : "Failed to change stage");
       }
     });

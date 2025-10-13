@@ -2,10 +2,16 @@
 
 import { useSession } from "@/lib/contexts/session-context";
 import Link from "next/link";
-import Image from "next/image";
+import { GreenRoom } from "./stages/green-room";
+import { IdeaCollection } from "./stages/idea-collection";
+import { IdeaVoting } from "./stages/idea-voting";
+import { getUserRole } from "@/lib/utils/permissions";
 
 export default function SessionBoard() {
-  const { session, currentStage, activeUsers, userCount, isConnected } = useSession();
+  const { session, ideas, currentStage, userCount, isConnected, userId } = useSession();
+
+  // Determine if user is admin
+  const userRole = getUserRole(session, userId);
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
@@ -69,6 +75,16 @@ export default function SessionBoard() {
                   {currentStage.replace(/_/g, " ")}
                 </span>
               </div>
+
+              {/* Admin Button */}
+              {(userRole === "owner" || userRole === "admin") && (
+                <Link
+                  href={`/session/${session.id}/admin`}
+                  className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                >
+                  Admin Controls
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -76,47 +92,88 @@ export default function SessionBoard() {
 
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="rounded-lg border border-zinc-200 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-900">
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
-            Session Board
-          </h2>
-          <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-            Current stage: <strong>{currentStage}</strong>
-          </p>
-          <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-500">
-            Stage-specific components will be rendered here based on the current stage.
-          </p>
-
-          {/* Active Users */}
-          {activeUsers.length > 0 && (
-            <div className="mt-6">
-              <h3 className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Active Participants:
-              </h3>
-              <div className="mt-2 flex flex-wrap justify-center gap-2">
-                {activeUsers.map((user) => (
-                  <div
-                    key={user.id}
-                    className="flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 dark:border-zinc-800 dark:bg-zinc-900"
-                  >
-                    {user.image && (
-                      <Image
-                        src={user.image}
-                        alt={user.name ?? "User"}
-                        width={20}
-                        height={20}
-                        className="h-5 w-5 rounded-full"
+        {/* Render stage-specific components */}
+        {currentStage === "pre_session" && (
+          <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="mx-auto max-w-2xl">
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+                Session Not Started
+              </h2>
+              <p className="mt-4 text-zinc-600 dark:text-zinc-400">
+                The facilitator will start the session soon. Please wait...
+              </p>
+              <div className="mt-8 rounded-lg border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-800 dark:bg-zinc-900">
+                <h3 className="text-lg font-medium text-zinc-900 dark:text-zinc-50">
+                  {session.name}
+                </h3>
+                {session.description && (
+                  <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                    {session.description}
+                  </p>
+                )}
+                <div className="mt-4 flex flex-wrap justify-center gap-4">
+                  {session.categories.map((category) => (
+                    <div
+                      key={category.id}
+                      className="flex items-center gap-2"
+                    >
+                      <div
+                        className="h-3 w-3 rounded-full"
+                        style={{ backgroundColor: category.color }}
                       />
-                    )}
-                    <span className="text-sm text-zinc-700 dark:text-zinc-300">
-                      {user.name ?? "Anonymous"}
-                    </span>
-                  </div>
-                ))}
+                      <span className="text-sm text-zinc-700 dark:text-zinc-300">
+                        {category.name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
+
+        {currentStage === "green_room" && (
+          <GreenRoom sessionId={session.id} initialUserCount={userCount} />
+        )}
+
+        {currentStage === "idea_collection" && (
+          <IdeaCollection
+            sessionId={session.id}
+            categories={session.categories}
+            initialIdeas={ideas}
+            userId={userId}
+          />
+        )}
+
+        {currentStage === "idea_voting" && session.settings && (
+          <IdeaVoting
+            sessionId={session.id}
+            categories={session.categories}
+            ideas={ideas}
+            settings={session.settings}
+            userId={userId}
+          />
+        )}
+
+        {(currentStage === "idea_grouping" ||
+          currentStage === "idea_finalization" ||
+          currentStage === "post_session") && (
+          <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center dark:border-zinc-800 dark:bg-zinc-900">
+            <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+              {currentStage === "idea_grouping" && "Grouping Ideas"}
+              {currentStage === "idea_finalization" && "Finalizing Results"}
+              {currentStage === "post_session" && "Session Complete"}
+            </h2>
+            <p className="mt-4 text-zinc-600 dark:text-zinc-400">
+              {currentStage === "idea_grouping" &&
+                "Organize ideas into groups. This stage is coming soon!"}
+              {currentStage === "idea_finalization" &&
+                "Review final results and action items. This stage is coming soon!"}
+              {currentStage === "post_session" &&
+                "Thank you for participating! Results view coming soon."}
+            </p>
+          </div>
+        )}
       </main>
     </div>
   );
