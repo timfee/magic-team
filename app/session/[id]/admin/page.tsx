@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { StageControls } from "./stage-controls";
+import { StageControls } from "@/components/session/admin/stage-controls";
 
 export default async function AdminPage({
   params,

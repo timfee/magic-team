@@ -1,5 +1,5 @@
 import { SessionProvider } from "@/lib/contexts/firebase-session-context";
-import SessionBoard from "./components/session-board";
+import SessionBoard from "@/components/session/session-board";
 
 export default async function SessionPage({
   params,

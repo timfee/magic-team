@@ -1,5 +1,5 @@
 
-import CreateSessionForm from "./create-session-form";
+import CreateSessionForm from "@/components/session/create-session-form";
 
 export default async function CreateSessionPage() {
 

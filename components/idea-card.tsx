@@ -23,12 +23,10 @@ export const IdeaCard = ({
   dropIndicator = null,
   showVotes = true,
 }: IdeaCardProps) => {
-  // Only use sortable if draggable is true
-  const sortable = draggable
-    ? useSortable({ id: idea.id, data: { type: "idea", idea } })
-    : null;
+  // Always call hooks unconditionally (React rules)
+  const sortable = useSortable({ id: idea.id, data: { type: "idea", idea } });
 
-  const style = draggable && sortable
+  const style = draggable
     ? {
         transform: CSS.Transform.toString(sortable.transform),
         transition: sortable.transition,
@@ -118,7 +116,7 @@ export const IdeaCard = ({
         </div>
       )}
 
-      {draggable && sortable && (
+      {draggable && (
         <div
           className="absolute left-0 top-0 h-full w-1 rounded-l-lg"
           style={{ backgroundColor: categoryColor }}
@@ -127,7 +125,7 @@ export const IdeaCard = ({
     </div>
   );
 
-  if (draggable && sortable) {
+  if (draggable) {
     return (
       <div className="relative">
         {showGlow && (

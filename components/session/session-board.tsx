@@ -2,10 +2,10 @@
 
 import { useSession } from "@/lib/contexts/firebase-session-context";
 import Link from "next/link";
-import { GreenRoom } from "./stages/green-room";
-import { IdeaCollection } from "./stages/idea-collection";
-import { IdeaGrouping } from "./stages/idea-grouping";
-import { IdeaVoting } from "./stages/idea-voting";
+import { GreenRoom } from "@/components/session/stages/green-room";
+import { IdeaCollection } from "@/components/session/stages/idea-collection";
+import { IdeaGrouping } from "@/components/session/stages/idea-grouping";
+import { IdeaVoting } from "@/components/session/stages/idea-voting";
 
 export default function SessionBoard() {
   const {
