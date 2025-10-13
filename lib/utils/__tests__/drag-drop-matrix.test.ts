@@ -471,23 +471,25 @@ describe("DRAG_DROP_MATRIX - Critical State Machine", () => {
     });
 
     it("should reject non-string activeId", () => {
+      // Testing runtime validation with invalid type
       const state = {
-        activeId: 123 as unknown,
+        activeId: 123,
         targetId: "idea-2",
         activeGroupId: null,
         targetGroupId: null,
-      };
+      } as never;
 
       expect(isValidDragDropState(state)).toBe(false);
     });
 
     it("should reject non-string groupIds", () => {
+      // Testing runtime validation with invalid type
       const state = {
         activeId: "idea-1",
         targetId: "idea-2",
-        activeGroupId: 123 as unknown,
+        activeGroupId: 123,
         targetGroupId: null,
-      };
+      } as never;
 
       expect(isValidDragDropState(state)).toBe(false);
     });
