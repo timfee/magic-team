@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { CreateIdeaInput } from "@/lib/types/session";
-import type { DocumentReference, DocumentData } from "firebase/firestore";
+import { createMockDocRef, getCallArg, hasProperties } from "./test-helpers";
 
 // Mock Firebase
 vi.mock("@/lib/firebase/client", () => ({
@@ -46,9 +46,7 @@ describe("Idea Actions", () => {
       const { addDoc } = await import("firebase/firestore");
 
       const mockAddDoc = vi.mocked(addDoc);
-      mockAddDoc.mockResolvedValue({
-        id: "idea-123",
-      } as DocumentReference<DocumentData>);
+      mockAddDoc.mockResolvedValue(createMockDocRef("idea-123"));
 
       const input: CreateIdeaInput = {
         sessionId: "session-123",
@@ -62,7 +60,7 @@ describe("Idea Actions", () => {
       expect(mockAddDoc).toHaveBeenCalled();
       expect(result).toHaveProperty("ideaId", "idea-123");
 
-      const ideaData = mockAddDoc.mock.calls[0][1] as Partial<IdeaData>;
+      const ideaData = getCallArg<Partial<IdeaData>>(mockAddDoc, 0, 1);
       expect(ideaData.content).toBe("Test idea content");
       expect(ideaData.isAnonymous).toBe(false);
     });
@@ -72,9 +70,7 @@ describe("Idea Actions", () => {
       const { addDoc } = await import("firebase/firestore");
 
       const mockAddDoc = vi.mocked(addDoc);
-      mockAddDoc.mockResolvedValue({
-        id: "idea-456",
-      } as DocumentReference<DocumentData>);
+      mockAddDoc.mockResolvedValue(createMockDocRef("idea-456"));
 
       const input: CreateIdeaInput = {
         sessionId: "session-123",
@@ -85,7 +81,7 @@ describe("Idea Actions", () => {
 
       await createIdea(input);
 
-      const ideaData = mockAddDoc.mock.calls[0][1] as Partial<IdeaData>;
+      const ideaData = getCallArg<Partial<IdeaData>>(mockAddDoc, 0, 1);
       expect(ideaData.isAnonymous).toBe(true);
       expect(ideaData.authorId).toBeUndefined();
     });
@@ -95,9 +91,7 @@ describe("Idea Actions", () => {
       const { addDoc } = await import("firebase/firestore");
 
       const mockAddDoc = vi.mocked(addDoc);
-      mockAddDoc.mockResolvedValue({
-        id: "idea-789",
-      } as DocumentReference<DocumentData>);
+      mockAddDoc.mockResolvedValue(createMockDocRef("idea-789"));
 
       const input: CreateIdeaInput = {
         sessionId: "session-123",
@@ -108,9 +102,9 @@ describe("Idea Actions", () => {
 
       await createIdea(input);
 
-      const ideaData = mockAddDoc.mock.calls[0][1] as Partial<IdeaData>;
+      const ideaData = getCallArg<Partial<IdeaData>>(mockAddDoc, 0, 1);
       // Order defaults to 0 if not in the implementation
-      expect(ideaData).toHaveProperty("order");
+      expect(hasProperties<IdeaData>(ideaData, "order")).toBe(true);
       expect(typeof ideaData.order).toBe("number");
     });
   });
@@ -128,9 +122,9 @@ describe("Idea Actions", () => {
       });
 
       expect(mockUpdateDoc).toHaveBeenCalled();
-      const updateData = mockUpdateDoc.mock.calls[0][1] as UpdateData;
+      const updateData = getCallArg<UpdateData>(mockUpdateDoc, 0, 1);
       expect(updateData.content).toBe("Updated content");
-      expect(updateData).toHaveProperty("updatedAt");
+      expect(hasProperties<UpdateData>(updateData, "updatedAt")).toBe(true);
     });
 
     it("should update idea category and group", async () => {
@@ -145,7 +139,7 @@ describe("Idea Actions", () => {
         groupId: "new-group",
       });
 
-      const updateData = mockUpdateDoc.mock.calls[0][1] as UpdateData;
+      const updateData = getCallArg<UpdateData>(mockUpdateDoc, 0, 1);
       expect(updateData.categoryId).toBe("new-category");
       expect(updateData.groupId).toBe("new-group");
     });
