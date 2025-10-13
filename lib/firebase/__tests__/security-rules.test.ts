@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
+import { describe, it, beforeAll, afterAll, beforeEach } from "vitest";
 import {
   setupFirebaseTest,
   cleanupFirebaseTest,
@@ -9,7 +9,6 @@ import {
 import {
   assertFails,
   assertSucceeds,
-  type RulesTestContext,
 } from "@firebase/rules-unit-testing";
 import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 

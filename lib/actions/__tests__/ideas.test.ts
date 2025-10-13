@@ -32,7 +32,7 @@ interface UpdateData {
   content?: string;
   categoryId?: string;
   groupId?: string | null;
-  updatedAt: Date;
+  updatedAt?: Date;
 }
 
 describe("Idea Actions", () => {

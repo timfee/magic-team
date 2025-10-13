@@ -10,7 +10,11 @@ import { Facepile } from "@/components/ui/facepile";
 import { useSession } from "@/lib/contexts/firebase-session-context";
 import Link from "next/link";
 
-export default function SessionBoard() {
+interface SessionBoardProps {
+  sessionId: string;
+}
+
+export default function SessionBoard({ sessionId }: SessionBoardProps) {
   const {
     session,
     ideas,
@@ -25,7 +29,7 @@ export default function SessionBoard() {
 
   // Show loading state while session data is being fetched
   if (isLoading || !session) {
-    return <SessionLoading sessionId={session?.id ?? "loading"} />;
+    return <SessionLoading sessionId={sessionId} />;
   }
 
   return (

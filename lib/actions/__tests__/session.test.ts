@@ -21,7 +21,7 @@ interface UpdateData {
   description?: string;
   visibility?: "public" | "private" | "protected";
   currentStage?: string;
-  updatedAt: Date;
+  updatedAt?: Date;
 }
 
 interface AdminData {
@@ -277,6 +277,12 @@ describe("Session Actions", () => {
             }),
           },
         ],
+        metadata: {} as never,
+        query: {} as never,
+        size: 2,
+        empty: false,
+        forEach: () => {},
+        docChanges: () => [],
       } as QuerySnapshot<DocumentData>);
 
       const sessions = await getUserSessions("user-123");

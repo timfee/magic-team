@@ -9,7 +9,33 @@ interface AdminControlsProps {
 }
 
 export const AdminControls = ({ sessionId }: AdminControlsProps) => {
-  const { session, userCount, ideas } = useSession();
+  const { session, userCount, ideas, isLoading } = useSession();
+
+  // Show loading state while session data is being fetched
+  if (isLoading || !session) {
+    return (
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="space-y-6 lg:col-span-2">
+          <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="h-6 w-32 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+            <div className="mt-4 space-y-2">
+              <div className="h-4 w-48 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+              <div className="h-4 w-36 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+            </div>
+          </div>
+        </div>
+        <div className="space-y-6">
+          <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="h-6 w-24 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+            <div className="mt-4 space-y-2">
+              <div className="h-4 w-full animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+              <div className="h-4 w-full animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">
@@ -68,8 +94,7 @@ export const AdminControls = ({ sessionId }: AdminControlsProps) => {
           <Link
             href={`/session/${sessionId}/presentation`}
             target="_blank"
-            className="mt-4 block w-full rounded-md bg-zinc-900 px-4 py-2 text-center text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
-          >
+            className="mt-4 block w-full rounded-md bg-zinc-900 px-4 py-2 text-center text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200">
             Open Presentation View
           </Link>
         </div>
@@ -87,9 +112,7 @@ export const AdminControls = ({ sessionId }: AdminControlsProps) => {
               </dd>
             </div>
             <div>
-              <dt className="text-zinc-600 dark:text-zinc-400">
-                Visibility
-              </dt>
+              <dt className="text-zinc-600 dark:text-zinc-400">Visibility</dt>
               <dd className="mt-1 font-medium text-zinc-900 capitalize dark:text-zinc-50">
                 {session.visibility}
               </dd>

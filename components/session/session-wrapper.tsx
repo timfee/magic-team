@@ -17,7 +17,7 @@ export const SessionWrapper = ({ sessionId }: SessionWrapperProps) => {
       userId={userId ?? "anonymous"}
       userName={userName ?? "Anonymous User"}
       userPhoto={userPhoto}>
-      <SessionBoard />
+      <SessionBoard sessionId={sessionId} />
     </SessionProvider>
   );
 };

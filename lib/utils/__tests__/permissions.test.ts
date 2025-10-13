@@ -17,6 +17,7 @@ describe("Permissions Utilities", () => {
     owner: {
       id: "owner-123",
       name: "Owner User",
+      email: "owner@example.com",
       image: null,
     },
     admins: [

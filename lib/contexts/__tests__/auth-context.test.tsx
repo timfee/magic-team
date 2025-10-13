@@ -16,10 +16,10 @@ vi.mock("firebase/auth", () => ({
   onAuthStateChanged: (
     auth: unknown,
     callback: (user: User | null) => void,
-  ) => mockOnAuthStateChanged(auth, callback),
-  signInWithPopup: (auth: unknown, provider: unknown) =>
-    mockSignInWithPopup(auth, provider),
-  signOut: (auth: unknown) => mockSignOut(auth),
+  ): (() => void) => mockOnAuthStateChanged(auth, callback) as () => void,
+  signInWithPopup: (auth: unknown, provider: unknown): Promise<unknown> =>
+    mockSignInWithPopup(auth, provider) as Promise<unknown>,
+  signOut: (auth: unknown): Promise<void> => mockSignOut(auth) as Promise<void>,
   GoogleAuthProvider: vi.fn(),
 }));
 
