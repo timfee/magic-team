@@ -258,6 +258,11 @@ export type GroupUpdatedEvent = {
   updates: Partial<IdeaGroup>;
 };
 
+export type GroupDeletedEvent = {
+  sessionId: string;
+  groupId: string;
+};
+
 export type CommentCreatedEvent = {
   sessionId: string;
   comment: Comment & {

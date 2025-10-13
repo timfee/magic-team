@@ -44,14 +44,18 @@ A real-time multiplayer retrospective application built with Next.js 15, Socket.
 - Admin page (`/session/[id]/admin`) with stage management controls
 - Real-time stage synchronization across all clients
 
-### Phase 4: Stage-Specific UIs (Partial)
+### Phase 4: Stage-Specific UIs
 - Green Room stage - Waiting area with live participant count
 - Idea Collection stage - Anonymous idea submission with real-time display
+- Idea Voting stage - Vote allocation with real-time updates
+- Idea Grouping stage - Drag-and-drop with real-time sync
 - Idea Card component - Display individual ideas with vote counts
 - Stage-based routing in SessionBoard
 - Category-filtered idea display
 - Per-category submission limits enforced
-- Optimistic UI updates for idea creation
+- Vote rules enforcement (votes per user, per category, per idea)
+- Optimistic UI updates for ideas and votes
+- Drag-and-drop grouping with @dnd-kit
 
 ## 🚧 TODO
 
@@ -73,23 +77,33 @@ A real-time multiplayer retrospective application built with Next.js 15, Socket.
 - [ ] Pre-submit functionality (if enabled)
 - [ ] Countdown timer
 
-**Idea Grouping**
-- [ ] Drag-and-drop with @dnd-kit
-- [ ] Create/edit groups with titles
-- [ ] Move ideas between groups and categories
+**Idea Grouping** ✅
+- [x] Advanced drag-and-drop with @dnd-kit
+- [x] Auto-group creation: drag one idea onto another to create a group
+- [x] Auto-delete empty groups when last card is removed
+- [x] Cross-category grouping (ideas from any category can be grouped together)
+- [x] Color preservation (cards keep their original category color)
+- [x] Move ideas between groups and categories
+- [x] Real-time synchronization for all drag operations
+- [x] Delete groups with ideas moving back to ungrouped
+- [x] Max cards per group enforcement
+- [x] Visual feedback: drag overlays, hover states, drop targets
+- [x] Three-column layout with mixed groups section
 - [ ] Real-time multiplayer dragging (show other users' cursors)
 - [ ] Conflict resolution for simultaneous moves
 - [ ] Comment system on ideas and groups
-- [ ] Max cards per group enforcement
 
-**Voting**
-- [ ] Vote allocation UI (N votes per user)
-- [ ] Visual vote indicators (dots, hearts, etc)
-- [ ] Real-time vote count updates
-- [ ] Rules enforcement (max votes per user/idea/category, groups-only/ideas-only)
-- [ ] Vote removal
+**Voting** ✅
+- [x] Vote allocation UI (N votes per user)
+- [x] Visual vote indicators (heart icons)
+- [x] Real-time vote count updates
+- [x] Rules enforcement (max votes per user via server actions)
+- [x] Vote/Unvote toggle buttons
+- [x] Remaining votes indicator
+- [x] Ideas sorted by vote count
 - [ ] Vote visualization (bar charts, heatmaps)
-- [ ] Remaining votes indicator
+- [ ] Category-specific vote limits UI
+- [ ] Group voting support
 
 **Finalization**
 - [ ] Idea selection interface
@@ -192,8 +206,15 @@ app/
 │   ├── idea-card.tsx                         ✅ Individual idea display
 │   └── stages/
 │       ├── green-room.tsx                    ✅ Waiting room
-│       └── idea-collection.tsx               ✅ Idea submission stage
+│       ├── idea-collection.tsx               ✅ Idea submission stage
+│       ├── idea-voting.tsx                   ✅ Voting stage
+│       └── idea-grouping.tsx                 ✅ Drag-and-drop grouping stage
 └── session/[id]/presentation/page.tsx        🚧 Presentation view
+
+components/ui/
+├── button.tsx                                ✅ Reusable button component
+├── badge.tsx                                 ✅ Badge component
+└── card.tsx                                  ✅ Card components
 
 lib/
 ├── actions/                                  ✅ All Server Actions (session, ideas, comments, votes)
@@ -204,26 +225,28 @@ lib/
 ├── contexts/session-context.tsx              ✅ Session state provider
 └── socket/client.tsx                         ✅ Socket hooks & provider
 
-server.js                                     ✅ Custom Node server with Socket.io
+server.ts                                     ✅ TypeScript server + presence tracking
+tsconfig.server.json                          ✅ Server TypeScript config
 ```
 
 ## 🚀 Next Steps
 
-1. **Build Drag-and-Drop Grouping** - @dnd-kit integration, real-time sync, conflict handling
-2. **Create Voting System** - Vote allocation UI, rules engine, real-time updates
-3. **Build Presentation View** - Projector-optimized layout, follow admin's focus
-4. **Add Timers** - Countdown timers for idea collection and voting stages
-5. **Add Polish** - Animations, loading states, error handling, accessibility
+1. **Build Presentation View** - Projector-optimized layout, follow admin's focus, read-only mode
+2. **Add Timers** - Countdown timers for idea collection and voting stages
+3. **Finalization Stage** - Select ideas, prioritize, assign owners, export results
+4. **Add Comment System** - Comments on ideas and groups
+5. **Polish** - Animations, loading states, error handling, accessibility, mobile optimization
 
 ## 🔧 Development Commands
 
 ```bash
-npm run dev              # Start dev server
+npm run dev              # Start dev server (tsx watch mode)
 npm run db:proxy         # Start Cloud SQL proxy
 npm run db:push          # Push schema to database
 npm run db:studio        # Open Drizzle Studio
 npm run lint             # Run ESLint
-npm run build            # Production build
+npm run build            # Build Next.js + compile server.ts
+npm start                # Run production server
 ```
 
 ## 🧹 Code Quality
@@ -234,12 +257,63 @@ npm run build            # Production build
 
 ## 🐛 Recent Fixes
 
-### WebSocket Real-Time Updates (2025-10-13)
-- Consolidated to single socket system (removed duplicate socket implementations)
-- Fixed stage change events not propagating between admin and participants
-- Server transforms `stage:change` → `stage:changed` for clients
+### Server Migration to TypeScript (2025-10-13)
+- Migrated `server.js` → `server.ts` with full type safety
+- Created `tsconfig.server.json` for server-specific compilation
+- Updated build process: Next.js + TypeScript server compilation
+- Using `tsx` for hot-reload development
+- Compiled server outputs to `dist/server.js` for production
+
+### WebSocket & Presence Tracking (2025-10-13)
+- Consolidated to single socket system (removed duplicate implementations)
+- Fixed stage changes not propagating between admin and participants
+- Fixed presence tracking - now shows participant names and avatars
+- Server queries database and broadcasts `presence:update` events
 - Added "Admin Controls" button for owners/admins
-- All components now use unified `SocketProvider` from `lib/socket/client.tsx`
+- All components use unified `SocketProvider` from `lib/socket/client.tsx`
+- Created reusable UI component library in `components/ui/`
+
+## 🐛 Recent Fixes
+
+### Simplified Drag-and-Drop Grouping (2025-10-13)
+**Core Features:**
+- Auto-group creation: Drag ungrouped ideas onto each other to instantly create a group with a random name
+- Add to existing groups: Drag any card onto another card in a group to join that group
+- Move between groups: Drag a card from one group to another group by dropping on any card in target group
+- Auto-delete empty groups: When you drag the last card out of a group, the group is automatically removed
+- Color preservation: Cards maintain their original category color (categoryId never changes after creation)
+- Single-category groups: Each group lives in one category (like TeamRetro)
+- Three-column category view: Each category shows its ungrouped ideas and groups
+
+**Visual Feedback (Crystal Clear Drop Targets):**
+- Contextual indicators on hover:
+  - Both ungrouped → Gradient glow + "Will create group"
+  - One ungrouped, one grouped → Blue ring + "Will join this group"
+  - Both grouped (different groups) → Blue ring + "Will move to this group"
+  - Same group → No indicator (no-op)
+- Ghost placeholders: Blue dashed boxes with "Will add here" or "Will ungroup here" in drop zones
+- Drop zones: Thick blue ring (ring-4) + blue background on hover over groups and ungrouped zones
+- Context-aware empty zone messaging: "Drop here to ungroup" when dragging FROM a group; "Drop ideas here" otherwise
+- Ungrouped zones are functional drop targets: Drag a grouped card to any empty ungrouped area to ungroup it
+- Drag overlay: Shadow-2xl with 0.3 opacity on source card for clear visual hierarchy
+- No snap-back: Cards smoothly transition to their final position
+
+**Technical Implementation:**
+- Fixed hydration mismatch by rendering DnD only after client mount (prevents SSR ID conflicts)
+- Collision detection with `closestCorners` for idea-on-idea drops
+- Simplified `handleDragEnd` with 4 cases for idea-on-idea:
+  1. Both ungrouped → create new group in first idea's category
+  2. Target grouped, active ungrouped → add active to target's group
+  3. Active grouped, target ungrouped → add target to active's group
+  4. Both grouped (different) → move active to target's group + auto-delete source if empty
+- UngroupedDropZone component using `useDroppable` for functional drop targets
+- dropIndicator prop with 3 states: "create-group", "join-group", "move-to-group"
+- Random group title generator with adjectives + nouns (e.g., "Brilliant Solutions")
+- Optimistic UI updates with smooth transitions
+- Real-time broadcast of all grouping operations via Socket.io
+- Auto-delete empty groups after last card is removed
+- Ideas never change categoryId (color preservation)
+- Groups belong to single category (simpler model like TeamRetro)
 
 ## 🐛 Known Issues
 

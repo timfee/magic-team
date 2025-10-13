@@ -5,10 +5,11 @@ import Link from "next/link";
 import { GreenRoom } from "./stages/green-room";
 import { IdeaCollection } from "./stages/idea-collection";
 import { IdeaVoting } from "./stages/idea-voting";
+import { IdeaGrouping } from "./stages/idea-grouping";
 import { getUserRole } from "@/lib/utils/permissions";
 
 export default function SessionBoard() {
-  const { session, ideas, currentStage, userCount, isConnected, userId } = useSession();
+  const { session, ideas, groups, currentStage, userCount, isConnected, userId } = useSession();
 
   // Determine if user is admin
   const userRole = getUserRole(session, userId);
@@ -155,18 +156,23 @@ export default function SessionBoard() {
           />
         )}
 
-        {(currentStage === "idea_grouping" ||
-          currentStage === "idea_finalization" ||
+        {currentStage === "idea_grouping" && (
+          <IdeaGrouping
+            sessionId={session.id}
+            categories={session.categories}
+            initialIdeas={ideas}
+            initialGroups={groups}
+          />
+        )}
+
+        {(currentStage === "idea_finalization" ||
           currentStage === "post_session") && (
           <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center dark:border-zinc-800 dark:bg-zinc-900">
             <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-              {currentStage === "idea_grouping" && "Grouping Ideas"}
               {currentStage === "idea_finalization" && "Finalizing Results"}
               {currentStage === "post_session" && "Session Complete"}
             </h2>
             <p className="mt-4 text-zinc-600 dark:text-zinc-400">
-              {currentStage === "idea_grouping" &&
-                "Organize ideas into groups. This stage is coming soon!"}
               {currentStage === "idea_finalization" &&
                 "Review final results and action items. This stage is coming soon!"}
               {currentStage === "post_session" &&
