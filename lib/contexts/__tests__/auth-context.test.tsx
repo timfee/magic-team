@@ -13,9 +13,13 @@ const mockSignInWithPopup = vi.fn();
 const mockSignOut = vi.fn();
 
 vi.mock("firebase/auth", () => ({
-  onAuthStateChanged: (...args: any[]) => mockOnAuthStateChanged(...args),
-  signInWithPopup: (...args: any[]) => mockSignInWithPopup(...args),
-  signOut: (...args: any[]) => mockSignOut(...args),
+  onAuthStateChanged: (
+    auth: unknown,
+    callback: (user: User | null) => void,
+  ) => mockOnAuthStateChanged(auth, callback),
+  signInWithPopup: (auth: unknown, provider: unknown) =>
+    mockSignInWithPopup(auth, provider),
+  signOut: (auth: unknown) => mockSignOut(auth),
   GoogleAuthProvider: vi.fn(),
 }));
 
@@ -29,10 +33,12 @@ function TestComponent() {
 
   return (
     <div>
-      <div data-testid="user-status">{user ? "Authenticated" : "Not authenticated"}</div>
-      <div data-testid="user-id">{userId || "No user ID"}</div>
-      <div data-testid="user-email">{userEmail || "No email"}</div>
-      <div data-testid="user-name">{userName || "No name"}</div>
+      <div data-testid="user-status">
+        {user ? "Authenticated" : "Not authenticated"}
+      </div>
+      <div data-testid="user-id">{userId ?? "No user ID"}</div>
+      <div data-testid="user-email">{userEmail ?? "No email"}</div>
+      <div data-testid="user-name">{userName ?? "No name"}</div>
     </div>
   );
 }
@@ -43,7 +49,7 @@ describe("AuthContext", () => {
   });
 
   it("should provide loading state initially", () => {
-    mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+    mockOnAuthStateChanged.mockImplementation(() => {
       // Don't call callback immediately to simulate loading
       return vi.fn();
     });
@@ -65,10 +71,12 @@ describe("AuthContext", () => {
       photoURL: "https://example.com/photo.jpg",
     };
 
-    mockOnAuthStateChanged.mockImplementation((auth, callback) => {
-      callback(mockUser as User);
-      return vi.fn();
-    });
+    mockOnAuthStateChanged.mockImplementation(
+      (_auth, callback: (user: User | null) => void) => {
+        callback(mockUser as User);
+        return vi.fn();
+      },
+    );
 
     render(
       <AuthProvider>
@@ -85,10 +93,12 @@ describe("AuthContext", () => {
   });
 
   it("should provide null user when not authenticated", async () => {
-    mockOnAuthStateChanged.mockImplementation((auth, callback) => {
-      callback(null);
-      return vi.fn();
-    });
+    mockOnAuthStateChanged.mockImplementation(
+      (_auth, callback: (user: User | null) => void) => {
+        callback(null);
+        return vi.fn();
+      },
+    );
 
     render(
       <AuthProvider>
@@ -106,7 +116,11 @@ describe("AuthContext", () => {
 
   it("should throw error when useAuth is used outside AuthProvider", () => {
     // Suppress console.error for this test
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {
+        // Intentionally empty - suppressing console.error for this test
+      });
 
     expect(() => {
       render(<TestComponent />);

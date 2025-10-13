@@ -36,13 +36,14 @@ interface ActiveUser {
 }
 
 interface SessionContextValue {
-  session: MagicSessionWithDetails;
+  session: MagicSessionWithDetails | null;
   ideas: IdeaWithDetails[];
   groups: IdeaGroupWithDetails[];
   currentStage: SessionStage;
   activeUsers: ActiveUser[];
   userCount: number;
   isConnected: boolean;
+  isLoading: boolean;
   userId: string;
   userName: string;
   // Methods
@@ -96,6 +97,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
   const [currentStage, setCurrentStage] = useState<SessionStage>("pre_session");
   const [activeUsers, setActiveUsers] = useState<ActiveUser[]>([]);
   const [userCount, setUserCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Load session data from Firebase
   useEffect(() => {
@@ -133,6 +135,9 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
           _count: { ideas: 0, presence: 0 },
         } as unknown as MagicSessionWithDetails);
         setCurrentStage(data.currentStage as SessionStage);
+        setIsLoading(false);
+      } else {
+        setIsLoading(false);
       }
     });
 
@@ -434,6 +439,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
     activeUsers,
     userCount,
     isConnected: true, // Always connected with Firestore
+    isLoading,
     userId,
     userName,
     updateIdea,

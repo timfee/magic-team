@@ -1,5 +1,36 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { CreateMagicSessionInput } from "@/lib/types/session";
+import type {
+  DocumentReference,
+  DocumentData,
+  QuerySnapshot,
+} from "firebase/firestore";
+
+interface SessionData {
+  name: string;
+  description?: string;
+  visibility: "public" | "private" | "protected";
+  currentStage: string;
+  ownerId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface UpdateData {
+  name?: string;
+  description?: string;
+  visibility?: "public" | "private" | "protected";
+  currentStage?: string;
+  updatedAt: Date;
+}
+
+interface AdminData {
+  sessionId: string;
+  userId: string;
+  role: "admin";
+  addedAt: Date;
+  addedById: string;
+}
 
 // Mock Firebase
 vi.mock("@/lib/firebase/client", () => ({
@@ -37,17 +68,14 @@ describe("Session Actions", () => {
   describe("createSession", () => {
     it("should validate session input", async () => {
       const { createSession } = await import("../session");
-      const {
-        addDoc,
-        collection,
-        setDoc,
-        doc,
-      } = await import("firebase/firestore");
+      const { addDoc, setDoc } = await import("firebase/firestore");
 
       const mockAddDoc = vi.mocked(addDoc);
       const mockSetDoc = vi.mocked(setDoc);
 
-      mockAddDoc.mockResolvedValue({ id: "test-session-id" } as any);
+      mockAddDoc.mockResolvedValue({
+        id: "test-session-id",
+      } as DocumentReference<DocumentData>);
       mockSetDoc.mockResolvedValue(undefined);
 
       const input: CreateMagicSessionInput = {
@@ -74,7 +102,9 @@ describe("Session Actions", () => {
       const mockAddDoc = vi.mocked(addDoc);
       const mockSetDoc = vi.mocked(setDoc);
 
-      mockAddDoc.mockResolvedValue({ id: "test-session-id" } as any);
+      mockAddDoc.mockResolvedValue({
+        id: "test-session-id",
+      } as DocumentReference<DocumentData>);
       mockSetDoc.mockResolvedValue(undefined);
 
       const input: CreateMagicSessionInput = {
@@ -85,7 +115,7 @@ describe("Session Actions", () => {
       await createSession(input, "user-123");
 
       const firstCall = mockAddDoc.mock.calls[0];
-      const sessionData = firstCall[1] as any;
+      const sessionData = firstCall[1] as Partial<SessionData>;
 
       expect(sessionData.visibility).toBe("public");
       expect(sessionData.currentStage).toBe("pre_session");
@@ -99,7 +129,9 @@ describe("Session Actions", () => {
       const mockAddDoc = vi.mocked(addDoc);
       const mockSetDoc = vi.mocked(setDoc);
 
-      mockAddDoc.mockResolvedValue({ id: "test-session-id" } as any);
+      mockAddDoc.mockResolvedValue({
+        id: "test-session-id",
+      } as DocumentReference<DocumentData>);
       mockSetDoc.mockResolvedValue(undefined);
 
       const input: CreateMagicSessionInput = {
@@ -132,7 +164,7 @@ describe("Session Actions", () => {
       await updateSession("session-123", { name: "Updated Name" });
 
       expect(mockUpdateDoc).toHaveBeenCalled();
-      const updateData = mockUpdateDoc.mock.calls[0][1] as any;
+      const updateData = mockUpdateDoc.mock.calls[0][1] as UpdateData;
       expect(updateData.name).toBe("Updated Name");
       expect(updateData).toHaveProperty("updatedAt");
     });
@@ -149,7 +181,7 @@ describe("Session Actions", () => {
       await updateSessionStage("session-123", "green_room");
 
       expect(mockUpdateDoc).toHaveBeenCalled();
-      const updateData = mockUpdateDoc.mock.calls[0][1] as any;
+      const updateData = mockUpdateDoc.mock.calls[0][1] as UpdateData;
       expect(updateData.currentStage).toBe("green_room");
     });
 
@@ -187,7 +219,9 @@ describe("Session Actions", () => {
       const { addDoc } = await import("firebase/firestore");
 
       const mockAddDoc = vi.mocked(addDoc);
-      mockAddDoc.mockResolvedValue({ id: "admin-doc-id" } as any);
+      mockAddDoc.mockResolvedValue({
+        id: "admin-doc-id",
+      } as DocumentReference<DocumentData>);
 
       const result = await addSessionAdmin(
         "session-123",
@@ -196,7 +230,7 @@ describe("Session Actions", () => {
       );
 
       expect(mockAddDoc).toHaveBeenCalled();
-      const adminData = mockAddDoc.mock.calls[0][1] as any;
+      const adminData = mockAddDoc.mock.calls[0][1] as Partial<AdminData>;
       expect(adminData.userId).toBe("admin-user-456");
       expect(adminData.addedById).toBe("owner-user-789");
       expect(adminData.role).toBe("admin");
@@ -210,7 +244,12 @@ describe("Session Actions", () => {
       const { getDocs, Timestamp } = await import("firebase/firestore");
 
       const timestamp1 = new Date("2024-01-01").getTime() / 1000;
-      const mockTimestamp1 = new (Timestamp as any)(timestamp1, 0);
+      const mockTimestamp1 = new (
+        Timestamp as unknown as new (
+          seconds: number,
+          nanoseconds: number,
+        ) => { toDate(): Date }
+      )(timestamp1, 0);
 
       const mockGetDocs = vi.mocked(getDocs);
       mockGetDocs.mockResolvedValue({
@@ -238,7 +277,7 @@ describe("Session Actions", () => {
             }),
           },
         ],
-      } as any);
+      } as QuerySnapshot<DocumentData>);
 
       const sessions = await getUserSessions("user-123");
 

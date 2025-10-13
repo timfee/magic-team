@@ -1,6 +1,7 @@
 "use client";
 
 import { ParticipantsList } from "@/components/participants-list";
+import { SessionLoading } from "@/components/session/session-loading";
 import { GreenRoom } from "@/components/session/stages/green-room";
 import { IdeaCollection } from "@/components/session/stages/idea-collection";
 import { IdeaGrouping } from "@/components/session/stages/idea-grouping";
@@ -17,9 +18,15 @@ export default function SessionBoard() {
     currentStage,
     userCount,
     isConnected,
+    isLoading,
     userId,
     activeUsers,
   } = useSession();
+
+  // Show loading state while session data is being fetched
+  if (isLoading || !session) {
+    return <SessionLoading sessionId={session?.id ?? "loading"} />;
+  }
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
