@@ -17,7 +17,9 @@ export const AdminWrapper = ({ sessionId }: AdminWrapperProps) => {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-950">
         <div className="text-center">
-          <div className="text-lg text-zinc-600 dark:text-zinc-400">Loading...</div>
+          <div className="text-lg text-zinc-600 dark:text-zinc-400">
+            Loading...
+          </div>
         </div>
       </div>
     );
@@ -36,14 +38,12 @@ export const AdminWrapper = ({ sessionId }: AdminWrapperProps) => {
           </p>
           <button
             onClick={() => signIn()}
-            className="mt-6 w-full rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-          >
+            className="mt-6 w-full rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700">
             Sign In with Google
           </button>
           <Link
             href={`/session/${sessionId}`}
-            className="mt-4 block text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-          >
+            className="mt-4 block text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50">
             ← Back to Session
           </Link>
         </div>
@@ -56,15 +56,13 @@ export const AdminWrapper = ({ sessionId }: AdminWrapperProps) => {
       sessionId={sessionId}
       userId={userId}
       userName={userName ?? "Anonymous User"}
-      userPhoto={userPhoto}
-    >
+      userPhoto={userPhoto}>
       <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="mb-8">
             <Link
               href={`/session/${sessionId}`}
-              className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-            >
+              className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50">
               ← Back to Session
             </Link>
             <h1 className="mt-4 text-3xl font-bold text-zinc-900 dark:text-zinc-50">

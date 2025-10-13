@@ -167,7 +167,13 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
     const interval = setInterval(() => {
       setDoc(
         presenceRef,
-        { userId, userName, userPhoto, isActive: true, lastSeenAt: serverTimestamp() },
+        {
+          userId,
+          userName,
+          userPhoto,
+          isActive: true,
+          lastSeenAt: serverTimestamp(),
+        },
         { merge: true },
       ).catch(console.error);
     }, 30000); // Update every 30 seconds
