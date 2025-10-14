@@ -12,6 +12,7 @@ import type {
   Category,
   IdeaGroupWithDetails,
   IdeaWithDetails,
+  CommentWithDetails,
 } from "@/lib/types/session";
 import {
   closestCorners,
@@ -29,12 +30,19 @@ import {
 import { useSortable } from "@dnd-kit/sortable";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { CommentThread } from "@/components/session/comment-thread";
+import { getCommentsWithDetails } from "@/lib/actions/comments";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { db } from "@/lib/firebase/client";
 
 interface IdeaGroupingProps {
   sessionId: string;
   categories: Category[];
   initialIdeas: IdeaWithDetails[];
   initialGroups: IdeaGroupWithDetails[];
+  userId: string | null;
+  isAdmin?: boolean;
 }
 
 // Generate random group title
@@ -130,6 +138,9 @@ const DroppableGroup = ({
   showGhostPlaceholder,
   dragOverId,
   activeId,
+  sessionId,
+  currentUserId,
+  isAdmin,
 }: {
   group: IdeaGroupWithDetails;
   ideas: IdeaWithDetails[];
@@ -140,11 +151,38 @@ const DroppableGroup = ({
   showGhostPlaceholder: boolean;
   dragOverId: string | null;
   activeId: string | null;
+  sessionId: string;
+  currentUserId: string | null;
+  isAdmin?: boolean;
 }) => {
   const { setNodeRef } = useSortable({
     id: group.id,
     data: { type: "group", group },
   });
+
+  // Comment state
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+  const [comments, setComments] = useState<CommentWithDetails[]>([]);
+  const [commentCount, setCommentCount] = useState(group._count?.comments ?? 0);
+
+  // Listen to comment count changes
+  useEffect(() => {
+    const commentsQuery = query(
+      collection(db, "sessions", sessionId, "comments"),
+      where("groupId", "==", group.id),
+    );
+    const unsubscribe = onSnapshot(commentsQuery, (snapshot) => {
+      setCommentCount(snapshot.size);
+    });
+    return () => unsubscribe();
+  }, [sessionId, group.id]);
+
+  // Load comments when modal opens
+  useEffect(() => {
+    if (isCommentsOpen) {
+      void getCommentsWithDetails(sessionId, undefined, group.id).then(setComments);
+    }
+  }, [isCommentsOpen, sessionId, group.id]);
 
   // Get category colors for ideas
   const getCategoryColor = (categoryId: string) => {
@@ -192,6 +230,24 @@ const DroppableGroup = ({
             {ideas.length}
             {group.maxCards && ` / ${group.maxCards}`}
           </span>
+          <button
+            onClick={() => setIsCommentsOpen(true)}
+            className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            aria-label="View comments">
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              />
+            </svg>
+            <span>{commentCount}</span>
+          </button>
           <Button
             variant="ghost"
             size="sm"
@@ -229,6 +285,26 @@ const DroppableGroup = ({
           </>
         )}
       </div>
+
+      {/* Comments Dialog */}
+      {isCommentsOpen && (
+        <Dialog open={isCommentsOpen} onOpenChange={setIsCommentsOpen}>
+          <DialogContent title={`Comments on ${group.title}`}>
+            <CommentThread
+              sessionId={sessionId}
+              groupId={group.id}
+              comments={comments}
+              currentUserId={currentUserId}
+              isAdmin={isAdmin}
+              onCommentAdded={() => {
+                void getCommentsWithDetails(sessionId, undefined, group.id).then(
+                  setComments,
+                );
+              }}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
@@ -339,6 +415,9 @@ const CategoryColumn = ({
   onDeleteGroup,
   dragOverId,
   activeId,
+  sessionId,
+  currentUserId,
+  isAdmin,
 }: {
   category: Category;
   ideas: IdeaWithDetails[];
@@ -346,6 +425,9 @@ const CategoryColumn = ({
   onDeleteGroup: (groupId: string) => void;
   dragOverId: string | null;
   activeId: string | null;
+  sessionId: string;
+  currentUserId: string | null;
+  isAdmin: boolean;
 }) => {
   // Ungrouped ideas in this category
   const ungroupedIdeas = ideas.filter(
@@ -403,6 +485,9 @@ const CategoryColumn = ({
               }
               dragOverId={dragOverId}
               activeId={activeId}
+              sessionId={sessionId}
+              currentUserId={currentUserId}
+              isAdmin={isAdmin}
             />
           );
         })}
@@ -415,6 +500,8 @@ export const IdeaGrouping = ({
   categories,
   initialIdeas,
   initialGroups,
+  userId,
+  isAdmin = false,
 }: IdeaGroupingProps) => {
   const ideas = initialIdeas;
   const groups = initialGroups;
@@ -704,6 +791,9 @@ export const IdeaGrouping = ({
               onDeleteGroup={handleDeleteGroup}
               dragOverId={overId}
               activeId={activeId}
+              sessionId={sessionId}
+              currentUserId={userId}
+              isAdmin={isAdmin}
             />
           ))}
         </div>

@@ -216,8 +216,6 @@ When making changes, ALWAYS:
 
 ## Additional Notes
 
-- **No database ORM usage**: Despite Drizzle schema existing, project currently uses Firebase Firestore exclusively for data
-- **No CI/CD workflows**: No GitHub Actions workflows exist yet (tests must be run locally)
 - **Turbopack enabled**: Dev server uses Turbopack for faster HMR
 - **Tailwind 4**: Uses latest Tailwind with PostCSS plugin
 - **Documentation**: See `TESTING.md`, `E2E_TESTING.md`, `PROJECT_STATUS.md` for detailed info

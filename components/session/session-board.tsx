@@ -8,6 +8,7 @@ import { IdeaGrouping } from "@/components/session/stages/idea-grouping";
 import { IdeaVoting } from "@/components/session/stages/idea-voting";
 import { Facepile } from "@/components/ui/facepile";
 import { useSession } from "@/lib/contexts/firebase-session-context";
+import { getUserRole } from "@/lib/utils/permissions";
 import Link from "next/link";
 
 interface SessionBoardProps {
@@ -31,6 +32,10 @@ export default function SessionBoard({ sessionId }: SessionBoardProps) {
   if (isLoading || !session) {
     return <SessionLoading sessionId={sessionId} />;
   }
+
+  // Determine if current user is admin
+  const userRole = userId ? getUserRole(session, userId) : "participant";
+  const isAdmin = userRole === "owner" || userRole === "admin";
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
@@ -174,6 +179,8 @@ export default function SessionBoard({ sessionId }: SessionBoardProps) {
             categories={session.categories}
             initialIdeas={ideas}
             initialGroups={groups}
+            userId={userId}
+            isAdmin={isAdmin}
           />
         )}
 

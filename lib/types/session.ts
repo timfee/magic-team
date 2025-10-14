@@ -81,6 +81,7 @@ export type Comment = {
   userId: string; // Changed from authorId to match Firestore security rules
   ideaId?: string;
   groupId?: string;
+  replyToId?: string; // For threaded comments
   createdAt: Date;
   updatedAt: Date;
 };
@@ -247,10 +248,28 @@ export type CreateIdeaGroupInput = {
 export type CreateCommentInput = {
   sessionId: string;
   content: string;
+  replyToId?: string; // Optional: comment ID being replied to
 } & (
   | { ideaId: string; groupId?: never }
   | { groupId: string; ideaId?: never }
 );
+
+export type CommentWithDetails = Comment & {
+  user: {
+    id: string;
+    name: string | null;
+    image: string | null;
+  };
+  replies?: CommentWithDetails[]; // Nested replies
+  replyTo?: {
+    id: string;
+    content: string;
+    user: {
+      id: string;
+      name: string | null;
+    };
+  } | null;
+};
 
 export type CastVoteInput = {
   sessionId: string;
