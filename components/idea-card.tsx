@@ -53,6 +53,8 @@ export const IdeaCard = ({
 
   const cardContent = (
     <div
+      data-testid="idea-card"
+      data-drop-indicator={dropIndicator ?? undefined}
       className={`group relative rounded-lg border bg-white p-4 transition-all hover:shadow-md ${
         isDraggedOver || dropIndicator
           ? "border-2 border-blue-500 ring-4 ring-blue-200 dark:ring-blue-900"

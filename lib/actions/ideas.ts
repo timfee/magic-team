@@ -68,10 +68,18 @@ export const moveIdeaToGroup = async (
   ideaId: string,
   groupId: string | null,
   sessionId: string,
+  order?: number,
 ) => {
   try {
     const ideaRef = doc(db, "sessions", sessionId, "ideas", ideaId);
-    await updateDoc(ideaRef, { groupId, updatedAt: serverTimestamp() });
+    const updates: Record<string, unknown> = {
+      groupId,
+      updatedAt: serverTimestamp(),
+    };
+    if (order !== undefined) {
+      updates.order = order;
+    }
+    await updateDoc(ideaRef, updates);
     return { success: true };
   } catch (error) {
     console.error("Error moving idea:", error);

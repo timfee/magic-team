@@ -144,6 +144,7 @@ const DroppableGroup = ({
   return (
     <div
       ref={setNodeRef}
+      data-testid="idea-group"
       className={`rounded-lg border-2 p-4 transition-all ${
         isOver
           ? "border-blue-500 bg-blue-50 ring-4 ring-blue-200 dark:bg-blue-950/30 dark:ring-blue-900"
@@ -248,6 +249,7 @@ const UngroupedDropZone = ({
   return (
     <div
       ref={setNodeRef}
+      data-testid="ungrouped-zone"
       className={`space-y-2 ${isDragging ? "min-h-32" : ""} ${
         isOver && isActiveIdeaGrouped
           ? "rounded-lg border-2 border-blue-500 bg-blue-50 p-2 ring-4 ring-blue-200 dark:bg-blue-950/30 dark:ring-blue-900"
@@ -543,6 +545,9 @@ export const IdeaGrouping = ({
       if (!overGroup) return;
 
       const fromGroupId = activeIdea.groupId;
+
+      // Don't move if already in target group (no-op)
+      if (fromGroupId === overGroup.id) return;
 
       startTransition(async () => {
         try {
