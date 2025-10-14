@@ -8,6 +8,7 @@ import {
   moveIdeaToGroup,
   updateIdea,
 } from "@/lib/actions/ideas";
+import { acquireLock, releaseLock } from "@/lib/actions/idea-locks";
 import type {
   Category,
   IdeaGroupWithDetails,
@@ -522,22 +523,59 @@ export const IdeaGrouping = ({
     useSensor(KeyboardSensor),
   );
 
-  const handleDragStart = (event: DragStartEvent) => {
-    setActiveId(event.active.id as string);
+  const handleDragStart = async (event: DragStartEvent) => {
+    const ideaId = event.active.id as string;
+    setActiveId(ideaId);
+
+    // Attempt to acquire lock for conflict resolution
+    if (userId) {
+      try {
+        const lockAcquired = await acquireLock(ideaId, userId, sessionId);
+        if (!lockAcquired) {
+          // Lock failed - another user is moving this idea
+          alert("Another user is currently moving this idea. Please try again in a moment.");
+          setActiveId(null);
+          return;
+        }
+      } catch (error) {
+        console.error("Failed to acquire lock:", error);
+        // Continue anyway - lock is best-effort
+      }
+    }
   };
 
   const handleDragOver = (event: DragOverEvent) => {
     setOverId(event.over?.id as string | null);
   };
 
-  const handleDragCancel = () => {
+  const handleDragCancel = async () => {
+    // Release lock when drag is cancelled
+    if (activeId && userId) {
+      try {
+        await releaseLock(activeId, userId, sessionId);
+      } catch (error) {
+        console.error("Failed to release lock:", error);
+      }
+    }
+
     // Reset state when drag is cancelled (ESC key or drag outside)
     setActiveId(null);
     setOverId(null);
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
+    const draggedIdeaId = active.id as string;
+
+    // Always release lock at the end of drag
+    if (userId) {
+      try {
+        await releaseLock(draggedIdeaId, userId, sessionId);
+      } catch (error) {
+        console.error("Failed to release lock:", error);
+      }
+    }
+
     setActiveId(null);
     setOverId(null);
 

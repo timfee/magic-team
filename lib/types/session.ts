@@ -59,6 +59,9 @@ export type Idea = {
   isSelected: boolean;
   priority?: number;
   assignedToId?: string;
+  // Conflict resolution fields
+  lockedById?: string; // User ID who currently has the idea locked
+  lockedAt?: Date; // When the lock was acquired
   createdAt: Date;
   updatedAt: Date;
 };
@@ -235,6 +238,8 @@ export type UpdateIdeaInput = Partial<{
   isSelected: boolean;
   priority: number;
   assignedToId: string | null;
+  lockedById: string | null;
+  lockedAt: Date | null;
 }>;
 
 export type CreateIdeaGroupInput = {

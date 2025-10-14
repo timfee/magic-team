@@ -56,8 +56,13 @@ service cloud.firestore {
         allow create: if canAccessSession(get(/databases/$(database)/documents/sessions/$(sessionId)).data) &&
                         (request.resource.data.isAnonymous == true ||
                          (isAuthenticated() && request.resource.data.authorId == request.auth.uid));
-        allow update: if isOwnerOrAdmin(get(/databases/$(database)/documents/sessions/$(sessionId)).data, sessionId) ||
-                        (isAuthenticated() && resource.data.authorId == request.auth.uid);
+        allow update: if (isOwnerOrAdmin(get(/databases/$(database)/documents/sessions/$(sessionId)).data, sessionId) ||
+                          (isAuthenticated() && resource.data.authorId == request.auth.uid)) &&
+                         // Lock validation: either no lock, lock expired (>30s), or locked by current user
+                         (!resource.data.keys().hasAll(['lockedById']) ||
+                          resource.data.lockedById == null ||
+                          resource.data.lockedById == request.auth.uid ||
+                          request.time > resource.data.lockedAt + duration.from(30, 's'));
         allow delete: if isOwnerOrAdmin(get(/databases/$(database)/documents/sessions/$(sessionId)).data, sessionId) ||
                         (isAuthenticated() && resource.data.authorId == request.auth.uid);
       }
