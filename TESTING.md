@@ -22,9 +22,9 @@ npm run test:ui
 
 Current test coverage:
 
-- **8 test files** with **57 total tests**
-- **40 passing unit tests** (run without emulators)
-- **17 Firebase integration tests** (require emulators)
+- **20 test files** with **255 total tests**
+- **238 passing unit tests** (run without emulators)
+- **17 Firebase integration tests** (require emulators, skipped without)
 
 ### Test Files:
 

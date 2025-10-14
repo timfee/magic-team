@@ -1,4 +1,4 @@
-import { PresentationView } from "@/components/session/presentation/presentation-view";
+import { PresentationWrapper } from "@/components/session/presentation/presentation-wrapper";
 
 export default async function PresentationPage({
   params,
@@ -7,5 +7,5 @@ export default async function PresentationPage({
 }) {
   const { id: sessionId } = await params;
 
-  return <PresentationView sessionId={sessionId} />;
+  return <PresentationWrapper sessionId={sessionId} />;
 }

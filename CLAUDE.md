@@ -47,7 +47,7 @@ npm start             # Production server on :3000
 
 ### Unit Tests (Vitest)
 
-**40 tests pass without emulators**:
+**238 tests pass without emulators**:
 
 ```bash
 npm test                # Run all once
@@ -102,7 +102,7 @@ app/                              # Next.js 15 App Router
         ├── admin/
         │   └── page.tsx          # Admin controls: stage management, force-progress
         ├── presentation/
-        │   └── page.tsx          # TODO: Projector-optimized view
+        │   └── page.tsx          # ✅ Projector-optimized view (all stages)
         └── components/
             ├── session-board.tsx         # Routes to stage-specific components
             ├── idea-card.tsx             # Individual idea display with votes
@@ -156,7 +156,7 @@ Configuration files (root):
 
 ### Stage System
 
-Admin-controlled progression: GREEN_ROOM (waiting) → IDEA_COLLECTION (submit, 500 char) → VOTING (allocate votes) → GROUPING (@dnd-kit drag-drop) → FINALIZATION (TODO) → POST_SESSION (TODO). Routing: `app/session/[id]/components/session-board.tsx`
+Admin-controlled progression: GREEN_ROOM (waiting) → IDEA_COLLECTION (submit, 500 char) → VOTING (allocate votes) → GROUPING (@dnd-kit drag-drop) → FINALIZATION (partial) → POST_SESSION (TODO). Routing: `app/session/[id]/components/session-board.tsx`. Presentation mode: `/session/[id]/presentation` - full-screen view for all stages.
 
 ### Drag & Drop
 
@@ -209,7 +209,7 @@ When making changes, ALWAYS:
 2. **Environment**: Verify `.env.local` exists (for builds)
 3. **Lint**: Run `npm run lint` (must be clean before committing)
 4. **Type check**: Verify build succeeds with `npm run build`
-5. **Unit tests**: Run `npm test` (40 tests should pass without emulators)
+5. **Unit tests**: Run `npm test` (238 tests should pass without emulators)
 6. **Integration tests** (if Firebase code changed): Run `npm run test:emulators`
 7. **E2E tests** (if user flows changed): Run `npm run test:e2e`
 8. **Manual testing**: Start dev server with `npm run dev`, test changed features
