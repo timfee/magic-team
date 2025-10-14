@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
 import type { IdeaWithDetails } from "@/lib/types/session";
+import { describe, expect, it } from "vitest";
 
 // Helper to calculate new order for reordering within same context
 const calculateNewOrder = (
@@ -9,7 +9,10 @@ const calculateNewOrder = (
 ): number => {
   // Get all ideas in the same context (same groupId or both ungrouped)
   const contextIdeas = ideas
-    .filter((i) => i.groupId === overIdea.groupId && i.categoryId === overIdea.categoryId)
+    .filter(
+      (i) =>
+        i.groupId === overIdea.groupId && i.categoryId === overIdea.categoryId,
+    )
     .sort((a, b) => a.order - b.order);
 
   const overIndex = contextIdeas.findIndex((i) => i.id === overIdea.id);
@@ -23,18 +26,24 @@ const calculateNewOrder = (
     if (overIndex === contextIdeas.length - 1) {
       return contextIdeas[overIndex].order + 1;
     }
-    return (contextIdeas[overIndex].order + contextIdeas[overIndex + 1].order) / 2;
+    return (
+      (contextIdeas[overIndex].order + contextIdeas[overIndex + 1].order) / 2
+    );
   }
 
   // Moving up (active after over)
   if (overIndex === 0) {
     return contextIdeas[0].order - 1;
   }
-  return (contextIdeas[overIndex - 1].order + contextIdeas[overIndex].order) / 2;
+  return (
+    (contextIdeas[overIndex - 1].order + contextIdeas[overIndex].order) / 2
+  );
 };
 
 // Mock idea factory
-const createMockIdea = (partial: Partial<IdeaWithDetails>): IdeaWithDetails => ({
+const createMockIdea = (
+  partial: Partial<IdeaWithDetails>,
+): IdeaWithDetails => ({
   id: partial.id ?? "idea-1",
   sessionId: partial.sessionId ?? "session-1",
   categoryId: partial.categoryId ?? "category-1",
@@ -56,9 +65,24 @@ describe("Reordering Logic", () => {
   describe("calculateNewOrder - Ungrouped Ideas (Same Category)", () => {
     it("should place idea after target when moving down", () => {
       const ideas = [
-        createMockIdea({ id: "1", order: 0, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "2", order: 1, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "3", order: 2, groupId: undefined, categoryId: "cat-1" }),
+        createMockIdea({
+          id: "1",
+          order: 0,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "2",
+          order: 1,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "3",
+          order: 2,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
       ];
 
       const newOrder = calculateNewOrder(ideas[0], ideas[2], ideas);
@@ -70,9 +94,24 @@ describe("Reordering Logic", () => {
 
     it("should place idea between targets when moving down to middle", () => {
       const ideas = [
-        createMockIdea({ id: "1", order: 0, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "2", order: 2, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "3", order: 4, groupId: undefined, categoryId: "cat-1" }),
+        createMockIdea({
+          id: "1",
+          order: 0,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "2",
+          order: 2,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "3",
+          order: 4,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
       ];
 
       const newOrder = calculateNewOrder(ideas[0], ideas[1], ideas);
@@ -83,9 +122,24 @@ describe("Reordering Logic", () => {
 
     it("should place idea before first when moving up to top", () => {
       const ideas = [
-        createMockIdea({ id: "1", order: 0, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "2", order: 1, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "3", order: 2, groupId: undefined, categoryId: "cat-1" }),
+        createMockIdea({
+          id: "1",
+          order: 0,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "2",
+          order: 1,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "3",
+          order: 2,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
       ];
 
       const newOrder = calculateNewOrder(ideas[2], ideas[0], ideas);
@@ -96,9 +150,24 @@ describe("Reordering Logic", () => {
 
     it("should place idea between targets when moving up to middle", () => {
       const ideas = [
-        createMockIdea({ id: "1", order: 0, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "2", order: 2, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "3", order: 4, groupId: undefined, categoryId: "cat-1" }),
+        createMockIdea({
+          id: "1",
+          order: 0,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "2",
+          order: 2,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "3",
+          order: 4,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
       ];
 
       const newOrder = calculateNewOrder(ideas[2], ideas[1], ideas);
@@ -109,9 +178,24 @@ describe("Reordering Logic", () => {
 
     it("should only consider ideas in same category", () => {
       const ideas = [
-        createMockIdea({ id: "1", order: 0, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "2", order: 1, groupId: undefined, categoryId: "cat-2" }), // Different category
-        createMockIdea({ id: "3", order: 2, groupId: undefined, categoryId: "cat-1" }),
+        createMockIdea({
+          id: "1",
+          order: 0,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "2",
+          order: 1,
+          groupId: undefined,
+          categoryId: "cat-2",
+        }), // Different category
+        createMockIdea({
+          id: "3",
+          order: 2,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
       ];
 
       const newOrder = calculateNewOrder(ideas[0], ideas[2], ideas);
@@ -122,8 +206,18 @@ describe("Reordering Logic", () => {
 
     it("should handle single idea in context", () => {
       const ideas = [
-        createMockIdea({ id: "1", order: 0, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "2", order: 1, groupId: "group-1", categoryId: "cat-1" }), // In group
+        createMockIdea({
+          id: "1",
+          order: 0,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "2",
+          order: 1,
+          groupId: "group-1",
+          categoryId: "cat-1",
+        }), // In group
       ];
 
       const newOrder = calculateNewOrder(ideas[0], ideas[0], ideas);
@@ -136,9 +230,24 @@ describe("Reordering Logic", () => {
   describe("calculateNewOrder - Grouped Ideas (Same Group)", () => {
     it("should reorder within same group - move down", () => {
       const ideas = [
-        createMockIdea({ id: "1", order: 0, groupId: "group-1", categoryId: "cat-1" }),
-        createMockIdea({ id: "2", order: 1, groupId: "group-1", categoryId: "cat-1" }),
-        createMockIdea({ id: "3", order: 2, groupId: "group-1", categoryId: "cat-1" }),
+        createMockIdea({
+          id: "1",
+          order: 0,
+          groupId: "group-1",
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "2",
+          order: 1,
+          groupId: "group-1",
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "3",
+          order: 2,
+          groupId: "group-1",
+          categoryId: "cat-1",
+        }),
       ];
 
       const newOrder = calculateNewOrder(ideas[0], ideas[2], ideas);
@@ -148,9 +257,24 @@ describe("Reordering Logic", () => {
 
     it("should reorder within same group - move up", () => {
       const ideas = [
-        createMockIdea({ id: "1", order: 0, groupId: "group-1", categoryId: "cat-1" }),
-        createMockIdea({ id: "2", order: 1, groupId: "group-1", categoryId: "cat-1" }),
-        createMockIdea({ id: "3", order: 2, groupId: "group-1", categoryId: "cat-1" }),
+        createMockIdea({
+          id: "1",
+          order: 0,
+          groupId: "group-1",
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "2",
+          order: 1,
+          groupId: "group-1",
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "3",
+          order: 2,
+          groupId: "group-1",
+          categoryId: "cat-1",
+        }),
       ];
 
       const newOrder = calculateNewOrder(ideas[2], ideas[0], ideas);
@@ -160,9 +284,24 @@ describe("Reordering Logic", () => {
 
     it("should only consider ideas in same group", () => {
       const ideas = [
-        createMockIdea({ id: "1", order: 0, groupId: "group-1", categoryId: "cat-1" }),
-        createMockIdea({ id: "2", order: 1, groupId: "group-2", categoryId: "cat-1" }), // Different group
-        createMockIdea({ id: "3", order: 2, groupId: "group-1", categoryId: "cat-1" }),
+        createMockIdea({
+          id: "1",
+          order: 0,
+          groupId: "group-1",
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "2",
+          order: 1,
+          groupId: "group-2",
+          categoryId: "cat-1",
+        }), // Different group
+        createMockIdea({
+          id: "3",
+          order: 2,
+          groupId: "group-1",
+          categoryId: "cat-1",
+        }),
       ];
 
       const newOrder = calculateNewOrder(ideas[0], ideas[2], ideas);
@@ -173,9 +312,24 @@ describe("Reordering Logic", () => {
 
     it("should handle fractional orders correctly", () => {
       const ideas = [
-        createMockIdea({ id: "1", order: 0, groupId: "group-1", categoryId: "cat-1" }),
-        createMockIdea({ id: "2", order: 0.5, groupId: "group-1", categoryId: "cat-1" }),
-        createMockIdea({ id: "3", order: 1, groupId: "group-1", categoryId: "cat-1" }),
+        createMockIdea({
+          id: "1",
+          order: 0,
+          groupId: "group-1",
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "2",
+          order: 0.5,
+          groupId: "group-1",
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "3",
+          order: 1,
+          groupId: "group-1",
+          categoryId: "cat-1",
+        }),
       ];
 
       const newOrder = calculateNewOrder(ideas[0], ideas[1], ideas);
@@ -188,8 +342,18 @@ describe("Reordering Logic", () => {
   describe("calculateNewOrder - Edge Cases", () => {
     it("should handle two-item reordering", () => {
       const ideas = [
-        createMockIdea({ id: "1", order: 0, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "2", order: 1, groupId: undefined, categoryId: "cat-1" }),
+        createMockIdea({
+          id: "1",
+          order: 0,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "2",
+          order: 1,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
       ];
 
       const newOrder = calculateNewOrder(ideas[0], ideas[1], ideas);
@@ -199,9 +363,24 @@ describe("Reordering Logic", () => {
 
     it("should handle negative orders", () => {
       const ideas = [
-        createMockIdea({ id: "1", order: -2, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "2", order: -1, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "3", order: 0, groupId: undefined, categoryId: "cat-1" }),
+        createMockIdea({
+          id: "1",
+          order: -2,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "2",
+          order: -1,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "3",
+          order: 0,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
       ];
 
       const newOrder = calculateNewOrder(ideas[2], ideas[0], ideas);
@@ -211,8 +390,18 @@ describe("Reordering Logic", () => {
 
     it("should calculate order when target has different context", () => {
       const ideas = [
-        createMockIdea({ id: "1", order: 0, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "2", order: 1, groupId: "group-1", categoryId: "cat-1" }),
+        createMockIdea({
+          id: "1",
+          order: 0,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "2",
+          order: 1,
+          groupId: "group-1",
+          categoryId: "cat-1",
+        }),
       ];
 
       // Try to get order for target in different context
@@ -224,9 +413,24 @@ describe("Reordering Logic", () => {
 
     it("should handle large order numbers", () => {
       const ideas = [
-        createMockIdea({ id: "1", order: 1000, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "2", order: 2000, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "3", order: 3000, groupId: undefined, categoryId: "cat-1" }),
+        createMockIdea({
+          id: "1",
+          order: 1000,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "2",
+          order: 2000,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "3",
+          order: 3000,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
       ];
 
       const newOrder = calculateNewOrder(ideas[0], ideas[1], ideas);
@@ -236,9 +440,24 @@ describe("Reordering Logic", () => {
 
     it("should handle very close fractional orders", () => {
       const ideas = [
-        createMockIdea({ id: "1", order: 0, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "2", order: 0.000001, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "3", order: 0.000002, groupId: undefined, categoryId: "cat-1" }),
+        createMockIdea({
+          id: "1",
+          order: 0,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "2",
+          order: 0.000001,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "3",
+          order: 0.000002,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
       ];
 
       const newOrder = calculateNewOrder(ideas[0], ideas[1], ideas);
@@ -251,10 +470,30 @@ describe("Reordering Logic", () => {
   describe("Reordering Scenarios - Integration", () => {
     it("should handle reordering in mixed context (some grouped, some not)", () => {
       const ideas = [
-        createMockIdea({ id: "1", order: 0, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "2", order: 1, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "3", order: 2, groupId: "group-1", categoryId: "cat-1" }),
-        createMockIdea({ id: "4", order: 3, groupId: "group-1", categoryId: "cat-1" }),
+        createMockIdea({
+          id: "1",
+          order: 0,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "2",
+          order: 1,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "3",
+          order: 2,
+          groupId: "group-1",
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "4",
+          order: 3,
+          groupId: "group-1",
+          categoryId: "cat-1",
+        }),
       ];
 
       // Reorder ungrouped ideas (should ignore grouped ones)
@@ -266,9 +505,24 @@ describe("Reordering Logic", () => {
 
     it("should maintain sort order after multiple reorderings", () => {
       const ideas = [
-        createMockIdea({ id: "1", order: 0, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "2", order: 1, groupId: undefined, categoryId: "cat-1" }),
-        createMockIdea({ id: "3", order: 2, groupId: undefined, categoryId: "cat-1" }),
+        createMockIdea({
+          id: "1",
+          order: 0,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "2",
+          order: 1,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
+        createMockIdea({
+          id: "3",
+          order: 2,
+          groupId: undefined,
+          categoryId: "cat-1",
+        }),
       ];
 
       // Move idea-1 after idea-3
