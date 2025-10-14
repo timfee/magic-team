@@ -220,7 +220,30 @@ When making changes, ALWAYS:
 - **No CI/CD workflows**: No GitHub Actions workflows exist yet (tests must be run locally)
 - **Turbopack enabled**: Dev server uses Turbopack for faster HMR
 - **Tailwind 4**: Uses latest Tailwind with PostCSS plugin
-- **Documentation**: See `TESTING.md`, `E2E_TESTING.md`, `PROJECT_STATUS.md` for detailed info
+- **Documentation**: See `TESTING.md`, `E2E_TESTING.md`, `TODO.md` for detailed info
+
+## Documentation Policy (CRITICAL)
+
+**DO NOT CREATE EXCESS STATUS/TODO FILES**
+
+- ✅ **SINGLE SOURCE OF TRUTH**: `TODO.md` - All project status, todos, and progress
+- ✅ Keep: `TESTING.md`, `E2E_TESTING.md`, `CLAUDE.md`, `.github/copilot-instructions.md`
+- ❌ **NEVER CREATE**:
+  - `FEATURES_COMPLETED.md`, `FEATURES_IMPLEMENTED.md`, `IMPLEMENTATION_STATUS.md`
+  - `VOTING_IMPLEMENTATION_SUMMARY.md`, `DRAG_DROP_MATRIX.md`
+  - `PROJECT_STATUS.md` or any other status tracking files
+  - Any file ending in `_STATUS.md`, `_SUMMARY.md`, `_COMPLETED.md`, etc.
+
+**When tracking progress:**
+- Update `TODO.md` only
+- Use clear checklist format with [x] for completed, [ ] for pending
+- Keep history concise - focus on what's done and what's next
+- Remove completed items periodically to keep file manageable
+
+**When documenting features:**
+- Add implementation notes to `TODO.md` under relevant sections
+- For architecture/testing specifics, update `CLAUDE.md` or testing guides
+- Do NOT create separate implementation summary files
 
 ---
 
