@@ -1,6 +1,10 @@
 "use client";
 
-import type { MagicSessionWithDetails, Idea, IdeaGroup } from "@/lib/types/session";
+import type {
+  MagicSessionWithDetails,
+  Idea,
+  IdeaGroup,
+} from "@/lib/types/session";
 import { motion } from "framer-motion";
 
 interface PresentationGroupingProps {
@@ -29,11 +33,7 @@ export function PresentationGrouping({
       ideas: categoryIdeas.filter((idea) => idea.groupId === group.id),
     }));
 
-    return {
-      category,
-      ungroupedIdeas,
-      groupedIdeas,
-    };
+    return { category, ungroupedIdeas, groupedIdeas };
   });
 
   return (

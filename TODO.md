@@ -7,6 +7,7 @@ This is the SINGLE source of truth for project status and remaining work. Do NOT
 ## 🎯 Current Sprint: Polish & UX Improvements ✅ COMPLETE
 
 ### High Priority
+
 - [x] **Presentation View** - Full projector-optimized display for all stages ✅
 - [x] **Firebase Emulators** - Get presence tracking working with emulators ✅
 - [x] **E2E Test Fixes** - Fix Playwright/Vitest conflicts ✅
@@ -18,6 +19,7 @@ This is the SINGLE source of truth for project status and remaining work. Do NOT
 ## ✅ COMPLETED FEATURES
 
 ### Core Infrastructure ✅
+
 - **Next.js 15** - App Router, Turbopack, React 19
 - **Firebase Firestore** - Real-time subscriptions, presence tracking
 - **NextAuth v5** - Google OAuth authentication
@@ -26,6 +28,7 @@ This is the SINGLE source of truth for project status and remaining work. Do NOT
 - **Styling** - TailwindCSS 4, Framer Motion animations
 
 ### Session Management ✅
+
 - **CRUD Operations** - Create, read, update, delete sessions
 - **Category System** - 1-10 categories per session with colors
 - **Permission System** - Owner, admin, participant roles
@@ -36,6 +39,7 @@ This is the SINGLE source of truth for project status and remaining work. Do NOT
 ### Stage-Specific UIs ✅
 
 #### Green Room (Waiting Area) ✅
+
 - [x] Live participant count with real-time updates
 - [x] Animated facepile showing participant avatars
 - [x] Pop-in animations for new participants
@@ -44,6 +48,7 @@ This is the SINGLE source of truth for project status and remaining work. Do NOT
 - [x] "Waiting for facilitator" message
 
 #### Idea Collection ✅
+
 - [x] Anonymous idea submission form
 - [x] Category selector with validation
 - [x] Real-time idea display grid
@@ -54,6 +59,7 @@ This is the SINGLE source of truth for project status and remaining work. Do NOT
 - [x] Optimistic UI updates
 
 #### Idea Voting ✅
+
 - [x] Vote allocation UI (N votes per user)
 - [x] Visual vote indicators (heart icons)
 - [x] Real-time vote count updates
@@ -66,6 +72,7 @@ This is the SINGLE source of truth for project status and remaining work. Do NOT
 - [x] Rules enforcement (max votes per user/category)
 
 #### Idea Grouping ✅
+
 - [x] Advanced drag-and-drop with @dnd-kit
 - [x] Auto-group creation (drag idea onto another)
 - [x] Auto-delete empty groups
@@ -78,6 +85,7 @@ This is the SINGLE source of truth for project status and remaining work. Do NOT
 - [x] Three-column layout with mixed groups section
 
 ### Comments System ✅
+
 - [x] Threaded comments on ideas (max 3 levels)
 - [x] Real-time post/edit/delete
 - [x] User avatars and timestamps
@@ -96,13 +104,15 @@ This is the SINGLE source of truth for project status and remaining work. Do NOT
 #### Implemented Features by Stage:
 
 **Green Room / Welcome:** ✅
+
 - [x] Show live participant count and avatars
-- [x] Display join URL prominently  
+- [x] Display join URL prominently
 - [x] Show URL code/QR code for easy joining
 - [x] Welcome message and instructions
 - [x] Countdown timer to session start
 
 **Idea Collection:** ✅
+
 - [x] Show ideas appearing in real-time (as colored blocks)
 - [x] Keep ideas anonymous until reveal
 - [x] Countdown timer (large, prominent)
@@ -110,24 +120,28 @@ This is the SINGLE source of truth for project status and remaining work. Do NOT
 - [x] NO input controls (view only)
 
 **Voting:** ✅
+
 - [x] Hide individual votes until stage complete
 - [x] Show progress bar (countdown from total OR count up)
 - [x] Show participation stats
 - [x] NO vote buttons (view only)
 
 **Grouping:** ✅
+
 - [x] Live drag-drop status optimized for viewing
 - [x] Show groups forming in real-time
 - [x] NO input controls (view only)
 - [x] Category sections clearly visible
 
 **Finalization:** ✅
+
 - [x] Step through entities by priority (most votes first)
 - [x] Auto-advancing slideshow (8 seconds per item)
 - [x] Expand details: ideas with full content
 - [x] Group displays with all contained ideas
 
 #### Admin Controls:
+
 - [x] Link in admin panel to open presentation view
 - [ ] Control presentation focus/selection from admin view
 - [ ] Manual reveal controls
@@ -138,6 +152,7 @@ This is the SINGLE source of truth for project status and remaining work. Do NOT
 ## 📋 TODO - Remaining Features
 
 ### Testing & Quality ✅ MOSTLY COMPLETE
+
 - [x] Fix E2E test configuration (excluded e2e from vitest) ✅
 - [x] All unit tests passing (238 tests) ✅
 - [x] Firebase emulator tests working (252 of 255 tests pass with emulators) ✅
@@ -148,6 +163,7 @@ This is the SINGLE source of truth for project status and remaining work. Do NOT
 **Note:** E2E tests work but need proper auth setup for full coverage.
 
 ### Finalization Stage (Priority 2) ✅ COMPLETE
+
 - [x] Idea selection interface ✅
 - [x] Priority ordering (drag to reorder) ✅
 - [x] Owner assignment to action items ✅
@@ -155,12 +171,14 @@ This is the SINGLE source of truth for project status and remaining work. Do NOT
 - [x] Summary view ✅
 
 ### Post-Session Stage (Priority 3) ✅ MOSTLY COMPLETE
+
 - [x] Read-only view of all results ✅
 - [x] Final statistics ✅
 - [ ] Archive functionality
 - [ ] Session history
 
 ### Polish & UX Improvements (Priority 4) ✅ MOSTLY COMPLETE
+
 - [x] Loading skeletons ✅
 - [x] Empty states for each stage ✅
 - [x] Error boundaries ✅
@@ -173,6 +191,7 @@ This is the SINGLE source of truth for project status and remaining work. Do NOT
 - [ ] Touch gestures for mobile drag-and-drop
 
 ### Accessibility (Priority 4) ✅ MOSTLY COMPLETE
+
 - [x] Focus indicators ✅
 - [ ] ARIA labels on all interactive elements (partial - forms have labels)
 - [ ] Keyboard navigation for all features (partial - native elements work)
@@ -180,6 +199,7 @@ This is the SINGLE source of truth for project status and remaining work. Do NOT
 - [ ] High contrast mode support
 
 ### Performance (Priority 4)
+
 - [ ] Virtualized lists for large idea counts
 - [ ] Debounced real-time updates
 - [ ] Image optimization
@@ -270,12 +290,14 @@ Configuration:
 ## 🔧 Development Commands
 
 ### Setup
+
 ```bash
 cp .env.example .env.local    # REQUIRED before build
 npm install                   # Install dependencies (~20s)
 ```
 
 ### Development
+
 ```bash
 npm run dev                   # Start dev server on :3000
 npm run build                 # Production build
@@ -285,6 +307,7 @@ npm run format                # Run Prettier
 ```
 
 ### Testing
+
 ```bash
 # Unit Tests (Vitest)
 npm test                      # Run all unit tests
@@ -304,6 +327,7 @@ npm run test:e2e:report       # View HTML report
 ```
 
 ### Firebase Emulators
+
 ```bash
 npm run emulators             # Start emulators
 # Firestore: 127.0.0.1:8080
@@ -316,6 +340,7 @@ npm run emulators             # Start emulators
 ## 🎨 Tech Stack Details
 
 ### Frontend
+
 - **Next.js 15** - App Router, Turbopack dev server
 - **React 19** - Latest features, Server Components
 - **TypeScript** - Strict mode enabled
@@ -324,12 +349,14 @@ npm run emulators             # Start emulators
 - **@dnd-kit** - Drag and drop
 
 ### Backend & Data
+
 - **Firebase Firestore** - Real-time database
 - **NextAuth v5** - Authentication (Google OAuth)
 - **Server Actions** - Next.js server-side mutations
 - **Zod** - Runtime validation
 
 ### Testing
+
 - **Vitest** - Unit tests (jsdom, 238 tests)
 - **Playwright** - E2E tests (Chromium)
 - **Firebase Emulators** - Integration tests (17 tests)
@@ -339,23 +366,27 @@ npm run emulators             # Start emulators
 ## 🏗️ Architecture Patterns
 
 ### Data Flow
+
 1. User action → Server Action → Firestore mutation
 2. Firebase listener → Real-time update to all clients
 3. Fallback → Page refresh if Firebase unavailable
 
 ### Real-Time Strategy
+
 - ✅ All features work without real-time (Server Actions)
 - ✅ Firebase adds real-time enhancements
 - ✅ Automatic offline/online handling
 - ✅ Manual refresh always available
 
 ### Security
+
 - ✅ OAuth at audience level (internal employees only)
 - ✅ Permission checks in Server Actions
 - ✅ Firestore security rules
 - ✅ Role-based access control (Owner, Admin, Participant)
 
 ### Component Patterns
+
 - Server Components by default
 - Client Components for interactivity ('use client')
 - Optimistic updates for better UX
@@ -366,6 +397,7 @@ npm run emulators             # Start emulators
 ## 📊 Current Status
 
 ### Code Quality ✅
+
 - **Build:** Successful ✅
 - **Lint:** Clean (0 errors, 0 warnings) ✅
 - **TypeScript:** Clean (0 errors) ✅
@@ -374,6 +406,7 @@ npm run emulators             # Start emulators
 - **E2E Tests:** Work but require auth setup (see E2E_TESTING.md)
 
 ### What Works ✅
+
 - Complete session management flow
 - All stage UIs (green room, idea collection, voting, grouping, finalization, **post-session** ✅ NEW)
 - **Presentation view for all stages** ✅
@@ -390,6 +423,7 @@ npm run emulators             # Start emulators
 - Firebase emulators with presence tracking
 
 ### What's Next 🚧
+
 1. **Post-Session Stage** - Results archive and session history
 2. **Mobile Optimization** - Responsive design and touch gestures
 3. **Accessibility** - ARIA labels, keyboard navigation, screen readers
@@ -401,14 +435,16 @@ npm run emulators             # Start emulators
 ## 🐛 Known Issues
 
 ### Testing
+
 - ~~E2E tests fail when run with `npm test` (Playwright/Vitest conflict)~~ ✅ FIXED
 - Firebase integration tests require emulators to be running ✅ WORKS
 - E2E tests need proper auth flow for full coverage (currently use conditional checks)
 
 ### Features
+
 - ~~Presentation view not yet implemented~~ ✅ COMPLETE
 - Finalization stage partially implemented (in presentation view)
-- Post-session stage not yet implemented  
+- Post-session stage not yet implemented
 - No export functionality yet
 - Mobile drag-and-drop could be improved
 - Admin controls for presentation view need enhancement
@@ -418,7 +454,9 @@ npm run emulators             # Start emulators
 ## 💡 Important Notes
 
 ### Environment Setup
+
 **ALWAYS** create `.env.local` before building:
+
 ```bash
 cp .env.example .env.local
 ```
@@ -426,19 +464,24 @@ cp .env.example .env.local
 The `.env.example` file contains placeholder Firebase config that works for local development.
 
 ### Testing Best Practices
+
 - **Unit tests:** Can run without Firebase emulators (238 tests)
 - **Firebase tests:** Require emulators (use `npm run test:emulators`)
 - **E2E tests:** Use `npm run test:e2e` (NOT `npm test`)
 
 ### E2E vs Unit Tests
+
 **CRITICAL:** Never run E2E tests with Vitest. Always use Playwright CLI:
+
 ```bash
 npm run test:e2e        # Correct
 npm test                # Wrong (includes E2E files, causes conflicts)
 ```
 
 ### Documentation
+
 This is the ONLY status/todo file. Do NOT create:
+
 - ❌ FEATURES_COMPLETED.md
 - ❌ FEATURES_IMPLEMENTED.md
 - ❌ IMPLEMENTATION_STATUS.md

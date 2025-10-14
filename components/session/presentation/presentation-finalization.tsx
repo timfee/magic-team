@@ -1,6 +1,10 @@
 "use client";
 
-import type { MagicSessionWithDetails, Idea, IdeaGroup } from "@/lib/types/session";
+import type {
+  MagicSessionWithDetails,
+  Idea,
+  IdeaGroup,
+} from "@/lib/types/session";
 import { useEffect, useState } from "react";
 import { collection, query, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
@@ -122,9 +126,7 @@ export function PresentationFinalization({
       <div className="flex h-full items-center justify-center text-white">
         <div className="text-center">
           <h1 className="text-5xl font-bold">{session.name}</h1>
-          <p className="mt-4 text-2xl text-zinc-400">
-            No items to review yet
-          </p>
+          <p className="mt-4 text-2xl text-zinc-400">No items to review yet</p>
         </div>
       </div>
     );
@@ -151,7 +153,7 @@ export function PresentationFinalization({
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center">
+      <div className="flex flex-1 items-center justify-center">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
@@ -159,7 +161,7 @@ export function PresentationFinalization({
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.8, opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="max-w-5xl w-full">
+            className="w-full max-w-5xl">
             {/* Vote Count Badge */}
             <div className="mb-8 flex justify-center">
               <div className="rounded-full bg-gradient-to-r from-blue-500 to-purple-500 px-12 py-6">
@@ -189,9 +191,7 @@ export function PresentationFinalization({
             {/* Content */}
             <div className="rounded-3xl bg-white/10 p-12 backdrop-blur-lg">
               {currentItem.type === "group" && currentItem.title && (
-                <h2 className="mb-6 text-4xl font-bold">
-                  {currentItem.title}
-                </h2>
+                <h2 className="mb-6 text-4xl font-bold">{currentItem.title}</h2>
               )}
 
               {currentItem.type === "group" && currentItem.ideas ? (
@@ -233,7 +233,7 @@ export function PresentationFinalization({
           <div
             key={idx}
             className={`h-3 w-3 rounded-full transition-all ${
-              idx === currentIndex ? "bg-blue-500 w-8" : "bg-white/20"
+              idx === currentIndex ? "w-8 bg-blue-500" : "bg-white/20"
             }`}
           />
         ))}

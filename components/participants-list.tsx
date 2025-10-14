@@ -119,8 +119,8 @@ export const ParticipantsList = ({
                       </span>
                     )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-zinc-900 dark:text-zinc-50 truncate">
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-50">
                       {user.name ?? `User ${user.id.slice(-4)}`}
                       {isCurrentUser && (
                         <span className="ml-1 text-xs text-blue-600 dark:text-blue-400">

@@ -233,12 +233,14 @@ When making changes, ALWAYS:
   - Any file ending in `_STATUS.md`, `_SUMMARY.md`, `_COMPLETED.md`, etc.
 
 **When tracking progress:**
+
 - Update `TODO.md` only
 - Use clear checklist format with [x] for completed, [ ] for pending
 - Keep history concise - focus on what's done and what's next
 - Remove completed items periodically to keep file manageable
 
 **When documenting features:**
+
 - Add implementation notes to `TODO.md` under relevant sections
 - For architecture/testing specifics, update `CLAUDE.md` or testing guides
 - Do NOT create separate implementation summary files

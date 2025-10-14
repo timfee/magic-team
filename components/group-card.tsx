@@ -19,7 +19,7 @@ export const GroupCard = ({
   return (
     <div
       data-testid="group-card"
-      className="group relative rounded-lg border bg-white p-4 transition-all hover:shadow-md border-zinc-200 dark:border-zinc-800 dark:bg-zinc-900"
+      className="group relative rounded-lg border border-zinc-200 bg-white p-4 transition-all hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
       style={{ borderLeftWidth: "3px", borderLeftColor: categoryColor }}>
       <div className="space-y-2">
         <h4 className="font-semibold text-zinc-900 dark:text-zinc-50">

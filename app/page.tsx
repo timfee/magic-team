@@ -18,7 +18,7 @@ export default function Home() {
               Collaborative retrospective sessions powered by Firebase
             </p>
           </div>
-          <div className="flex gap-4 items-center">
+          <div className="flex items-center gap-4">
             {isLoading ? (
               <span className="text-sm text-zinc-600 dark:text-zinc-400">
                 Loading...
@@ -30,19 +30,19 @@ export default function Home() {
                 </span>
                 <Link
                   href="/session/create"
-                  className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors">
+                  className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
                   Create Session
                 </Link>
                 <button
                   onClick={() => signOut()}
-                  className="rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 transition-colors">
+                  className="rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
                   Sign Out
                 </button>
               </>
             ) : (
               <button
                 onClick={() => signIn()}
-                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors">
+                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
                 Sign In
               </button>
             )}
@@ -59,7 +59,7 @@ export default function Home() {
           </p>
           <Link
             href="/session/create"
-            className="mt-6 inline-block rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white hover:bg-blue-700 transition-colors">
+            className="mt-6 inline-block rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700">
             Create Your First Session
           </Link>
         </div>

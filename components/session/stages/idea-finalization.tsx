@@ -3,8 +3,22 @@
 import { useSession } from "@/lib/contexts/firebase-session-context";
 import type { Category } from "@/lib/types/session";
 import { useState } from "react";
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useToast } from "@/lib/contexts/toast-context";
@@ -39,9 +53,9 @@ export const IdeaFinalization = ({
     const items: ActionItem[] = [];
 
     // Add top voted ideas (not in groups)
-    const ungroupedIdeas = ideas.filter(idea => !idea.groupId);
+    const ungroupedIdeas = ideas.filter((idea) => !idea.groupId);
     ungroupedIdeas.forEach((idea, index) => {
-      const category = categories.find(c => c.id === idea.categoryId);
+      const category = categories.find((c) => c.id === idea.categoryId);
       const voteCount = idea._count?.votes ?? 0;
 
       items.push({
@@ -58,13 +72,16 @@ export const IdeaFinalization = ({
 
     // Add groups
     groups.forEach((group, index) => {
-      const category = categories.find(c => c.id === group.categoryId);
-      const groupIdeas = ideas.filter(i => i.groupId === group.id);
-      const totalVotes = groupIdeas.reduce((sum, idea) => sum + (idea._count?.votes ?? 0), 0);
+      const category = categories.find((c) => c.id === group.categoryId);
+      const groupIdeas = ideas.filter((i) => i.groupId === group.id);
+      const totalVotes = groupIdeas.reduce(
+        (sum, idea) => sum + (idea._count?.votes ?? 0),
+        0,
+      );
 
       items.push({
         id: group.id,
-        content: groupIdeas.map(i => i.content).join(", "),
+        content: groupIdeas.map((i) => i.content).join(", "),
         categoryId: group.categoryId,
         categoryName: category?.name ?? "Unknown",
         categoryColor: category?.color ?? "#6B7280",
@@ -85,7 +102,7 @@ export const IdeaFinalization = ({
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -107,7 +124,7 @@ export const IdeaFinalization = ({
   };
 
   const toggleSelection = (id: string) => {
-    setSelectedItems(prev => {
+    setSelectedItems((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
         next.delete(id);
@@ -119,14 +136,18 @@ export const IdeaFinalization = ({
   };
 
   const handleExport = (format: "csv" | "json" | "markdown") => {
-    const selectedActionItems = actionItems.filter(item => selectedItems.has(item.id));
-    const itemsToExport = selectedActionItems.length > 0 ? selectedActionItems : actionItems;
+    const selectedActionItems = actionItems.filter((item) =>
+      selectedItems.has(item.id),
+    );
+    const itemsToExport =
+      selectedActionItems.length > 0 ? selectedActionItems : actionItems;
 
     if (format === "csv") {
       const csv = [
         "Priority,Category,Content,Votes,Assigned To",
-        ...itemsToExport.map(item =>
-          `${item.priority + 1},"${item.categoryName}","${item.content.replace(/"/g, '""')}",${item.votes},"${item.assignedTo ?? ""}"`
+        ...itemsToExport.map(
+          (item) =>
+            `${item.priority + 1},"${item.categoryName}","${item.content.replace(/"/g, '""')}",${item.votes},"${item.assignedTo ?? ""}"`,
         ),
       ].join("\n");
 
@@ -138,18 +159,26 @@ export const IdeaFinalization = ({
       const markdown = [
         "# Action Items",
         "",
-        ...itemsToExport.map(item =>
-          `## ${item.priority + 1}. ${item.categoryName}\n\n${item.content}\n\n- **Votes:** ${item.votes}\n- **Assigned To:** ${item.assignedTo ?? "Unassigned"}\n`
+        ...itemsToExport.map(
+          (item) =>
+            `## ${item.priority + 1}. ${item.categoryName}\n\n${item.content}\n\n- **Votes:** ${item.votes}\n- **Assigned To:** ${item.assignedTo ?? "Unassigned"}\n`,
         ),
       ].join("\n");
 
       downloadFile(markdown, "action-items.md", "text/markdown");
     }
 
-    addToast(`Exported ${itemsToExport.length} items as ${format.toUpperCase()}`, "success");
+    addToast(
+      `Exported ${itemsToExport.length} items as ${format.toUpperCase()}`,
+      "success",
+    );
   };
 
-  const downloadFile = (content: string, filename: string, mimeType: string) => {
+  const downloadFile = (
+    content: string,
+    filename: string,
+    mimeType: string,
+  ) => {
     const blob = new Blob([content], { type: mimeType });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -205,8 +234,13 @@ export const IdeaFinalization = ({
       </div>
 
       {/* Action Items List */}
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={actionItems.map(item => item.id)} strategy={verticalListSortingStrategy}>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}>
+        <SortableContext
+          items={actionItems.map((item) => item.id)}
+          strategy={verticalListSortingStrategy}>
           <div className="space-y-3">
             {actionItems.map((item, index) => (
               <SortableActionItem
@@ -225,7 +259,9 @@ export const IdeaFinalization = ({
       <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex items-center justify-between text-sm">
           <span className="text-zinc-600 dark:text-zinc-400">
-            {selectedItems.size > 0 ? `${selectedItems.size} selected` : `${actionItems.length} total items`}
+            {selectedItems.size > 0
+              ? `${selectedItems.size} selected`
+              : `${actionItems.length} total items`}
           </span>
           {selectedItems.size > 0 && (
             <button
@@ -247,8 +283,20 @@ interface SortableActionItemProps {
   onToggleSelection: () => void;
 }
 
-function SortableActionItem({ item, index, isSelected, onToggleSelection }: SortableActionItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
+function SortableActionItem({
+  item,
+  index,
+  isSelected,
+  onToggleSelection,
+}: SortableActionItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -262,7 +310,7 @@ function SortableActionItem({ item, index, isSelected, onToggleSelection }: Sort
       style={style}
       className={`rounded-lg border bg-white p-4 transition-all dark:bg-zinc-900 ${
         isSelected
-          ? "border-blue-500 ring-2 ring-blue-500 ring-opacity-50"
+          ? "ring-opacity-50 border-blue-500 ring-2 ring-blue-500"
           : "border-zinc-200 dark:border-zinc-800"
       }`}>
       <div className="flex items-start gap-4">
@@ -271,8 +319,17 @@ function SortableActionItem({ item, index, isSelected, onToggleSelection }: Sort
           {...attributes}
           {...listeners}
           className="mt-1 cursor-grab text-zinc-400 hover:text-zinc-600 active:cursor-grabbing dark:text-zinc-600 dark:hover:text-zinc-400">
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+          <svg
+            className="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 8h16M4 16h16"
+            />
           </svg>
         </button>
 
@@ -303,8 +360,15 @@ function SortableActionItem({ item, index, isSelected, onToggleSelection }: Sort
               </span>
             )}
             <span className="ml-auto flex items-center gap-1 text-sm text-zinc-600 dark:text-zinc-400">
-              <svg className="h-4 w-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+              <svg
+                className="h-4 w-4 text-red-500"
+                fill="currentColor"
+                viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                  clipRule="evenodd"
+                />
               </svg>
               {item.votes}
             </span>
@@ -320,7 +384,7 @@ function SortableActionItem({ item, index, isSelected, onToggleSelection }: Sort
               <input
                 type="text"
                 placeholder="Name or email"
-                className="rounded border border-zinc-300 bg-white px-2 py-1 text-zinc-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+                className="rounded border border-zinc-300 bg-white px-2 py-1 text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
               />
             </label>
           </div>

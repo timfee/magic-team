@@ -22,14 +22,20 @@ export const PostSession = ({
 
   // Calculate statistics
   const totalIdeas = ideas.length;
-  const totalVotes = ideas.reduce((sum, idea) => sum + (idea._count?.votes ?? 0), 0);
+  const totalVotes = ideas.reduce(
+    (sum, idea) => sum + (idea._count?.votes ?? 0),
+    0,
+  );
   const totalGroups = groups.length;
-  const totalComments = ideas.reduce((sum, idea) => sum + (idea._count?.comments ?? 0), 0);
+  const totalComments = ideas.reduce(
+    (sum, idea) => sum + (idea._count?.comments ?? 0),
+    0,
+  );
 
-  const ideasByCategory = categories.map(category => ({
+  const ideasByCategory = categories.map((category) => ({
     ...category,
-    ideas: ideas.filter(idea => idea.categoryId === category.id),
-    groups: groups.filter(group => group.categoryId === category.id),
+    ideas: ideas.filter((idea) => idea.categoryId === category.id),
+    groups: groups.filter((group) => group.categoryId === category.id),
   }));
 
   const topIdeas = [...ideas]
@@ -61,7 +67,11 @@ export const PostSession = ({
         </p>
         <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-green-100 px-4 py-2 text-sm font-medium text-green-800 dark:bg-green-900/30 dark:text-green-300">
           <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+              clipRule="evenodd"
+            />
           </svg>
           Session Complete
         </div>
@@ -110,7 +120,7 @@ export const PostSession = ({
           </h2>
           <div className="space-y-3">
             {topIdeas.map((idea, index) => {
-              const category = categories.find(c => c.id === idea.categoryId);
+              const category = categories.find((c) => c.id === idea.categoryId);
               return (
                 <motion.div
                   key={idea.id}
@@ -140,8 +150,15 @@ export const PostSession = ({
                     </p>
                   </div>
                   <div className="flex items-center gap-1 text-sm font-semibold text-red-600 dark:text-red-400">
-                    <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                    <svg
+                      className="h-5 w-5"
+                      fill="currentColor"
+                      viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                     {idea._count?.votes ?? 0}
                   </div>
@@ -187,25 +204,44 @@ export const PostSession = ({
               </p>
             ) : (
               <div className="grid gap-3 sm:grid-cols-2">
-                {category.ideas.map(idea => (
+                {category.ideas.map((idea) => (
                   <div
                     key={idea.id}
                     className="rounded-md border border-zinc-200 p-3 dark:border-zinc-700"
-                    style={{ borderLeftWidth: "3px", borderLeftColor: category.color }}>
+                    style={{
+                      borderLeftWidth: "3px",
+                      borderLeftColor: category.color,
+                    }}>
                     <p className="text-sm text-zinc-900 dark:text-zinc-50">
                       {idea.content}
                     </p>
                     <div className="mt-2 flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-500">
                       <span className="flex items-center gap-1">
-                        <svg className="h-3 w-3 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                        <svg
+                          className="h-3 w-3 text-red-500"
+                          fill="currentColor"
+                          viewBox="0 0 20 20">
+                          <path
+                            fillRule="evenodd"
+                            d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                         {idea._count?.votes ?? 0}
                       </span>
                       {(idea._count?.comments ?? 0) > 0 && (
                         <span className="flex items-center gap-1">
-                          <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                          <svg
+                            className="h-3 w-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+                            />
                           </svg>
                           {idea._count.comments}
                         </span>
@@ -229,11 +265,12 @@ export const PostSession = ({
           👥 Participation
         </h2>
         <p className="text-lg text-zinc-700 dark:text-zinc-300">
-          <span className="font-semibold">{userCount}</span> participants contributed to this session
+          <span className="font-semibold">{userCount}</span> participants
+          contributed to this session
         </p>
         {activeUsers.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
-            {activeUsers.slice(0, 10).map(user => (
+            {activeUsers.slice(0, 10).map((user) => (
               <div
                 key={user.id}
                 className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-sm dark:bg-zinc-900">
@@ -280,7 +317,8 @@ function StatCard({ icon, label, value, color }: StatCardProps) {
   return (
     <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
       <div className="flex items-center gap-3">
-        <div className={`flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br ${colorClasses[color]} text-2xl`}>
+        <div
+          className={`flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br ${colorClasses[color]} text-2xl`}>
           {icon}
         </div>
         <div>

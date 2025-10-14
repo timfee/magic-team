@@ -3,9 +3,7 @@
  */
 
 interface SessionWithSettings {
-  settings?: {
-    votesPerUser?: number;
-  } | null;
+  settings?: { votesPerUser?: number } | null;
 }
 
 /**

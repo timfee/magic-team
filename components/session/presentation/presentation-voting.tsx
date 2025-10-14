@@ -1,6 +1,10 @@
 "use client";
 
-import type { MagicSessionWithDetails, Idea, IdeaGroup } from "@/lib/types/session";
+import type {
+  MagicSessionWithDetails,
+  Idea,
+  IdeaGroup,
+} from "@/lib/types/session";
 import { useEffect, useState } from "react";
 import { collection, query, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
@@ -47,7 +51,9 @@ export function PresentationVoting({
     : 0;
 
   // Check if voting is complete (simplified - could be more sophisticated)
-  const votingComplete = Boolean(maxPossibleVotes && totalVotesCast >= maxPossibleVotes);
+  const votingComplete = Boolean(
+    maxPossibleVotes && totalVotesCast >= maxPossibleVotes,
+  );
 
   return (
     <div className="flex h-full flex-col text-white">
@@ -110,7 +116,7 @@ export function PresentationVoting({
       </div>
 
       {/* Voting Status Message */}
-      <div className="flex-1 flex items-center justify-center">
+      <div className="flex flex-1 items-center justify-center">
         {votingComplete ? (
           <div className="text-center">
             <div className="mb-6 text-9xl">✅</div>

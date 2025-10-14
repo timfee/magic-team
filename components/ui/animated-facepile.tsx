@@ -114,7 +114,7 @@ export const AnimatedFacepile = ({
             )}
             {/* Ripple effect for new users */}
             {isNew && (
-              <div className="absolute inset-0 rounded-full border-4 border-blue-400 animate-[ping_1s_ease-out]" />
+              <div className="absolute inset-0 animate-[ping_1s_ease-out] rounded-full border-4 border-blue-400" />
             )}
           </div>
         );
@@ -123,7 +123,7 @@ export const AnimatedFacepile = ({
       {remainingCount > 0 && (
         <div
           className={cn(
-            "flex items-center justify-center rounded-full border-4 border-white bg-blue-500 font-bold text-white shadow-lg transition-all duration-300 dark:border-zinc-900 animate-[float_3s_ease-in-out_infinite]",
+            "flex animate-[float_3s_ease-in-out_infinite] items-center justify-center rounded-full border-4 border-white bg-blue-500 font-bold text-white shadow-lg transition-all duration-300 dark:border-zinc-900",
             sizeConfig.avatarSize,
             sizeConfig.textSize,
           )}

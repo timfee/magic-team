@@ -79,7 +79,7 @@ const SingleComment = ({
             className="h-8 w-8 rounded-full"
           />
         ) : (
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-white text-xs font-medium">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-xs font-medium text-white">
             {(comment.user.name ?? "U").charAt(0).toUpperCase()}
           </div>
         )}
@@ -88,7 +88,7 @@ const SingleComment = ({
       {/* Comment Content */}
       <div className="flex-1 space-y-1">
         <div className="flex items-center gap-2">
-          <span className="font-medium text-zinc-900 dark:text-zinc-50 text-sm">
+          <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
             {comment.user.name ?? "Unknown User"}
           </span>
           <span className="text-xs text-zinc-500">
@@ -101,7 +101,7 @@ const SingleComment = ({
 
         {/* Reply-to indicator */}
         {comment.replyTo && (
-          <div className="text-xs text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-900 rounded px-2 py-1 inline-block">
+          <div className="inline-block rounded bg-zinc-100 px-2 py-1 text-xs text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400">
             Replying to{" "}
             <span className="font-medium">{comment.replyTo.user.name}</span>
           </div>
@@ -137,7 +137,7 @@ const SingleComment = ({
             </div>
           </div>
         ) : (
-          <p className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap">
+          <p className="text-sm whitespace-pre-wrap text-zinc-700 dark:text-zinc-300">
             {comment.content}
           </p>
         )}
@@ -148,7 +148,7 @@ const SingleComment = ({
             {depth < MAX_DEPTH && (
               <button
                 onClick={() => onReply(comment.id, comment.user.name)}
-                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                className="font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                 data-testid="reply-button">
                 Reply
               </button>

@@ -80,7 +80,7 @@ export default function SessionBoard({ sessionId }: SessionBoardProps) {
                 userCount={userCount}
                 currentUserId={userId}
                 trigger={
-                  <div className="flex items-center gap-2 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 cursor-pointer transition-colors hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800">
+                  <div className="flex cursor-pointer items-center gap-2 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 transition-colors hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800">
                     <Facepile users={activeUsers} maxVisible={4} size="sm" />
                     <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
                       {userCount}{" "}

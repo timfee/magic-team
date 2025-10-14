@@ -27,7 +27,9 @@ export function useKeyboardShortcuts(shortcuts: KeyboardShortcut[]) {
 
       shortcuts.forEach((shortcut) => {
         const keyMatch = event.key.toLowerCase() === shortcut.key.toLowerCase();
-        const ctrlMatch = shortcut.ctrl ? event.ctrlKey || event.metaKey : !event.ctrlKey && !event.metaKey;
+        const ctrlMatch = shortcut.ctrl
+          ? event.ctrlKey || event.metaKey
+          : !event.ctrlKey && !event.metaKey;
         const shiftMatch = shortcut.shift ? event.shiftKey : !event.shiftKey;
         const altMatch = shortcut.alt ? event.altKey : !event.altKey;
 
@@ -44,7 +46,9 @@ export function useKeyboardShortcuts(shortcuts: KeyboardShortcut[]) {
 }
 
 // Helper to show keyboard shortcuts dialog
-export function getKeyboardShortcutsHelp(shortcuts: KeyboardShortcut[]): string {
+export function getKeyboardShortcutsHelp(
+  shortcuts: KeyboardShortcut[],
+): string {
   return shortcuts
     .map((s) => {
       const keys = [];
