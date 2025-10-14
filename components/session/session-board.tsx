@@ -6,6 +6,8 @@ import { GreenRoom } from "@/components/session/stages/green-room";
 import { IdeaCollection } from "@/components/session/stages/idea-collection";
 import { IdeaGrouping } from "@/components/session/stages/idea-grouping";
 import { IdeaVoting } from "@/components/session/stages/idea-voting";
+import { IdeaFinalization } from "@/components/session/stages/idea-finalization";
+import { PostSession } from "@/components/session/stages/post-session";
 import { Facepile } from "@/components/ui/facepile";
 import { useSession } from "@/lib/contexts/firebase-session-context";
 import { getUserRole } from "@/lib/utils/permissions";
@@ -184,20 +186,20 @@ export default function SessionBoard({ sessionId }: SessionBoardProps) {
           />
         )}
 
-        {(currentStage === "idea_finalization" ||
-          currentStage === "post_session") && (
-          <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center dark:border-zinc-800 dark:bg-zinc-900">
-            <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-              {currentStage === "idea_finalization" && "Finalizing Results"}
-              {currentStage === "post_session" && "Session Complete"}
-            </h2>
-            <p className="mt-4 text-zinc-600 dark:text-zinc-400">
-              {currentStage === "idea_finalization" &&
-                "Review final results and action items. This stage is coming soon!"}
-              {currentStage === "post_session" &&
-                "Thank you for participating! Results view coming soon."}
-            </p>
-          </div>
+        {currentStage === "idea_finalization" && (
+          <IdeaFinalization
+            sessionId={session.id}
+            categories={session.categories}
+          />
+        )}
+
+        {currentStage === "post_session" && (
+          <PostSession
+            sessionId={session.id}
+            sessionName={session.name}
+            categories={session.categories}
+            createdAt={session.createdAt}
+          />
         )}
       </main>
     </div>
