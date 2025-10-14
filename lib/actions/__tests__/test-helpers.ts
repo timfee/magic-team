@@ -19,7 +19,8 @@ export function createMockDocRef(id: string): DocumentReference<DocumentData> {
     withConverter: (() => {
       // Mock implementation
     }) as never,
-  };
+    toJSON: () => ({ id, path: `mock/${id}` }),
+  } as DocumentReference<DocumentData>;
 }
 
 /**
@@ -28,14 +29,14 @@ export function createMockDocRef(id: string): DocumentReference<DocumentData> {
 export function createMockQuerySnapshot<T = DocumentData>(
   docs: Array<{ id: string; data: T }>,
 ): QuerySnapshot<DocumentData> {
-  const mockDocs: QueryDocumentSnapshot<DocumentData>[] = docs.map((doc) => ({
+  const mockDocs = docs.map((doc) => ({
     id: doc.id,
     ref: createMockDocRef(doc.id),
     data: () => doc.data as DocumentData,
     exists: () => true,
     get: ((field: string) => (doc.data as Record<string, unknown>)[field]) as never,
     metadata: { hasPendingWrites: false, fromCache: false },
-  })) as QueryDocumentSnapshot<DocumentData>[];
+  })) as unknown as QueryDocumentSnapshot<DocumentData>[];
 
   return {
     docs: mockDocs,
@@ -47,7 +48,7 @@ export function createMockQuerySnapshot<T = DocumentData>(
       mockDocs.forEach(callback);
     },
     docChanges: () => [],
-  } as QuerySnapshot<DocumentData>;
+  } as unknown as QuerySnapshot<DocumentData>;
 }
 
 /**
