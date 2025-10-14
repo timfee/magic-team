@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "@/lib/contexts/firebase-session-context";
-import type { Category, IdeaWithDetails, IdeaGroupWithDetails } from "@/lib/types/session";
+import type { Category } from "@/lib/types/session";
 import { useState } from "react";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
@@ -28,7 +28,7 @@ interface ActionItem {
 }
 
 export const IdeaFinalization = ({
-  sessionId,
+  sessionId: _sessionId,
   categories,
 }: IdeaFinalizationProps) => {
   const { ideas, groups } = useSession();

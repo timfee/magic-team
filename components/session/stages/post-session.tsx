@@ -13,7 +13,7 @@ interface PostSessionProps {
 }
 
 export const PostSession = ({
-  sessionId,
+  sessionId: _sessionId,
   sessionName,
   categories,
   createdAt,
@@ -238,6 +238,7 @@ export const PostSession = ({
                 key={user.id}
                 className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-sm dark:bg-zinc-900">
                 {user.image && (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={user.image}
                     alt={user.name ?? "User"}
