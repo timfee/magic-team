@@ -7,9 +7,7 @@ import {
 } from "./test-helpers";
 
 // Mock Firebase
-vi.mock("@/lib/firebase/client", () => ({
-  db: {},
-}));
+vi.mock("@/lib/firebase/client", () => ({ db: {} }));
 
 vi.mock("firebase/firestore", () => ({
   addDoc: vi.fn(),
@@ -44,7 +42,11 @@ describe("Category Actions", () => {
       expect(mockAddDoc).toHaveBeenCalled();
       expect(result).toEqual({ categoryId: "category-123" });
 
-      const categoryData = getCallArg<Record<string, unknown>>(mockAddDoc, 0, 1);
+      const categoryData = getCallArg<Record<string, unknown>>(
+        mockAddDoc,
+        0,
+        1,
+      );
       expect(categoryData.sessionId).toBe("session-123");
       expect(categoryData.name).toBe("Ideas");
       expect(categoryData.color).toBe("#3b82f6"); // Default color
@@ -67,7 +69,11 @@ describe("Category Actions", () => {
 
       await createCategory(input);
 
-      const categoryData = getCallArg<Record<string, unknown>>(mockAddDoc, 0, 1);
+      const categoryData = getCallArg<Record<string, unknown>>(
+        mockAddDoc,
+        0,
+        1,
+      );
       expect(categoryData.color).toBe("#ef4444");
       expect(categoryData.order).toBe(2);
     });
@@ -87,7 +93,11 @@ describe("Category Actions", () => {
 
       await createCategory(input);
 
-      const categoryData = getCallArg<Record<string, unknown>>(mockAddDoc, 0, 1);
+      const categoryData = getCallArg<Record<string, unknown>>(
+        mockAddDoc,
+        0,
+        1,
+      );
       expect(categoryData.maxEntriesPerPerson).toBe(3);
     });
 
@@ -105,7 +115,11 @@ describe("Category Actions", () => {
 
       await createCategory(input);
 
-      const categoryData = getCallArg<Record<string, unknown>>(mockAddDoc, 0, 1);
+      const categoryData = getCallArg<Record<string, unknown>>(
+        mockAddDoc,
+        0,
+        1,
+      );
       expect(categoryData).not.toHaveProperty("maxEntriesPerPerson");
     });
 
@@ -156,9 +170,7 @@ describe("Category Actions", () => {
       const { getDoc } = await import("firebase/firestore");
 
       const mockGetDoc = vi.mocked(getDoc);
-      mockGetDoc.mockResolvedValue({
-        exists: () => false,
-      } as never);
+      mockGetDoc.mockResolvedValue({ exists: () => false } as never);
 
       const category = await getCategory("session-123", "nonexistent");
 

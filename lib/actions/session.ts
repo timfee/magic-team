@@ -53,7 +53,10 @@ export const createSession = async (
           categoryData.maxEntriesPerPerson = category.maxEntriesPerPerson;
         }
 
-        return addDoc(collection(db, "sessions", sessionId, "categories"), categoryData);
+        return addDoc(
+          collection(db, "sessions", sessionId, "categories"),
+          categoryData,
+        );
       });
       await Promise.all(categoryPromises);
     }

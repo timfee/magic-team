@@ -32,6 +32,7 @@ e2e/
 ## Test Coverage
 
 ### 1. Navigation Tests (`e2e/navigation.spec.ts`)
+
 - ✅ Homepage loading
 - ✅ Navigation to create session page
 - ✅ Back navigation
@@ -39,6 +40,7 @@ e2e/
 - ✅ Session detail page navigation
 
 ### 2. Session Creation Tests (`e2e/session-creation.spec.ts`)
+
 - ✅ Navigate to create session from homepage
 - ✅ Display of session creation form
 - ✅ Default categories
@@ -46,6 +48,7 @@ e2e/
 - ✅ Form validation
 
 ### 3. Session Viewing Tests (`e2e/session-viewing.spec.ts`)
+
 - ✅ Session board page loading
 - ✅ Header with navigation
 - ✅ Connection status display
@@ -97,24 +100,28 @@ test.describe("Feature Name", () => {
 ### Common Patterns
 
 **Navigating and Checking URL:**
+
 ```typescript
 await page.goto("/session/create");
 await expect(page).toHaveURL(/\/session\/create/);
 ```
 
 **Interacting with Forms:**
+
 ```typescript
 await page.getByLabel(/session name/i).fill("My Session");
 await page.getByRole("button", { name: /submit/i }).click();
 ```
 
 **Checking for Elements:**
+
 ```typescript
 await expect(page.getByText("Success")).toBeVisible();
 await expect(page.getByRole("heading")).toContainText("Welcome");
 ```
 
 **Handling Authentication:**
+
 ```typescript
 // Check if auth is required
 const authButton = page.getByText(/sign in/i);
@@ -150,6 +157,7 @@ webServer: {
 For tests that require Firebase (authentication, database):
 
 1. **Terminal 1**: Start Firebase emulators
+
    ```bash
    npm run emulators
    ```
@@ -162,17 +170,20 @@ For tests that require Firebase (authentication, database):
 ## Debugging Tests
 
 ### UI Mode (Recommended)
+
 ```bash
 npm run test:e2e:ui
 ```
 
 This opens an interactive UI where you can:
+
 - Run tests step by step
 - See the browser in real-time
 - Inspect element locators
 - View traces and screenshots
 
 ### Debug Mode
+
 ```bash
 npm run test:e2e:debug
 ```
@@ -182,6 +193,7 @@ This runs tests with the Playwright Inspector for debugging.
 ### VS Code Extension
 
 Install the [Playwright VS Code extension](https://marketplace.visualstudio.com/items?itemName=ms-playwright.playwright) for:
+
 - Running tests from the editor
 - Setting breakpoints
 - Seeing test results inline
@@ -217,6 +229,7 @@ npm run test:e2e:report
 ```
 
 The report includes:
+
 - Test results summary
 - Screenshots of failures
 - Step-by-step traces
@@ -227,6 +240,7 @@ The report includes:
 ### Tests Timing Out
 
 Increase timeout in `playwright.config.ts`:
+
 ```typescript
 use: {
   timeout: 60000, // 60 seconds
@@ -236,6 +250,7 @@ use: {
 ### Element Not Found
 
 Use Playwright's locator debugging:
+
 ```bash
 npx playwright test --debug
 ```
@@ -249,6 +264,7 @@ npx playwright test --debug
 ### Port Already in Use
 
 If port 3000 is busy:
+
 ```bash
 # Kill the process using port 3000
 lsof -ti:3000 | xargs kill -9

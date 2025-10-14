@@ -4,9 +4,7 @@ import { AuthProvider, useAuth } from "../auth-context";
 import type { User } from "firebase/auth";
 
 // Mock Firebase Auth
-vi.mock("@/lib/firebase/client", () => ({
-  auth: {},
-}));
+vi.mock("@/lib/firebase/client", () => ({ auth: {} }));
 
 const mockOnAuthStateChanged = vi.fn();
 const mockSignInWithPopup = vi.fn();
@@ -99,9 +97,13 @@ describe("AuthContext", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId("user-status")).toHaveTextContent("Authenticated");
+      expect(screen.getByTestId("user-status")).toHaveTextContent(
+        "Authenticated",
+      );
       expect(screen.getByTestId("user-id")).toHaveTextContent("user-123");
-      expect(screen.getByTestId("user-email")).toHaveTextContent("test@example.com");
+      expect(screen.getByTestId("user-email")).toHaveTextContent(
+        "test@example.com",
+      );
       expect(screen.getByTestId("user-name")).toHaveTextContent("Test User");
     });
   });
@@ -121,7 +123,9 @@ describe("AuthContext", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId("user-status")).toHaveTextContent("Not authenticated");
+      expect(screen.getByTestId("user-status")).toHaveTextContent(
+        "Not authenticated",
+      );
       expect(screen.getByTestId("user-id")).toHaveTextContent("No user ID");
       expect(screen.getByTestId("user-email")).toHaveTextContent("No email");
       expect(screen.getByTestId("user-name")).toHaveTextContent("No name");
@@ -130,11 +134,9 @@ describe("AuthContext", () => {
 
   it("should throw error when useAuth is used outside AuthProvider", () => {
     // Suppress console.error for this test
-    const consoleSpy = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {
-        // Intentionally empty - suppressing console.error for this test
-      });
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {
+      // Intentionally empty - suppressing console.error for this test
+    });
 
     expect(() => {
       render(<TestComponent />);

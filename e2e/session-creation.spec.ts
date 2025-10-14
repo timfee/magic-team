@@ -102,9 +102,7 @@ test.describe("Session Creation Flow", () => {
     await page.goto("/session/create");
 
     // Try to submit without filling in session name
-    const submitButton = page.getByRole("button", {
-      name: /create session/i,
-    });
+    const submitButton = page.getByRole("button", { name: /create session/i });
     await submitButton.click();
 
     // Should show validation error (HTML5 validation or custom error)

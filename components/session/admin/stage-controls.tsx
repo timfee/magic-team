@@ -116,8 +116,7 @@ export const StageControls = ({
                   !isPast &&
                   "border-zinc-200 bg-white hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700",
                 isPending && "cursor-not-allowed opacity-50",
-              )}
-            >
+              )}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div
@@ -130,8 +129,7 @@ export const StageControls = ({
                       !isCurrent &&
                         !isPast &&
                         "bg-zinc-200 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400",
-                    )}
-                  >
+                    )}>
                     {index + 1}
                   </div>
                   <div>
@@ -140,8 +138,7 @@ export const StageControls = ({
                         "font-medium",
                         isCurrent && "text-blue-900 dark:text-blue-100",
                         !isCurrent && "text-zinc-900 dark:text-zinc-50",
-                      )}
-                    >
+                      )}>
                       {stage.label}
                     </div>
                     <div
@@ -149,8 +146,7 @@ export const StageControls = ({
                         "text-sm",
                         isCurrent && "text-blue-700 dark:text-blue-300",
                         !isCurrent && "text-zinc-600 dark:text-zinc-400",
-                      )}
-                    >
+                      )}>
                       {stage.description}
                     </div>
                   </div>
@@ -171,8 +167,7 @@ export const StageControls = ({
           <button
             onClick={() => handleStageChange(STAGES[currentIndex - 1].value)}
             disabled={isPending}
-            className="flex-1 rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-          >
+            className="flex-1 rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
             ← Previous Stage
           </button>
         )}
@@ -180,8 +175,7 @@ export const StageControls = ({
           <button
             onClick={() => handleStageChange(STAGES[currentIndex + 1].value)}
             disabled={isPending}
-            className="flex-1 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
-          >
+            className="flex-1 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50">
             Next Stage →
           </button>
         )}

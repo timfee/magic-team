@@ -72,12 +72,7 @@ export const getSessionCategories = async (
   sessionId: string,
 ): Promise<Category[]> => {
   try {
-    const categoriesQuery = collection(
-      db,
-      "sessions",
-      sessionId,
-      "categories",
-    );
+    const categoriesQuery = collection(db, "sessions", sessionId, "categories");
     const snapshot = await getDocs(categoriesQuery);
 
     return snapshot.docs.map((doc) => {

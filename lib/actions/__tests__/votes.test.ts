@@ -8,9 +8,7 @@ import {
 } from "./test-helpers";
 
 // Mock Firebase
-vi.mock("@/lib/firebase/client", () => ({
-  db: {},
-}));
+vi.mock("@/lib/firebase/client", () => ({ db: {} }));
 
 const mockTimestamp = { toDate: () => new Date("2024-01-01") };
 
@@ -373,9 +371,9 @@ describe("Vote Actions", () => {
       const mockGetDocs = vi.mocked(getDocs);
       mockGetDocs.mockRejectedValue(new Error("Query failed"));
 
-      await expect(
-        getUserVotes("session-123", "user-123"),
-      ).rejects.toThrow("Query failed");
+      await expect(getUserVotes("session-123", "user-123")).rejects.toThrow(
+        "Query failed",
+      );
     });
   });
 

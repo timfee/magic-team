@@ -19,6 +19,7 @@ A new component that displays participant avatars with smooth animations:
 - **Size Options**: Supports `sm`, `md`, and `lg` sizes
 
 **Key Features**:
+
 ```typescript
 - Auto-detects new users and applies pop-in animations
 - Smooth transitions with CSS keyframe animations (@keyframes float, scale-in)
@@ -38,6 +39,7 @@ Displays a countdown to the session start time:
 - **Real-time Updates**: Updates every second via useEffect with setInterval
 
 **Usage**:
+
 ```tsx
 <GreenRoom
   sessionId="session-id"
@@ -51,6 +53,7 @@ Displays a countdown to the session start time:
 **Enhanced**: `lib/types/session.ts`
 
 Added new fields to `SessionSettings`:
+
 ```typescript
 greenRoomStartTime?: Date | null;  // When the session is scheduled to start
 ```
@@ -71,6 +74,7 @@ Displays a countdown timer for idea collection with visual feedback:
   - Red background: Timer expired
 
 **Key Features**:
+
 ```typescript
 - Graceful disable: Does not abruptly stop in-progress submissions
 - Visual warnings when time is running out
@@ -88,6 +92,7 @@ Facilitators can disable submissions independently of the timer:
 - **Combined Logic**: Works with timer to determine final submission availability
 
 **States**:
+
 1. **Enabled + Timer Active**: Users can submit normally
 2. **Enabled + Timer Expired**: Users see red "Time's up" message
 3. **Disabled + Timer Active/Inactive**: Users see amber "Disabled by facilitator" message
@@ -97,6 +102,7 @@ Facilitators can disable submissions independently of the timer:
 **Enhanced**: `lib/types/session.ts`
 
 Added new fields to `SessionSettings`:
+
 ```typescript
 ideaCollectionTimerEnd?: Date | null;     // When idea collection timer ends
 ideaCollectionEnabled?: boolean;           // Whether idea submission is enabled
@@ -107,6 +113,7 @@ ideaCollectionEnabled?: boolean;           // Whether idea submission is enabled
 **Enhanced**: `components/session/admin/stage-controls.tsx`
 
 Added helpful tip for idea collection stage:
+
 - Shows guidance on using timer + disable workflow
 - Explains graceful disable behavior
 
@@ -119,15 +126,28 @@ New keyframe animations:
 ```css
 @keyframes float {
   /* Subtle up-and-down motion */
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes scale-in {
   /* Pop-in effect for new avatars */
-  0% { transform: scale(0); opacity: 0; }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 ```
 
@@ -216,7 +236,7 @@ Now passes timer props to stage components:
 1. **Set Timer**: Admin sets `ideaCollectionTimerEnd` in session settings
 2. **Monitor Progress**: Participants see countdown badge
 3. **Timer Warning**: Visual changes as time runs low
-4. **Graceful Disable**: 
+4. **Graceful Disable**:
    - Timer expires → "Time's up!" shown
    - OR Admin disables submissions → "Disabled by facilitator" shown
 5. **Advance Stage**: Admin moves to next stage when ready
@@ -226,12 +246,14 @@ Now passes timer props to stage components:
 ## Files Changed
 
 ### New Files (4)
+
 - `components/ui/animated-facepile.tsx`
 - `components/ui/__tests__/animated-facepile.test.tsx`
 - `components/session/stages/__tests__/green-room.test.tsx`
 - `components/session/stages/__tests__/idea-collection-timer.test.tsx`
 
 ### Modified Files (6)
+
 - `components/session/stages/green-room.tsx`
 - `components/session/stages/idea-collection.tsx`
 - `components/session/session-board.tsx`
@@ -289,6 +311,6 @@ This implementation successfully adds:
 ✅ Type-safe implementation with TypeScript  
 ✅ Clean, idiomatic React code  
 ✅ Zero linting errors  
-✅ Production build passing  
+✅ Production build passing
 
 All features align with the existing codebase patterns and architectural decisions.

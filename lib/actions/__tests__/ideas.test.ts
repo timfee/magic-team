@@ -3,9 +3,7 @@ import type { CreateIdeaInput } from "@/lib/types/session";
 import { createMockDocRef, getCallArg, hasProperties } from "./test-helpers";
 
 // Mock Firebase
-vi.mock("@/lib/firebase/client", () => ({
-  db: {},
-}));
+vi.mock("@/lib/firebase/client", () => ({ db: {} }));
 
 vi.mock("firebase/firestore", () => ({
   addDoc: vi.fn(),

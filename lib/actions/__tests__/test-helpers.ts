@@ -55,7 +55,8 @@ export function createMockQuerySnapshot<T = DocumentData>(
     ref: createMockDocRef(doc.id),
     data: () => doc.data as DocumentData,
     exists: () => true,
-    get: ((field: string) => (doc.data as Record<string, unknown>)[field]) as never,
+    get: ((field: string) =>
+      (doc.data as Record<string, unknown>)[field]) as never,
     metadata: { hasPendingWrites: false, fromCache: false },
   })) as unknown as QueryDocumentSnapshot<DocumentData>[];
 

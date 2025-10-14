@@ -29,7 +29,9 @@ export default function CreateSessionForm() {
   const [isPending, startTransition] = useTransition();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [visibility, setVisibility] = useState<"public" | "private" | "protected">("public");
+  const [visibility, setVisibility] = useState<
+    "public" | "private" | "protected"
+  >("public");
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,7 +42,10 @@ export default function CreateSessionForm() {
     }
     setCategories([
       ...categories,
-      { name: "", color: COLOR_OPTIONS[categories.length % COLOR_OPTIONS.length] },
+      {
+        name: "",
+        color: COLOR_OPTIONS[categories.length % COLOR_OPTIONS.length],
+      },
     ]);
   };
 
@@ -97,7 +102,9 @@ export default function CreateSessionForm() {
         const result = await createSession(input, userId);
         router.push(`/session/${result.sessionId}`);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to create session");
+        setError(
+          err instanceof Error ? err.message : "Failed to create session",
+        );
       }
     });
   };
@@ -130,8 +137,7 @@ export default function CreateSessionForm() {
             }
           }}
           type="button"
-          className="mt-6 rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
-        >
+          className="mt-6 rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white hover:bg-blue-700 transition-colors">
           Sign In with Google
         </button>
       </div>
@@ -154,8 +160,7 @@ export default function CreateSessionForm() {
           <div>
             <label
               htmlFor="name"
-              className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-            >
+              className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
               Session Name
             </label>
             <input
@@ -172,8 +177,7 @@ export default function CreateSessionForm() {
           <div>
             <label
               htmlFor="description"
-              className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-            >
+              className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
               Description (optional)
             </label>
             <textarea
@@ -197,7 +201,9 @@ export default function CreateSessionForm() {
                   value="public"
                   checked={visibility === "public"}
                   onChange={(e) =>
-                    setVisibility(e.target.value as "public" | "private" | "protected")
+                    setVisibility(
+                      e.target.value as "public" | "private" | "protected",
+                    )
                   }
                   className="h-4 w-4 border-zinc-300 text-blue-600 focus:ring-blue-500"
                 />
@@ -211,7 +217,9 @@ export default function CreateSessionForm() {
                   value="private"
                   checked={visibility === "private"}
                   onChange={(e) =>
-                    setVisibility(e.target.value as "public" | "private" | "protected")
+                    setVisibility(
+                      e.target.value as "public" | "private" | "protected",
+                    )
                   }
                   className="h-4 w-4 border-zinc-300 text-blue-600 focus:ring-blue-500"
                 />
@@ -225,7 +233,9 @@ export default function CreateSessionForm() {
                   value="protected"
                   checked={visibility === "protected"}
                   onChange={(e) =>
-                    setVisibility(e.target.value as "public" | "private" | "protected")
+                    setVisibility(
+                      e.target.value as "public" | "private" | "protected",
+                    )
                   }
                   className="h-4 w-4 border-zinc-300 text-blue-600 focus:ring-blue-500"
                 />
@@ -247,8 +257,7 @@ export default function CreateSessionForm() {
             type="button"
             onClick={handleAddCategory}
             disabled={categories.length >= 10}
-            className="rounded-md bg-blue-600 px-3 py-1 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
+            className="rounded-md bg-blue-600 px-3 py-1 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
             Add Category
           </button>
         </div>
@@ -259,13 +268,17 @@ export default function CreateSessionForm() {
               <input
                 type="color"
                 value={category.color}
-                onChange={(e) => handleCategoryChange(index, "color", e.target.value)}
+                onChange={(e) =>
+                  handleCategoryChange(index, "color", e.target.value)
+                }
                 className="h-10 w-10 cursor-pointer rounded border border-zinc-300 dark:border-zinc-700"
               />
               <input
                 type="text"
                 value={category.name}
-                onChange={(e) => handleCategoryChange(index, "name", e.target.value)}
+                onChange={(e) =>
+                  handleCategoryChange(index, "name", e.target.value)
+                }
                 className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50 dark:placeholder-zinc-500"
                 placeholder="Category name"
                 required
@@ -274,8 +287,7 @@ export default function CreateSessionForm() {
                 type="button"
                 onClick={() => handleRemoveCategory(index)}
                 disabled={categories.length <= 1}
-                className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 transition-colors"
-              >
+                className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 transition-colors">
                 Remove
               </button>
             </div>
@@ -287,15 +299,13 @@ export default function CreateSessionForm() {
         <button
           type="button"
           onClick={() => router.back()}
-          className="rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 transition-colors"
-        >
+          className="rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 transition-colors">
           Cancel
         </button>
         <button
           type="submit"
           disabled={isPending}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
+          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
           {isPending ? "Creating..." : "Create Session"}
         </button>
       </div>

@@ -6,10 +6,7 @@ import {
   getAuthenticatedContext,
   getUnauthenticatedContext,
 } from "../test-utils";
-import {
-  assertFails,
-  assertSucceeds,
-} from "@firebase/rules-unit-testing";
+import { assertFails, assertSucceeds } from "@firebase/rules-unit-testing";
 import { doc, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
 
 describe("Firestore Security Rules - Ideas", () => {
@@ -42,7 +39,13 @@ describe("Firestore Security Rules - Ideas", () => {
       });
 
       // Create idea
-      const ideaRef = doc(context.firestore(), "sessions", "session-1", "ideas", "idea-1");
+      const ideaRef = doc(
+        context.firestore(),
+        "sessions",
+        "session-1",
+        "ideas",
+        "idea-1",
+      );
       await assertSucceeds(
         setDoc(ideaRef, {
           sessionId: "session-1",
@@ -58,7 +61,10 @@ describe("Firestore Security Rules - Ideas", () => {
 
     it("should allow anonymous ideas in public sessions", async () => {
       const ownerId = "owner-123";
-      const ownerContext = getAuthenticatedContext(ownerId, "owner@example.com");
+      const ownerContext = getAuthenticatedContext(
+        ownerId,
+        "owner@example.com",
+      );
 
       // Create session
       const sessionRef = doc(ownerContext.firestore(), "sessions", "session-2");
@@ -73,7 +79,13 @@ describe("Firestore Security Rules - Ideas", () => {
 
       // Create anonymous idea (unauthenticated)
       const unauthContext = getUnauthenticatedContext();
-      const ideaRef = doc(unauthContext.firestore(), "sessions", "session-2", "ideas", "idea-2");
+      const ideaRef = doc(
+        unauthContext.firestore(),
+        "sessions",
+        "session-2",
+        "ideas",
+        "idea-2",
+      );
 
       await assertSucceeds(
         setDoc(ideaRef, {
@@ -103,7 +115,13 @@ describe("Firestore Security Rules - Ideas", () => {
       });
 
       // Try to create idea with different authorId
-      const ideaRef = doc(context.firestore(), "sessions", "session-3", "ideas", "idea-3");
+      const ideaRef = doc(
+        context.firestore(),
+        "sessions",
+        "session-3",
+        "ideas",
+        "idea-3",
+      );
       await assertFails(
         setDoc(ideaRef, {
           sessionId: "session-3",
@@ -134,7 +152,13 @@ describe("Firestore Security Rules - Ideas", () => {
         updatedAt: new Date(),
       });
 
-      const ideaRef = doc(context.firestore(), "sessions", "session-4", "ideas", "idea-4");
+      const ideaRef = doc(
+        context.firestore(),
+        "sessions",
+        "session-4",
+        "ideas",
+        "idea-4",
+      );
       await setDoc(ideaRef, {
         sessionId: "session-4",
         categoryId: "category-1",
@@ -146,11 +170,7 @@ describe("Firestore Security Rules - Ideas", () => {
       });
 
       // Update idea
-      await assertSucceeds(
-        updateDoc(ideaRef, {
-          content: "Updated content",
-        }),
-      );
+      await assertSucceeds(updateDoc(ideaRef, { content: "Updated content" }));
     });
 
     it("should allow session owner to update any idea", async () => {
@@ -158,7 +178,10 @@ describe("Firestore Security Rules - Ideas", () => {
       const authorId = "author-456";
 
       // Owner creates session
-      const ownerContext = getAuthenticatedContext(ownerId, "owner@example.com");
+      const ownerContext = getAuthenticatedContext(
+        ownerId,
+        "owner@example.com",
+      );
       const sessionRef = doc(ownerContext.firestore(), "sessions", "session-5");
       await setDoc(sessionRef, {
         name: "Test Session",
@@ -170,8 +193,17 @@ describe("Firestore Security Rules - Ideas", () => {
       });
 
       // Author creates idea
-      const authorContext = getAuthenticatedContext(authorId, "author@example.com");
-      const ideaRefAuthor = doc(authorContext.firestore(), "sessions", "session-5", "ideas", "idea-5");
+      const authorContext = getAuthenticatedContext(
+        authorId,
+        "author@example.com",
+      );
+      const ideaRefAuthor = doc(
+        authorContext.firestore(),
+        "sessions",
+        "session-5",
+        "ideas",
+        "idea-5",
+      );
       await setDoc(ideaRefAuthor, {
         sessionId: "session-5",
         categoryId: "category-1",
@@ -183,11 +215,15 @@ describe("Firestore Security Rules - Ideas", () => {
       });
 
       // Owner updates the idea
-      const ideaRefOwner = doc(ownerContext.firestore(), "sessions", "session-5", "ideas", "idea-5");
+      const ideaRefOwner = doc(
+        ownerContext.firestore(),
+        "sessions",
+        "session-5",
+        "ideas",
+        "idea-5",
+      );
       await assertSucceeds(
-        updateDoc(ideaRefOwner, {
-          content: "Moderated content",
-        }),
+        updateDoc(ideaRefOwner, { content: "Moderated content" }),
       );
     });
 
@@ -197,7 +233,10 @@ describe("Firestore Security Rules - Ideas", () => {
       const ownerId = "owner-789";
 
       // Owner creates session
-      const ownerContext = getAuthenticatedContext(ownerId, "owner@example.com");
+      const ownerContext = getAuthenticatedContext(
+        ownerId,
+        "owner@example.com",
+      );
       const sessionRef = doc(ownerContext.firestore(), "sessions", "session-6");
       await setDoc(sessionRef, {
         name: "Test Session",
@@ -209,8 +248,17 @@ describe("Firestore Security Rules - Ideas", () => {
       });
 
       // Author creates idea
-      const authorContext = getAuthenticatedContext(authorId, "author@example.com");
-      const ideaRefAuthor = doc(authorContext.firestore(), "sessions", "session-6", "ideas", "idea-6");
+      const authorContext = getAuthenticatedContext(
+        authorId,
+        "author@example.com",
+      );
+      const ideaRefAuthor = doc(
+        authorContext.firestore(),
+        "sessions",
+        "session-6",
+        "ideas",
+        "idea-6",
+      );
       await setDoc(ideaRefAuthor, {
         sessionId: "session-6",
         categoryId: "category-1",
@@ -222,13 +270,18 @@ describe("Firestore Security Rules - Ideas", () => {
       });
 
       // Other user tries to update
-      const otherContext = getAuthenticatedContext(otherUserId, "other@example.com");
-      const ideaRefOther = doc(otherContext.firestore(), "sessions", "session-6", "ideas", "idea-6");
-      await assertFails(
-        updateDoc(ideaRefOther, {
-          content: "Hacked content",
-        }),
+      const otherContext = getAuthenticatedContext(
+        otherUserId,
+        "other@example.com",
       );
+      const ideaRefOther = doc(
+        otherContext.firestore(),
+        "sessions",
+        "session-6",
+        "ideas",
+        "idea-6",
+      );
+      await assertFails(updateDoc(ideaRefOther, { content: "Hacked content" }));
     });
   });
 
@@ -248,7 +301,13 @@ describe("Firestore Security Rules - Ideas", () => {
         updatedAt: new Date(),
       });
 
-      const ideaRef = doc(context.firestore(), "sessions", "session-7", "ideas", "idea-7");
+      const ideaRef = doc(
+        context.firestore(),
+        "sessions",
+        "session-7",
+        "ideas",
+        "idea-7",
+      );
       await setDoc(ideaRef, {
         sessionId: "session-7",
         categoryId: "category-1",
@@ -268,7 +327,10 @@ describe("Firestore Security Rules - Ideas", () => {
       const authorId = "author-456";
 
       // Owner creates session
-      const ownerContext = getAuthenticatedContext(ownerId, "owner@example.com");
+      const ownerContext = getAuthenticatedContext(
+        ownerId,
+        "owner@example.com",
+      );
       const sessionRef = doc(ownerContext.firestore(), "sessions", "session-8");
       await setDoc(sessionRef, {
         name: "Test Session",
@@ -280,8 +342,17 @@ describe("Firestore Security Rules - Ideas", () => {
       });
 
       // Author creates idea
-      const authorContext = getAuthenticatedContext(authorId, "author@example.com");
-      const ideaRefAuthor = doc(authorContext.firestore(), "sessions", "session-8", "ideas", "idea-8");
+      const authorContext = getAuthenticatedContext(
+        authorId,
+        "author@example.com",
+      );
+      const ideaRefAuthor = doc(
+        authorContext.firestore(),
+        "sessions",
+        "session-8",
+        "ideas",
+        "idea-8",
+      );
       await setDoc(ideaRefAuthor, {
         sessionId: "session-8",
         categoryId: "category-1",
@@ -293,7 +364,13 @@ describe("Firestore Security Rules - Ideas", () => {
       });
 
       // Owner deletes the idea
-      const ideaRefOwner = doc(ownerContext.firestore(), "sessions", "session-8", "ideas", "idea-8");
+      const ideaRefOwner = doc(
+        ownerContext.firestore(),
+        "sessions",
+        "session-8",
+        "ideas",
+        "idea-8",
+      );
       await assertSucceeds(deleteDoc(ideaRefOwner));
     });
   });

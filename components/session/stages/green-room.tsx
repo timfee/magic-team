@@ -17,7 +17,7 @@ export const GreenRoom = ({
 }: GreenRoomProps) => {
   const { userCount, activeUsers } = useSession();
   const [timeRemaining, setTimeRemaining] = useState<string | null>(
-    startTime ? "" : null
+    startTime ? "" : null,
   );
 
   // Calculate time until start
@@ -61,8 +61,7 @@ export const GreenRoom = ({
               className="h-12 w-12 text-blue-600 dark:text-blue-400"
               fill="none"
               stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+              viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

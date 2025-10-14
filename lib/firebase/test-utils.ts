@@ -19,11 +19,7 @@ export async function setupFirebaseTest() {
 
   testEnv = await initializeTestEnvironment({
     projectId,
-    firestore: {
-      rules: firestoreRules,
-      host: "127.0.0.1",
-      port: 8080,
-    },
+    firestore: { rules: firestoreRules, host: "127.0.0.1", port: 8080 },
   });
 
   return testEnv;

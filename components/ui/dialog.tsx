@@ -27,8 +27,7 @@ export const Dialog = ({ open, onOpenChange, children }: DialogProps) => {
       ref={dialogRef}
       onClose={() => onOpenChange(false)}
       className="rounded-lg border border-zinc-200 bg-white p-0 shadow-xl backdrop:bg-black/50 dark:border-zinc-800 dark:bg-zinc-900"
-      data-testid="dialog"
-    >
+      data-testid="dialog">
       {children}
     </dialog>
   );
@@ -56,14 +55,12 @@ export const DialogContent = ({
             <button
               onClick={onClose}
               className="rounded-md p-1 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
-              data-testid="dialog-close"
-            >
+              data-testid="dialog-close">
               <svg
                 className="h-5 w-5"
                 fill="none"
                 stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+                viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

@@ -24,13 +24,14 @@ export const Button = ({
             variant === "default",
           "bg-blue-600 text-white hover:bg-blue-700": variant === "primary",
           "bg-red-600 text-white hover:bg-red-700": variant === "danger",
-          "bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800": variant === "ghost",
+          "bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800":
+            variant === "ghost",
           // Sizes
           "h-8 px-3 text-sm": size === "sm",
           "h-10 px-4 text-sm": size === "md",
           "h-12 px-6 text-base": size === "lg",
         },
-        className
+        className,
       )}
       {...props}
     />

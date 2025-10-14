@@ -38,7 +38,9 @@ test.describe("Session Viewing", () => {
 
     // Should show the current stage of the session
     // Possible stages: pre_session, green_room, idea_collection, etc.
-    const stageElement = page.locator("text=/pre.*session|green.*room|idea|voting/i");
+    const stageElement = page.locator(
+      "text=/pre.*session|green.*room|idea|voting/i",
+    );
     await expect(stageElement.first()).toBeVisible({ timeout: 10000 });
   });
 
@@ -61,9 +63,9 @@ test.describe("Session Viewing", () => {
     await expect(page).toHaveURL(/\/session\/test-id\/admin/);
 
     // Admin page should load
-    await expect(
-      page.getByRole("heading", { name: /admin/i }),
-    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: /admin/i })).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test("should show authentication requirement for admin page", async ({
@@ -76,8 +78,8 @@ test.describe("Session Viewing", () => {
     const adminHeading = page.getByRole("heading", { name: /admin/i });
 
     // One of these should be visible
-    await expect(
-      authRequired.or(adminHeading).first(),
-    ).toBeVisible({ timeout: 10000 });
+    await expect(authRequired.or(adminHeading).first()).toBeVisible({
+      timeout: 10000,
+    });
   });
 });

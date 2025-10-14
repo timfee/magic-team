@@ -249,19 +249,14 @@ export const getCommentsWithDetails = async (
           currentComment.replyTo = {
             id: parentComment.id,
             content: parentComment.content,
-            user: {
-              id: parentComment.user.id,
-              name: parentComment.user.name,
-            },
+            user: { id: parentComment.user.id, name: parentComment.user.name },
           };
         }
       }
     }
 
     // Sort root comments by creation time (newest first)
-    rootComments.sort(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-    );
+    rootComments.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
     // Sort replies within each thread (oldest first for natural conversation flow)
     const sortReplies = (comment: CommentWithDetails) => {

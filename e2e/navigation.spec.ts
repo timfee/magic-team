@@ -42,9 +42,9 @@ test.describe("Navigation", () => {
     expect(response?.status()).toBe(404);
 
     // Should show 404 page content
-    await expect(
-      page.getByText(/not found|404/i).first(),
-    ).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(/not found|404/i).first()).toBeVisible({
+      timeout: 5000,
+    });
   });
 
   test("should navigate to session detail page with valid ID", async ({

@@ -30,10 +30,7 @@ describe("Permissions Utilities", () => {
         addedById: "owner-123",
       },
     ],
-    _count: {
-      ideas: 0,
-      presence: 0,
-    },
+    _count: { ideas: 0, presence: 0 },
   };
 
   describe("getUserRole", () => {

@@ -60,16 +60,8 @@ export const IdeaVoting = ({
     startTransition(async () => {
       try {
         const voteInput = target.ideaId
-          ? {
-              sessionId,
-              categoryId,
-              ideaId: target.ideaId,
-            }
-          : {
-              sessionId,
-              categoryId,
-              groupId: target.groupId!,
-            };
+          ? { sessionId, categoryId, ideaId: target.ideaId }
+          : { sessionId, categoryId, groupId: target.groupId! };
 
         const result = await castVote(voteInput, userId);
 
@@ -272,13 +264,11 @@ export const IdeaVoting = ({
                             <button
                               onClick={() => handleUnvote(voteId!)}
                               disabled={isPending}
-                              className="flex items-center gap-1 rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white transition-colors hover:bg-red-600 disabled:opacity-50"
-                            >
+                              className="flex items-center gap-1 rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white transition-colors hover:bg-red-600 disabled:opacity-50">
                               <svg
                                 className="h-4 w-4"
                                 fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
+                                viewBox="0 0 20 20">
                                 <path
                                   fillRule="evenodd"
                                   d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
@@ -297,14 +287,12 @@ export const IdeaVoting = ({
                                 votesRemaining <= 0 ||
                                 categoryVotesRemaining <= 0
                               }
-                              className="flex items-center gap-1 rounded-full bg-blue-600 px-3 py-1 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-                            >
+                              className="flex items-center gap-1 rounded-full bg-blue-600 px-3 py-1 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
                               <svg
                                 className="h-4 w-4"
                                 fill="none"
                                 stroke="currentColor"
-                                viewBox="0 0 20 20"
-                              >
+                                viewBox="0 0 20 20">
                                 <path
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
@@ -347,13 +335,11 @@ export const IdeaVoting = ({
                             <button
                               onClick={() => handleUnvote(voteId!)}
                               disabled={isPending}
-                              className="flex items-center gap-1 rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white transition-colors hover:bg-red-600 disabled:opacity-50"
-                            >
+                              className="flex items-center gap-1 rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white transition-colors hover:bg-red-600 disabled:opacity-50">
                               <svg
                                 className="h-4 w-4"
                                 fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
+                                viewBox="0 0 20 20">
                                 <path
                                   fillRule="evenodd"
                                   d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
@@ -372,14 +358,12 @@ export const IdeaVoting = ({
                                 votesRemaining <= 0 ||
                                 categoryVotesRemaining <= 0
                               }
-                              className="flex items-center gap-1 rounded-full bg-blue-600 px-3 py-1 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-                            >
+                              className="flex items-center gap-1 rounded-full bg-blue-600 px-3 py-1 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
                               <svg
                                 className="h-4 w-4"
                                 fill="none"
                                 stroke="currentColor"
-                                viewBox="0 0 20 20"
-                              >
+                                viewBox="0 0 20 20">
                                 <path
                                   strokeLinecap="round"
                                   strokeLinejoin="round"

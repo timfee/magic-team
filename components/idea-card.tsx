@@ -60,16 +60,14 @@ export const IdeaCard = ({
           ? "border-2 border-blue-500 ring-4 ring-blue-200 dark:ring-blue-900"
           : "border-zinc-200 dark:border-zinc-800"
       } ${isOverlay ? "shadow-2xl" : ""} dark:bg-zinc-900`}
-      style={{
-        borderLeftWidth: "3px",
-        borderLeftColor: categoryColor,
-      }}
-    >
-      <p className={`text-zinc-900 dark:text-zinc-50 ${draggable ? "ml-3" : ""}`}>
+      style={{ borderLeftWidth: "3px", borderLeftColor: categoryColor }}>
+      <p
+        className={`text-zinc-900 dark:text-zinc-50 ${draggable ? "ml-3" : ""}`}>
         {idea.content}
       </p>
 
-      <div className={`mt-3 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-500 ${draggable ? "ml-3" : ""}`}>
+      <div
+        className={`mt-3 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-500 ${draggable ? "ml-3" : ""}`}>
         <div className="flex items-center gap-2">
           {!idea.isAnonymous && idea.author && (
             <span className="font-medium text-zinc-700 dark:text-zinc-300">
@@ -84,8 +82,7 @@ export const IdeaCard = ({
             <svg
               className="h-4 w-4 text-red-500"
               fill="currentColor"
-              viewBox="0 0 20 20"
-            >
+              viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
                 d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
@@ -100,13 +97,13 @@ export const IdeaCard = ({
       </div>
 
       {indicatorText && (
-        <div className={`mt-2 flex items-center gap-1 text-xs font-medium text-blue-600 dark:text-blue-400 ${draggable ? "ml-3" : ""}`}>
+        <div
+          className={`mt-2 flex items-center gap-1 text-xs font-medium text-blue-600 dark:text-blue-400 ${draggable ? "ml-3" : ""}`}>
           <svg
             className="h-4 w-4"
             fill="none"
             stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+            viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -143,8 +140,7 @@ export const IdeaCard = ({
           ref={sortable.setNodeRef}
           style={style}
           {...sortable.attributes}
-          {...sortable.listeners}
-        >
+          {...sortable.listeners}>
           {cardContent}
         </div>
       </div>

@@ -11,11 +11,13 @@
 ### Environment Variables (REQUIRED)
 
 **ALWAYS create `.env.local` before building or running dev server:**
+
 ```bash
 cp .env.example .env.local
 ```
 
 The build will fail with Zod validation errors if Firebase environment variables are missing. The `.env.example` file contains placeholder values that work for local development:
+
 - `NEXT_PUBLIC_FIREBASE_API_KEY`
 - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
 - `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
@@ -46,6 +48,7 @@ npm start             # Production server on :3000
 ### Unit Tests (Vitest)
 
 **40 tests pass without emulators**:
+
 ```bash
 npm test                # Run all once
 npm run test:watch      # Watch mode
@@ -59,6 +62,7 @@ npm run test:coverage   # Coverage report → coverage/index.html
 ### Firebase Integration Tests (17 tests)
 
 **REQUIRES Emulators** - Ports: Firestore (8080), Auth (9099), UI (4000)
+
 ```bash
 npm run test:emulators  # Auto: start→test→stop (RECOMMENDED)
 # OR Manual: Terminal 1: npm run emulators | Terminal 2: npm test

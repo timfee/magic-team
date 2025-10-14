@@ -21,11 +21,13 @@ npm run test:ui
 ## Test Coverage
 
 Current test coverage:
+
 - **8 test files** with **57 total tests**
 - **40 passing unit tests** (run without emulators)
 - **17 Firebase integration tests** (require emulators)
 
 ### Test Files:
+
 - `lib/utils/__tests__/` - Utility functions (cn, permissions)
 - `lib/actions/__tests__/` - Server actions (session, ideas)
 - `components/__tests__/` - React components (IdeaCard)
@@ -57,12 +59,16 @@ npm test
 ## Test Structure
 
 ### Unit Tests
+
 Located in `__tests__` folders next to the code they test:
+
 - `lib/utils/__tests__/` - Utility function tests
 - No Firebase emulator needed
 
 ### Integration Tests
+
 Tests that interact with Firebase services:
+
 - `lib/firebase/__tests__/` - Firebase security rules and data tests
 - **Requires Firebase emulators to be running**
 
@@ -118,9 +124,7 @@ describe("Firestore Rules", () => {
     const context = getAuthenticatedContext("user-123", "user@example.com");
     const ref = doc(context.firestore(), "sessions", "session-1");
 
-    await assertSucceeds(
-      setDoc(ref, { data: "value" })
-    );
+    await assertSucceeds(setDoc(ref, { data: "value" }));
   });
 });
 ```
@@ -144,6 +148,7 @@ For CI environments, use the `test:emulators` command which handles starting/sto
 For E2E testing with Playwright, see **[E2E_TESTING.md](./E2E_TESTING.md)** for detailed documentation.
 
 Quick start for E2E tests:
+
 ```bash
 # Run E2E tests
 npm run test:e2e
@@ -158,18 +163,23 @@ npm run test:e2e:debug
 ## Troubleshooting
 
 ### "Cannot find module" errors
+
 Make sure you're running tests from the project root and all dependencies are installed:
+
 ```bash
 npm install
 ```
 
 ### Emulator connection errors
+
 1. Check that emulators are running: `npm run emulators`
 2. Verify ports are not in use
 3. Check `firebase.json` emulator configuration
 
 ### Test timeouts
+
 Firebase emulator tests may take longer. Increase timeout in `vitest.config.ts` if needed:
+
 ```typescript
 test: {
   testTimeout: 10000, // 10 seconds

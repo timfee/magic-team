@@ -3,6 +3,7 @@
 ## ✅ COMPLETED: Comments System (100%)
 
 ### Files Created:
+
 1. **`components/ui/dialog.tsx`** - Modal dialog component
    - Native HTML dialog with backdrop
    - Close button and title support
@@ -23,6 +24,7 @@
    - Idea preview in modal
 
 ### Files Modified:
+
 1. **`lib/types/session.ts`**
    - Added `replyToId?: string` to Comment (line 84)
    - Added `CommentWithDetails` type (lines 257-272)
@@ -48,7 +50,7 @@ import { IdeaCardWithComments } from "@/components/session/idea-card-with-commen
   currentUserId={currentUserId}
   isAdmin={isAdmin}
   showComments={true}
-/>
+/>;
 ```
 
 ---
@@ -56,9 +58,11 @@ import { IdeaCardWithComments } from "@/components/session/idea-card-with-commen
 ## 🔄 PARTIALLY COMPLETED: Group Comments
 
 ### What's Done:
+
 - DroppableGroup component signature updated with necessary props
 
 ### What's Needed:
+
 1. Add state management for group comments dialog
 2. Add comment button to group header (next to Delete button)
 3. Add real-time comment count listener
@@ -94,26 +98,27 @@ useEffect(() => {
 // In header JSX (after idea count):
 <button
   onClick={() => setIsCommentsOpen(true)}
-  className="flex items-center gap-1 rounded-md px-2 py-1 text-xs hover:bg-zinc-100"
->
+  className="flex items-center gap-1 rounded-md px-2 py-1 text-xs hover:bg-zinc-100">
   <svg className="h-4 w-4">/* comment icon */</svg>
   <span>{commentCount}</span>
-</button>
+</button>;
 
 // After component return, add dialog:
-{isCommentsOpen && (
-  <Dialog open={isCommentsOpen} onOpenChange={setIsCommentsOpen}>
-    <DialogContent title={`Comments on ${group.title}`}>
-      <CommentThread
-        sessionId={sessionId}
-        groupId={group.id}
-        comments={comments}
-        currentUserId={currentUserId}
-        isAdmin={isAdmin}
-      />
-    </DialogContent>
-  </Dialog>
-)}
+{
+  isCommentsOpen && (
+    <Dialog open={isCommentsOpen} onOpenChange={setIsCommentsOpen}>
+      <DialogContent title={`Comments on ${group.title}`}>
+        <CommentThread
+          sessionId={sessionId}
+          groupId={group.id}
+          comments={comments}
+          currentUserId={currentUserId}
+          isAdmin={isAdmin}
+        />
+      </DialogContent>
+    </Dialog>
+  );
+}
 ```
 
 Then update all `<DroppableGroup />` calls to pass `sessionId`, `currentUserId`, and `isAdmin`.
@@ -125,15 +130,18 @@ Then update all `<DroppableGroup />` calls to pass `sessionId`, `currentUserId`,
 ### Feature 2: Pre-submit Functionality (0%)
 
 **Files to Create:**
+
 - `lib/actions/pre-submit.ts`
 
 **Files to Modify:**
+
 - `lib/types/session.ts` - Add status fields to Idea type
 - `components/session/stages/idea-collection.tsx` - Add draft/submit UI
 - `app/session/[id]/admin/components/pre-submit-queue.tsx` - New file
 - `firestore.rules` - Add pre-submit rules
 
 **Type Changes Needed:**
+
 ```typescript
 // In Idea type:
 submissionStatus?: 'draft' | 'pending' | 'approved' | 'rejected';
@@ -145,6 +153,7 @@ requirePreSubmitApproval?: boolean;
 ```
 
 **Actions Needed:**
+
 ```typescript
 // lib/actions/pre-submit.ts
 export const submitIdeaForApproval(ideaId: string, sessionId: string);
@@ -157,14 +166,17 @@ export const rejectIdea(ideaId: string, sessionId: string, adminId: string, reas
 ### Feature 3: Multiplayer Cursors (0%)
 
 **Files to Create:**
+
 - `lib/contexts/cursor-tracking-context.tsx`
 - `components/session/cursor-overlay.tsx`
 
 **Files to Modify:**
+
 - `lib/types/session.ts` - Add cursor fields to UserPresence
 - `components/session/stages/idea-grouping.tsx` - Wrap with CursorProvider
 
 **Type Changes Needed:**
+
 ```typescript
 // In UserPresence:
 cursorX?: number;
@@ -173,6 +185,7 @@ draggedIdeaId?: string;
 ```
 
 **Implementation Pattern:**
+
 ```typescript
 // Track cursor in drag events
 onDragStart: throttle((e) => {
@@ -194,14 +207,17 @@ onDragStart: throttle((e) => {
 ### Feature 4: Conflict Resolution (0%)
 
 **Files to Create:**
+
 - `lib/actions/idea-locks.ts`
 
 **Files to Modify:**
+
 - `lib/types/session.ts` - Add lock fields to Idea
 - `components/session/stages/idea-grouping.tsx` - Add lock checks
 - `firestore.rules` - Add lock validation
 
 **Type Changes Needed:**
+
 ```typescript
 // In Idea:
 lockedById?: string;
@@ -209,6 +225,7 @@ lockedAt?: Date;
 ```
 
 **Lock Actions:**
+
 ```typescript
 export const acquireLock(ideaId: string, userId: string, sessionId: string);
 export const releaseLock(ideaId: string, userId: string, sessionId: string);
@@ -216,6 +233,7 @@ export const refreshLock(ideaId: string, userId: string, sessionId: string);
 ```
 
 **Integration:**
+
 ```typescript
 handleDragStart: async (event) => {
   const canLock = await acquireLock(ideaId, userId, sessionId);
@@ -260,6 +278,7 @@ handleDragEnd: async () => {
 ### E2E Tests to Write:
 
 1. **`e2e/comments.spec.ts`**
+
    ```typescript
    test("should post and reply to comment", async ({ page }) => {
      // Navigate to idea
@@ -271,6 +290,7 @@ handleDragEnd: async () => {
    ```
 
 2. **`e2e/idea-collection-pre-submit.spec.ts`**
+
    ```typescript
    test("should submit idea for approval", async ({ page }) => {
      // Save as draft
@@ -281,6 +301,7 @@ handleDragEnd: async () => {
    ```
 
 3. **`e2e/multiplayer-cursors.spec.ts`**
+
    ```typescript
    test("should show other users' cursors", async ({ browser }) => {
      const context1 = await browser.newContext();
@@ -304,14 +325,14 @@ handleDragEnd: async () => {
 
 ## 📊 Progress Summary
 
-| Feature | Status | Progress |
-|---------|--------|----------|
-| Comments System | ✅ Complete | 100% |
-| Pre-submit | ⏳ Not Started | 0% |
-| Multiplayer Cursors | ⏳ Not Started | 0% |
-| Conflict Resolution | ⏳ Not Started | 0% |
-| Unit Tests | ⏳ Not Started | 0% |
-| E2E Tests | ⏳ Not Started | 0% |
+| Feature             | Status         | Progress |
+| ------------------- | -------------- | -------- |
+| Comments System     | ✅ Complete    | 100%     |
+| Pre-submit          | ⏳ Not Started | 0%       |
+| Multiplayer Cursors | ⏳ Not Started | 0%       |
+| Conflict Resolution | ⏳ Not Started | 0%       |
+| Unit Tests          | ⏳ Not Started | 0%       |
+| E2E Tests           | ⏳ Not Started | 0%       |
 
 **Overall Progress: ~25% complete**
 
@@ -320,6 +341,7 @@ handleDragEnd: async () => {
 ## 🚀 Quick Start Guide
 
 ### To Test Comments:
+
 ```bash
 npm run dev
 # Navigate to a session in grouping stage
@@ -328,6 +350,7 @@ npm run dev
 ```
 
 ### To Continue Development:
+
 1. Finish group comments (5-10 min)
 2. Write comment tests (1-2 hours)
 3. Implement pre-submit (3-4 hours)

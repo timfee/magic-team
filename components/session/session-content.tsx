@@ -37,8 +37,7 @@ export const SessionContent = ({
         <div className="mb-4 flex items-center justify-between">
           <Link
             href="/"
-            className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-          >
+            className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50">
             ← Back to Dashboard
           </Link>
           <PresenceTracker sessionId={sessionId} userId={userId} />
@@ -61,8 +60,7 @@ export const SessionContent = ({
             {isAdmin && (
               <Link
                 href={`/session/${sessionId}/admin`}
-                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-              >
+                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
                 Admin Controls
               </Link>
             )}
@@ -76,11 +74,7 @@ export const SessionContent = ({
           <div
             key={category.id}
             className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900"
-            style={{
-              borderLeftWidth: "4px",
-              borderLeftColor: category.color,
-            }}
-          >
+            style={{ borderLeftWidth: "4px", borderLeftColor: category.color }}>
             <h3 className="text-lg font-medium text-zinc-900 dark:text-zinc-50">
               {category.name}
             </h3>

@@ -33,10 +33,7 @@ export const VoteBar = ({
       <div className="relative h-2 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
         <div
           className="h-full rounded-full transition-all duration-300 ease-in-out"
-          style={{
-            width: `${cappedPercentage}%`,
-            backgroundColor: color,
-          }}
+          style={{ width: `${cappedPercentage}%`, backgroundColor: color }}
         />
       </div>
     </div>

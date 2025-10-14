@@ -143,10 +143,7 @@ export type MagicSessionWithDetails = MagicSession & {
     image: string | null;
   };
   admins?: SessionAdmin[];
-  _count?: {
-    ideas: number;
-    presence: number;
-  };
+  _count?: { ideas: number; presence: number };
 };
 
 export type CategoryWithIdeas = Category & {
@@ -155,41 +152,22 @@ export type CategoryWithIdeas = Category & {
 };
 
 export type IdeaWithDetails = Idea & {
-  author?: {
-    id: string;
-    name: string | null;
-    image: string | null;
-  } | null;
+  author?: { id: string; name: string | null; image: string | null } | null;
   group?: IdeaGroup | null;
   comments: (Comment & {
-    user: {
-      id: string;
-      name: string | null;
-      image: string | null;
-    };
+    user: { id: string; name: string | null; image: string | null };
   })[];
   votes: Vote[];
-  _count: {
-    votes: number;
-    comments: number;
-  };
+  _count: { votes: number; comments: number };
 };
 
 export type IdeaGroupWithDetails = IdeaGroup & {
   ideas: Idea[];
   comments: (Comment & {
-    user: {
-      id: string;
-      name: string | null;
-      image: string | null;
-    };
+    user: { id: string; name: string | null; image: string | null };
   })[];
   votes: Vote[];
-  _count: {
-    ideas: number;
-    votes: number;
-    comments: number;
-  };
+  _count: { ideas: number; votes: number; comments: number };
 };
 
 // ============================================================
@@ -200,11 +178,7 @@ export type CreateMagicSessionInput = {
   name: string;
   description?: string;
   visibility?: SessionVisibility;
-  categories: {
-    name: string;
-    color?: string;
-    maxEntriesPerPerson?: number;
-  }[];
+  categories: { name: string; color?: string; maxEntriesPerPerson?: number }[];
   settings?: Partial<Omit<SessionSettings, "updatedAt">>;
 };
 
@@ -254,32 +228,19 @@ export type CreateCommentInput = {
   sessionId: string;
   content: string;
   replyToId?: string; // Optional: comment ID being replied to
-} & (
-  | { ideaId: string; groupId?: never }
-  | { groupId: string; ideaId?: never }
-);
+} & ({ ideaId: string; groupId?: never } | { groupId: string; ideaId?: never });
 
 export type CommentWithDetails = Comment & {
-  user: {
-    id: string;
-    name: string | null;
-    image: string | null;
-  };
+  user: { id: string; name: string | null; image: string | null };
   replies?: CommentWithDetails[]; // Nested replies
   replyTo?: {
     id: string;
     content: string;
-    user: {
-      id: string;
-      name: string | null;
-    };
+    user: { id: string; name: string | null };
   } | null;
 };
 
-export type CastVoteInput = {
-  sessionId: string;
-  categoryId: string;
-} & (
+export type CastVoteInput = { sessionId: string; categoryId: string } & (
   | { ideaId: string; groupId?: never }
   | { groupId: string; ideaId?: never }
 );
@@ -337,10 +298,7 @@ export type StageChangedEvent = {
   changedBy: string;
 };
 
-export type IdeaCreatedEvent = {
-  sessionId: string;
-  idea: IdeaWithDetails;
-};
+export type IdeaCreatedEvent = { sessionId: string; idea: IdeaWithDetails };
 
 export type IdeaUpdatedEvent = {
   sessionId: string;
@@ -367,31 +325,18 @@ export type GroupUpdatedEvent = {
   updates: Partial<IdeaGroup>;
 };
 
-export type GroupDeletedEvent = {
-  sessionId: string;
-  groupId: string;
-};
+export type GroupDeletedEvent = { sessionId: string; groupId: string };
 
 export type CommentCreatedEvent = {
   sessionId: string;
   comment: Comment & {
-    user: {
-      id: string;
-      name: string | null;
-      image: string | null;
-    };
+    user: { id: string; name: string | null; image: string | null };
   };
 };
 
-export type VoteCastEvent = {
-  sessionId: string;
-  vote: Vote;
-};
+export type VoteCastEvent = { sessionId: string; vote: Vote };
 
-export type VoteRemovedEvent = {
-  sessionId: string;
-  voteId: string;
-};
+export type VoteRemovedEvent = { sessionId: string; voteId: string };
 
 export type PresenceUpdateEvent = {
   sessionId: string;

@@ -527,7 +527,9 @@ describe("DRAG_DROP_MATRIX - Critical State Machine", () => {
 
   describe("getDropActionDescription", () => {
     it("should return description for create-group", () => {
-      expect(getDropActionDescription("create-group")).toBe("Will create group");
+      expect(getDropActionDescription("create-group")).toBe(
+        "Will create group",
+      );
     });
 
     it("should return description for join-group", () => {

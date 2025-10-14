@@ -19,9 +19,7 @@ vi.mock("@/lib/contexts/firebase-session-context", () => ({
 // Mock AnimatedFacepile
 vi.mock("@/components/ui/animated-facepile", () => ({
   AnimatedFacepile: ({ users }: { users: unknown[] }) => (
-    <div data-testid="animated-facepile">
-      {users.length} users
-    </div>
+    <div data-testid="animated-facepile">{users.length} users</div>
   ),
 }));
 
@@ -36,24 +34,22 @@ describe("GreenRoom", () => {
   });
 
   it("should render green room title", () => {
-    render(
-      <GreenRoom sessionId="test-session" initialUserCount={5} />
-    );
+    render(<GreenRoom sessionId="test-session" initialUserCount={5} />);
 
     expect(screen.getByText("Green Room")).toBeInTheDocument();
   });
 
   it("should display participant count correctly", () => {
-    render(
-      <GreenRoom sessionId="test-session" initialUserCount={5} />
-    );
+    render(<GreenRoom sessionId="test-session" initialUserCount={5} />);
 
     expect(screen.getByText(/5 participants ready/i)).toBeInTheDocument();
   });
 
   it("should show singular text for one participant", async () => {
     // Temporarily override the mock
-    const { useSession } = await import("@/lib/contexts/firebase-session-context");
+    const { useSession } = await import(
+      "@/lib/contexts/firebase-session-context"
+    );
     vi.mocked(useSession).mockReturnValueOnce({
       userCount: 1,
       activeUsers: [
@@ -61,31 +57,23 @@ describe("GreenRoom", () => {
       ],
     } as never);
 
-    render(
-      <GreenRoom sessionId="test-session" initialUserCount={1} />
-    );
+    render(<GreenRoom sessionId="test-session" initialUserCount={1} />);
 
-    expect(
-      screen.getByText("You're the first one here!")
-    ).toBeInTheDocument();
+    expect(screen.getByText("You're the first one here!")).toBeInTheDocument();
   });
 
   it("should render animated facepile", () => {
-    render(
-      <GreenRoom sessionId="test-session" initialUserCount={5} />
-    );
+    render(<GreenRoom sessionId="test-session" initialUserCount={5} />);
 
     expect(screen.getByTestId("animated-facepile")).toBeInTheDocument();
     expect(screen.getByText("5 users")).toBeInTheDocument();
   });
 
   it("should display waiting message", () => {
-    render(
-      <GreenRoom sessionId="test-session" initialUserCount={5} />
-    );
+    render(<GreenRoom sessionId="test-session" initialUserCount={5} />);
 
     expect(
-      screen.getByText(/Waiting for the facilitator to start the session/i)
+      screen.getByText(/Waiting for the facilitator to start the session/i),
     ).toBeInTheDocument();
   });
 
@@ -98,7 +86,7 @@ describe("GreenRoom", () => {
         sessionId="test-session"
         initialUserCount={5}
         startTime={futureTime}
-      />
+      />,
     );
 
     expect(screen.getByText(/Time until start:/i)).toBeInTheDocument();
@@ -115,7 +103,7 @@ describe("GreenRoom", () => {
         sessionId="test-session"
         initialUserCount={5}
         startTime={futureTime}
-      />
+      />,
     );
 
     expect(screen.getByText(/Time until start:/i)).toBeInTheDocument();
@@ -132,7 +120,7 @@ describe("GreenRoom", () => {
         sessionId="test-session"
         initialUserCount={5}
         startTime={pastTime}
-      />
+      />,
     );
 
     expect(screen.getByText(/Starting now/i)).toBeInTheDocument();
@@ -144,7 +132,7 @@ describe("GreenRoom", () => {
         sessionId="test-session"
         initialUserCount={5}
         startTime={null}
-      />
+      />,
     );
 
     expect(screen.queryByText(/Time until start:/i)).not.toBeInTheDocument();
@@ -152,7 +140,7 @@ describe("GreenRoom", () => {
 
   it("should render animated waiting dots", () => {
     const { container } = render(
-      <GreenRoom sessionId="test-session" initialUserCount={5} />
+      <GreenRoom sessionId="test-session" initialUserCount={5} />,
     );
 
     // Check for the presence of animated dots

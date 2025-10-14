@@ -8,9 +8,7 @@ import { defineConfig } from "eslint/config";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
+const compat = new FlatCompat({ baseDirectory: __dirname });
 
 const eslintConfig = [
   ...tseslint.configs.recommended,
@@ -33,9 +31,7 @@ const eslintConfig = [
   {
     languageOptions: {
       parser: tseslint.parser,
-      parserOptions: {
-        projectService: true,
-      },
+      parserOptions: { projectService: true },
     },
     rules: {
       "@typescript-eslint/array-type": "off",

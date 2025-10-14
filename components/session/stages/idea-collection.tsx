@@ -29,7 +29,7 @@ export const IdeaCollection = ({
 }: IdeaCollectionProps) => {
   const { ideas } = useSession();
   const [timeRemaining, setTimeRemaining] = useState<string | null>(
-    timerEnd ? "" : null
+    timerEnd ? "" : null,
   );
   const [timerExpired, setTimerExpired] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>(
@@ -85,7 +85,7 @@ export const IdeaCollection = ({
         // Create idea directly in Firebase
         const ideaId = crypto.randomUUID();
         const ideaRef = doc(db, "sessions", sessionId, "ideas", ideaId);
-        
+
         await setDoc(ideaRef, {
           id: ideaId,
           sessionId,
@@ -139,8 +139,7 @@ export const IdeaCollection = ({
                   timerExpired
                     ? "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-300"
                     : "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300"
-                }`}
-              >
+                }`}>
                 {timeRemaining}
               </div>
             )}
@@ -167,16 +166,14 @@ export const IdeaCollection = ({
             <div>
               <label
                 htmlFor="category"
-                className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-              >
+                className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 Category
               </label>
               <select
                 id="category"
                 value={selectedCategoryId}
                 onChange={(e) => setSelectedCategoryId(e.target.value)}
-                className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-zinc-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
-              >
+                className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-zinc-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50">
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
@@ -197,8 +194,7 @@ export const IdeaCollection = ({
             <div>
               <label
                 htmlFor="content"
-                className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-              >
+                className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 Your Idea
               </label>
               <textarea
@@ -226,8 +222,7 @@ export const IdeaCollection = ({
               />
               <label
                 htmlFor="anonymous"
-                className="ml-2 text-sm text-zinc-700 dark:text-zinc-300"
-              >
+                className="ml-2 text-sm text-zinc-700 dark:text-zinc-300">
                 Submit anonymously
               </label>
             </div>
@@ -245,8 +240,7 @@ export const IdeaCollection = ({
             <button
               type="submit"
               disabled={isPending || !content.trim() || effectivelyDisabled}
-              className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-            >
+              className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
               {isPending ? "Submitting..." : "Submit Idea"}
             </button>
 
@@ -311,8 +305,7 @@ export const IdeaCollection = ({
                 className="mx-auto h-12 w-12 text-zinc-400"
                 fill="none"
                 stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+                viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

@@ -48,12 +48,8 @@ export const VoteHeatmap = ({ ideas, categoryColors }: VoteHeatmapProps) => {
             <div
               key={idea.id}
               className="group relative aspect-square rounded transition-transform hover:scale-110"
-              style={{
-                backgroundColor: categoryColor,
-                opacity,
-              }}
-              title={`${idea.content.substring(0, 50)}${idea.content.length > 50 ? "..." : ""} - ${idea._count.votes} votes`}
-            >
+              style={{ backgroundColor: categoryColor, opacity }}
+              title={`${idea.content.substring(0, 50)}${idea.content.length > 50 ? "..." : ""} - ${idea._count.votes} votes`}>
               <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white opacity-0 transition-opacity group-hover:opacity-100">
                 {idea._count.votes}
               </div>

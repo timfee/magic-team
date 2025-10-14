@@ -16,11 +16,7 @@ vi.mock("@dnd-kit/sortable", () => ({
 }));
 
 vi.mock("@dnd-kit/utilities", () => ({
-  CSS: {
-    Transform: {
-      toString: () => "",
-    },
-  },
+  CSS: { Transform: { toString: () => "" } },
 }));
 
 describe("IdeaCard", () => {
@@ -34,18 +30,11 @@ describe("IdeaCard", () => {
     isSelected: false,
     createdAt: new Date(),
     updatedAt: new Date(),
-    author: {
-      id: "user-123",
-      name: "Test User",
-      image: null,
-    },
+    author: { id: "user-123", name: "Test User", image: null },
     group: null,
     comments: [],
     votes: [],
-    _count: {
-      comments: 0,
-      votes: 0,
-    },
+    _count: { comments: 0, votes: 0 },
   };
 
   it("should render idea content", () => {
@@ -65,11 +54,7 @@ describe("IdeaCard", () => {
   });
 
   it("should show 'Anonymous' when idea is anonymous", () => {
-    const anonymousIdea = {
-      ...mockIdea,
-      isAnonymous: true,
-      author: null,
-    };
+    const anonymousIdea = { ...mockIdea, isAnonymous: true, author: null };
 
     render(
       <IdeaCard
@@ -83,13 +68,7 @@ describe("IdeaCard", () => {
   });
 
   it("should show vote count when votes > 0", () => {
-    const ideaWithVotes = {
-      ...mockIdea,
-      _count: {
-        comments: 0,
-        votes: 5,
-      },
-    };
+    const ideaWithVotes = { ...mockIdea, _count: { comments: 0, votes: 5 } };
 
     render(
       <IdeaCard
@@ -104,13 +83,7 @@ describe("IdeaCard", () => {
   });
 
   it("should not show vote count when showVotes is false", () => {
-    const ideaWithVotes = {
-      ...mockIdea,
-      _count: {
-        comments: 0,
-        votes: 5,
-      },
-    };
+    const ideaWithVotes = { ...mockIdea, _count: { comments: 0, votes: 5 } };
 
     render(
       <IdeaCard

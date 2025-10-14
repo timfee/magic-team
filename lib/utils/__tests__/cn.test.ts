@@ -83,10 +83,7 @@ describe("cn utility", () => {
     });
 
     it("should handle mixed input with objects", () => {
-      const result = cn("base", {
-        active: true,
-        disabled: false,
-      });
+      const result = cn("base", { active: true, disabled: false });
       expect(result).toBe("base active");
     });
   });
@@ -120,17 +117,12 @@ describe("cn utility", () => {
       const isFocused = false;
       const isDisabled = false;
 
-      const result = cn(
-        "input",
-        "border",
-        "rounded",
-        {
-          "border-red-500": hasError,
-          "border-blue-500": isFocused && !hasError,
-          "border-gray-300": !hasError && !isFocused,
-          "bg-gray-100": isDisabled,
-        },
-      );
+      const result = cn("input", "border", "rounded", {
+        "border-red-500": hasError,
+        "border-blue-500": isFocused && !hasError,
+        "border-gray-300": !hasError && !isFocused,
+        "bg-gray-100": isDisabled,
+      });
 
       expect(result).toContain("input");
       expect(result).toContain("border-red-500");
@@ -141,16 +133,10 @@ describe("cn utility", () => {
       const isHovered = true;
       const isSelected = false;
 
-      const result = cn(
-        "card",
-        "p-4",
-        "rounded-lg",
-        "transition-all",
-        {
-          "shadow-lg scale-105": isHovered,
-          "ring-2 ring-blue-500": isSelected,
-        },
-      );
+      const result = cn("card", "p-4", "rounded-lg", "transition-all", {
+        "shadow-lg scale-105": isHovered,
+        "ring-2 ring-blue-500": isSelected,
+      });
 
       expect(result).toBe(
         "card p-4 rounded-lg transition-all shadow-lg scale-105",
@@ -195,12 +181,7 @@ describe("cn utility", () => {
       const objectClass = { active: true, disabled: false };
       const conditionalClass = true && "visible";
 
-      const result = cn(
-        stringClass,
-        arrayClass,
-        objectClass,
-        conditionalClass,
-      );
+      const result = cn(stringClass, arrayClass, objectClass, conditionalClass);
 
       expect(typeof result).toBe("string");
     });

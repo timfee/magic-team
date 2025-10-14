@@ -23,9 +23,7 @@ test.describe("Voting Stage", () => {
     await page.waitForLoadState("networkidle");
 
     // Look for vote counter or votes used/remaining text
-    const voteCounter = page.locator(
-      "text=/votes.*used|votes.*remaining|∞/i",
-    );
+    const voteCounter = page.locator("text=/votes.*used|votes.*remaining|∞/i");
     const hasVoteCounter = (await voteCounter.count()) > 0;
 
     if (hasVoteCounter) {
@@ -117,9 +115,9 @@ test.describe("Voting Stage", () => {
     await page.waitForLoadState("networkidle");
 
     // Look for progress bar elements (typically divs with specific styles)
-    const progressBars = page.locator('div[style*="width"]').filter({
-      has: page.locator('div[class*="rounded-full"]'),
-    });
+    const progressBars = page
+      .locator('div[style*="width"]')
+      .filter({ has: page.locator('div[class*="rounded-full"]') });
     const hasProgressBars = (await progressBars.count()) > 0;
 
     if (hasProgressBars) {
@@ -164,7 +162,7 @@ test.describe("Vote Interactions", () => {
     // Look for enabled vote buttons
     const voteButton = page
       .locator("button:has-text('Vote')")
-      .filter({ hasNot: page.locator('[disabled]') })
+      .filter({ hasNot: page.locator("[disabled]") })
       .first();
 
     const hasVoteButton = (await voteButton.count()) > 0;
@@ -182,13 +180,13 @@ test.describe("Vote Interactions", () => {
     await page.waitForLoadState("networkidle");
 
     // Look for disabled vote buttons
-    const disabledVoteButton = page.locator("button:has-text('Vote')[disabled]");
+    const disabledVoteButton = page.locator(
+      "button:has-text('Vote')[disabled]",
+    );
     const hasDisabledButton = (await disabledVoteButton.count()) > 0;
 
     if (hasDisabledButton) {
-      await expect(disabledVoteButton.first()).toBeDisabled({
-        timeout: 10000,
-      });
+      await expect(disabledVoteButton.first()).toBeDisabled({ timeout: 10000 });
     }
   });
 

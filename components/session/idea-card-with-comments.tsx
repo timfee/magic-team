@@ -117,14 +117,12 @@ export const IdeaCardWithComments = ({
           <button
             onClick={handleCommentClick}
             className="absolute bottom-2 right-2 flex items-center gap-1 rounded-md bg-white px-2 py-1 text-xs text-zinc-600 shadow-sm hover:bg-zinc-50 hover:text-zinc-900 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-50"
-            data-testid="comment-button"
-          >
+            data-testid="comment-button">
             <svg
               className="h-4 w-4"
               fill="none"
               stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+              viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -142,8 +140,7 @@ export const IdeaCardWithComments = ({
         <Dialog open={isCommentsOpen} onOpenChange={setIsCommentsOpen}>
           <DialogContent
             title={`Comments on Idea`}
-            onClose={() => setIsCommentsOpen(false)}
-          >
+            onClose={() => setIsCommentsOpen(false)}>
             <div className="space-y-4">
               {/* Idea Preview */}
               <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/50">

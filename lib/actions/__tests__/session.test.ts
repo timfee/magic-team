@@ -34,13 +34,14 @@ interface AdminData {
 }
 
 // Mock Firebase
-vi.mock("@/lib/firebase/client", () => ({
-  db: {},
-}));
+vi.mock("@/lib/firebase/client", () => ({ db: {} }));
 
 // Create a Timestamp class mock
 class MockTimestamp {
-  constructor(public seconds: number, public nanoseconds: number) {}
+  constructor(
+    public seconds: number,
+    public nanoseconds: number,
+  ) {}
   toDate() {
     return new Date(this.seconds * 1000);
   }
@@ -236,12 +237,10 @@ describe("Session Actions", () => {
       const { getDocs, Timestamp } = await import("firebase/firestore");
 
       const timestamp1 = new Date("2024-01-01").getTime() / 1000;
-      const mockTimestamp1 = new (
-        Timestamp as unknown as new (
-          seconds: number,
-          nanoseconds: number,
-        ) => { toDate(): Date }
-      )(timestamp1, 0);
+      const mockTimestamp1 = new (Timestamp as unknown as new (
+        seconds: number,
+        nanoseconds: number,
+      ) => { toDate(): Date })(timestamp1, 0);
 
       const mockGetDocs = vi.mocked(getDocs);
       mockGetDocs.mockResolvedValue(

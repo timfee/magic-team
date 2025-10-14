@@ -1,7 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { createComment, deleteComment, updateComment } from "@/lib/actions/comments";
+import {
+  createComment,
+  deleteComment,
+  updateComment,
+} from "@/lib/actions/comments";
 import type { CommentWithDetails } from "@/lib/types/session";
 import { formatDistanceToNow } from "date-fns";
 import { useState, useTransition } from "react";
@@ -64,8 +68,7 @@ const SingleComment = ({
   return (
     <div
       className={`flex gap-3 ${depth > 0 ? "ml-8 border-l-2 border-zinc-200 pl-4 dark:border-zinc-800" : ""}`}
-      data-testid="comment"
-    >
+      data-testid="comment">
       {/* User Avatar */}
       <div className="flex-shrink-0">
         {comment.user.image ? (
@@ -99,7 +102,8 @@ const SingleComment = ({
         {/* Reply-to indicator */}
         {comment.replyTo && (
           <div className="text-xs text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-900 rounded px-2 py-1 inline-block">
-            Replying to <span className="font-medium">{comment.replyTo.user.name}</span>
+            Replying to{" "}
+            <span className="font-medium">{comment.replyTo.user.name}</span>
           </div>
         )}
 
@@ -117,8 +121,7 @@ const SingleComment = ({
               <Button
                 size="sm"
                 onClick={handleEdit}
-                disabled={isPending || !editContent.trim()}
-              >
+                disabled={isPending || !editContent.trim()}>
                 Save
               </Button>
               <Button
@@ -128,8 +131,7 @@ const SingleComment = ({
                   setIsEditing(false);
                   setEditContent(comment.content);
                 }}
-                disabled={isPending}
-              >
+                disabled={isPending}>
                 Cancel
               </Button>
             </div>
@@ -147,8 +149,7 @@ const SingleComment = ({
               <button
                 onClick={() => onReply(comment.id, comment.user.name)}
                 className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
-                data-testid="reply-button"
-              >
+                data-testid="reply-button">
                 Reply
               </button>
             )}
@@ -156,8 +157,7 @@ const SingleComment = ({
               <button
                 onClick={() => setIsEditing(true)}
                 className="text-zinc-600 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300"
-                data-testid="edit-button"
-              >
+                data-testid="edit-button">
                 Edit
               </button>
             )}
@@ -165,8 +165,7 @@ const SingleComment = ({
               <button
                 onClick={() => onDelete(comment.id)}
                 className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                data-testid="delete-button"
-              >
+                data-testid="delete-button">
                 Delete
               </button>
             )}
@@ -277,13 +276,13 @@ export const CommentThread = ({
           {replyingTo && (
             <div className="flex items-center justify-between rounded-md bg-blue-50 px-3 py-2 text-sm dark:bg-blue-950/30">
               <span className="text-blue-700 dark:text-blue-300">
-                Replying to <span className="font-medium">{replyingTo.userName}</span>
+                Replying to{" "}
+                <span className="font-medium">{replyingTo.userName}</span>
               </span>
               <button
                 type="button"
                 onClick={() => setReplyingTo(null)}
-                className="text-blue-600 hover:text-blue-700 dark:text-blue-400"
-              >
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400">
                 Cancel
               </button>
             </div>
@@ -303,9 +302,12 @@ export const CommentThread = ({
             type="submit"
             size="sm"
             disabled={isPending || !newComment.trim()}
-            data-testid="post-comment-button"
-          >
-            {isPending ? "Posting..." : replyingTo ? "Post Reply" : "Post Comment"}
+            data-testid="post-comment-button">
+            {isPending
+              ? "Posting..."
+              : replyingTo
+                ? "Post Reply"
+                : "Post Comment"}
           </Button>
         </form>
       )}
@@ -319,7 +321,9 @@ export const CommentThread = ({
       {/* Comments List */}
       {comments.length === 0 ? (
         <div className="rounded-md border-2 border-dashed border-zinc-200 p-8 text-center dark:border-zinc-800">
-          <p className="text-sm text-zinc-500">No comments yet. Be the first to comment!</p>
+          <p className="text-sm text-zinc-500">
+            No comments yet. Be the first to comment!
+          </p>
         </div>
       ) : (
         <div className="space-y-4">

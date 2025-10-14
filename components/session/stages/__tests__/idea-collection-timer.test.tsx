@@ -4,24 +4,18 @@ import { IdeaCollection } from "../idea-collection";
 
 // Mock dependencies
 vi.mock("@/lib/contexts/firebase-session-context", () => ({
-  useSession: vi.fn(() => ({
-    ideas: [],
-  })),
+  useSession: vi.fn(() => ({ ideas: [] })),
 }));
 
 vi.mock("next/navigation", () => ({
-  useRouter: vi.fn(() => ({
-    refresh: vi.fn(),
-  })),
+  useRouter: vi.fn(() => ({ refresh: vi.fn() })),
 }));
 
 vi.mock("@/components/idea-card", () => ({
   IdeaCard: () => <div>Idea Card</div>,
 }));
 
-vi.mock("@/lib/firebase/client", () => ({
-  db: {},
-}));
+vi.mock("@/lib/firebase/client", () => ({ db: {} }));
 
 vi.mock("firebase/firestore", () => ({
   doc: vi.fn(),
@@ -63,7 +57,7 @@ describe("IdeaCollection Timer", () => {
         categories={mockCategories}
         initialIdeas={[]}
         userId="user-1"
-      />
+      />,
     );
 
     expect(screen.queryByText(/\d+m \d+s/)).not.toBeInTheDocument();
@@ -80,7 +74,7 @@ describe("IdeaCollection Timer", () => {
         initialIdeas={[]}
         userId="user-1"
         timerEnd={futureTime}
-      />
+      />,
     );
 
     expect(screen.getByText(/2m 0s/)).toBeInTheDocument();
@@ -97,7 +91,7 @@ describe("IdeaCollection Timer", () => {
         initialIdeas={[]}
         userId="user-1"
         timerEnd={futureTime}
-      />
+      />,
     );
 
     expect(screen.getByText(/30s/)).toBeInTheDocument();
@@ -114,7 +108,7 @@ describe("IdeaCollection Timer", () => {
         initialIdeas={[]}
         userId="user-1"
         timerEnd={futureTime}
-      />
+      />,
     );
 
     expect(screen.getByText(/10s/)).toBeInTheDocument();
@@ -131,7 +125,7 @@ describe("IdeaCollection Timer", () => {
         initialIdeas={[]}
         userId="user-1"
         timerEnd={pastTime}
-      />
+      />,
     );
 
     expect(screen.getByText("Time's up!")).toBeInTheDocument();
@@ -148,12 +142,10 @@ describe("IdeaCollection Timer", () => {
         initialIdeas={[]}
         userId="user-1"
         timerEnd={pastTime}
-      />
+      />,
     );
 
-    const submitButton = screen.getByRole("button", {
-      name: /Submit Idea/i,
-    });
+    const submitButton = screen.getByRole("button", { name: /Submit Idea/i });
     expect(submitButton).toBeDisabled();
   });
 
@@ -168,11 +160,11 @@ describe("IdeaCollection Timer", () => {
         initialIdeas={[]}
         userId="user-1"
         timerEnd={pastTime}
-      />
+      />,
     );
 
     expect(
-      screen.getByText(/Time for idea collection has ended/i)
+      screen.getByText(/Time for idea collection has ended/i),
     ).toBeInTheDocument();
   });
 
@@ -184,12 +176,10 @@ describe("IdeaCollection Timer", () => {
         initialIdeas={[]}
         userId="user-1"
         submissionsEnabled={false}
-      />
+      />,
     );
 
-    const submitButton = screen.getByRole("button", {
-      name: /Submit Idea/i,
-    });
+    const submitButton = screen.getByRole("button", { name: /Submit Idea/i });
     expect(submitButton).toBeDisabled();
   });
 
@@ -201,13 +191,13 @@ describe("IdeaCollection Timer", () => {
         initialIdeas={[]}
         userId="user-1"
         submissionsEnabled={false}
-      />
+      />,
     );
 
     expect(
       screen.getByText(
-        /Idea submissions have been disabled by the facilitator/i
-      )
+        /Idea submissions have been disabled by the facilitator/i,
+      ),
     ).toBeInTheDocument();
   });
 
@@ -222,7 +212,7 @@ describe("IdeaCollection Timer", () => {
         initialIdeas={[]}
         userId="user-1"
         timerEnd={futureTime}
-      />
+      />,
     );
 
     const timerElement = container.querySelector(".bg-blue-100");
@@ -240,7 +230,7 @@ describe("IdeaCollection Timer", () => {
         initialIdeas={[]}
         userId="user-1"
         timerEnd={pastTime}
-      />
+      />,
     );
 
     const timerElement = container.querySelector(".bg-red-100");

@@ -6,10 +6,7 @@ import {
   getAuthenticatedContext,
   getUnauthenticatedContext,
 } from "../test-utils";
-import {
-  assertFails,
-  assertSucceeds,
-} from "@firebase/rules-unit-testing";
+import { assertFails, assertSucceeds } from "@firebase/rules-unit-testing";
 import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 
 describe("Firestore Security Rules", () => {
@@ -79,8 +76,15 @@ describe("Firestore Security Rules", () => {
   describe("Session Updates", () => {
     it("should allow session owner to update session", async () => {
       const ownerId = "owner-123";
-      const ownerContext = getAuthenticatedContext(ownerId, "owner@example.com");
-      const sessionRef = doc(ownerContext.firestore(), "sessions", "test-session-4");
+      const ownerContext = getAuthenticatedContext(
+        ownerId,
+        "owner@example.com",
+      );
+      const sessionRef = doc(
+        ownerContext.firestore(),
+        "sessions",
+        "test-session-4",
+      );
 
       // Create session as owner
       await setDoc(sessionRef, {
@@ -94,9 +98,7 @@ describe("Firestore Security Rules", () => {
 
       // Update as owner
       await assertSucceeds(
-        updateDoc(sessionRef, {
-          currentStage: "green_room",
-        }),
+        updateDoc(sessionRef, { currentStage: "green_room" }),
       );
     });
 
@@ -105,8 +107,15 @@ describe("Firestore Security Rules", () => {
       const otherUserId = "other-user-456";
 
       // Create session as owner
-      const ownerContext = getAuthenticatedContext(ownerId, "owner@example.com");
-      const sessionRef = doc(ownerContext.firestore(), "sessions", "test-session-5");
+      const ownerContext = getAuthenticatedContext(
+        ownerId,
+        "owner@example.com",
+      );
+      const sessionRef = doc(
+        ownerContext.firestore(),
+        "sessions",
+        "test-session-5",
+      );
       await setDoc(sessionRef, {
         name: "Test Session",
         ownerId,
@@ -117,7 +126,10 @@ describe("Firestore Security Rules", () => {
       });
 
       // Try to update as different user
-      const otherContext = getAuthenticatedContext(otherUserId, "other@example.com");
+      const otherContext = getAuthenticatedContext(
+        otherUserId,
+        "other@example.com",
+      );
       const otherSessionRef = doc(
         otherContext.firestore(),
         "sessions",
@@ -125,9 +137,7 @@ describe("Firestore Security Rules", () => {
       );
 
       await assertFails(
-        updateDoc(otherSessionRef, {
-          currentStage: "green_room",
-        }),
+        updateDoc(otherSessionRef, { currentStage: "green_room" }),
       );
     });
   });
@@ -135,8 +145,15 @@ describe("Firestore Security Rules", () => {
   describe("Session Reading", () => {
     it("should allow anyone to read public sessions", async () => {
       const ownerId = "owner-123";
-      const ownerContext = getAuthenticatedContext(ownerId, "owner@example.com");
-      const sessionRef = doc(ownerContext.firestore(), "sessions", "test-session-6");
+      const ownerContext = getAuthenticatedContext(
+        ownerId,
+        "owner@example.com",
+      );
+      const sessionRef = doc(
+        ownerContext.firestore(),
+        "sessions",
+        "test-session-6",
+      );
 
       // Create public session
       await setDoc(sessionRef, {
@@ -161,8 +178,15 @@ describe("Firestore Security Rules", () => {
 
     it("should allow anyone to read private sessions (with link)", async () => {
       const ownerId = "owner-123";
-      const ownerContext = getAuthenticatedContext(ownerId, "owner@example.com");
-      const sessionRef = doc(ownerContext.firestore(), "sessions", "test-session-7");
+      const ownerContext = getAuthenticatedContext(
+        ownerId,
+        "owner@example.com",
+      );
+      const sessionRef = doc(
+        ownerContext.firestore(),
+        "sessions",
+        "test-session-7",
+      );
 
       // Create private session
       await setDoc(sessionRef, {

@@ -82,7 +82,8 @@ export function isValidDragDropState(
     state.activeId.length > 0 &&
     typeof state.targetId === "string" &&
     state.targetId.length > 0 &&
-    (isNullish(state.activeGroupId) || typeof state.activeGroupId === "string") &&
+    (isNullish(state.activeGroupId) ||
+      typeof state.activeGroupId === "string") &&
     (isNullish(state.targetGroupId) || typeof state.targetGroupId === "string")
   );
 }

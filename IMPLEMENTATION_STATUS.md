@@ -3,11 +3,13 @@
 ## ✅ COMPLETED: Comments System
 
 ### 1. Type Updates (`lib/types/session.ts`)
+
 - ✅ Added `replyToId?: string` to `Comment` type (line 84)
 - ✅ Updated `CreateCommentInput` to support `replyToId` (line 251)
 - ✅ Created `CommentWithDetails` type with nested structure (lines 257-272)
 
 ### 2. Enhanced Actions (`lib/actions/comments.ts`)
+
 - ✅ Updated `createComment` to handle threaded replies
 - ✅ Added `getUserDetails` helper function (fetches from presence → users)
 - ✅ Created `getCommentsWithDetails` function:
@@ -16,6 +18,7 @@
   - Sorts root (newest first) and replies (oldest first)
 
 ### 3. Comment Thread UI (`components/session/comment-thread.tsx`)
+
 - ✅ Full threaded comment component with:
   - Post/reply/edit/delete functionality
   - User avatars and timestamps
@@ -27,6 +30,7 @@
 ## 🔄 IN PROGRESS: Integration
 
 ### Next Steps:
+
 1. **Add comments to idea cards** - Create modal/popover trigger
 2. **Add comments to groups** - Similar integration
 3. **Write unit tests** - Test comment threading logic
@@ -35,6 +39,7 @@
 ## 📋 TODO: Remaining Features
 
 ### Feature 2: Pre-submit Functionality
+
 - [ ] Update `Idea` type with status fields
 - [ ] Update `SessionSettings` with `requirePreSubmitApproval`
 - [ ] Create `/lib/actions/pre-submit.ts`
@@ -44,6 +49,7 @@
 - [ ] Write tests
 
 ### Feature 3: Multiplayer Cursors
+
 - [ ] Update `UserPresence` type with cursor fields
 - [ ] Create cursor tracking context
 - [ ] Create cursor overlay component
@@ -51,6 +57,7 @@
 - [ ] Write tests
 
 ### Feature 4: Conflict Resolution
+
 - [ ] Add lock fields to `Idea` type
 - [ ] Create `/lib/actions/idea-locks.ts`
 - [ ] Update Firestore rules for locks
@@ -92,7 +99,9 @@ import { useState, useEffect } from "react";
 
 ```typescript
 // In firebase-session-context.tsx
-const [comments, setComments] = useState<Record<string, CommentWithDetails[]>>({});
+const [comments, setComments] = useState<Record<string, CommentWithDetails[]>>(
+  {},
+);
 
 useEffect(() => {
   const commentsQuery = collection(db, "sessions", sessionId, "comments");
@@ -136,12 +145,14 @@ e2e/
 ## Test Coverage Needed
 
 ### Unit Tests
+
 1. `lib/actions/__tests__/comments.test.ts` - Test threading logic
 2. `lib/actions/__tests__/pre-submit.test.ts` - Test status transitions
 3. `lib/actions/__tests__/idea-locks.test.ts` - Test lock acquisition
 4. `components/__tests__/comment-thread.test.tsx` - Test UI behavior
 
 ### E2E Tests
+
 1. `e2e/comments.spec.ts` - Full comment flow
 2. `e2e/idea-collection-pre-submit.spec.ts` - Draft/approval workflow
 3. `e2e/multiplayer-cursors.spec.ts` - Multi-context cursor visibility
@@ -169,6 +180,7 @@ match /presence/{userId} {
 ## Dependencies
 
 All required dependencies are already installed:
+
 - ✅ Firebase SDK
 - ✅ @dnd-kit (for drag-drop)
 - ✅ date-fns (for timestamps)

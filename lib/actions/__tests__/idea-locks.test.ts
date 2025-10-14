@@ -1,11 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { createMockDocSnapshot, getCallArg } from "./test-helpers";
-import { acquireLock, releaseLock, refreshLock, checkLock } from "../idea-locks";
+import {
+  acquireLock,
+  releaseLock,
+  refreshLock,
+  checkLock,
+} from "../idea-locks";
 
 // Mock Firebase
-vi.mock("@/lib/firebase/client", () => ({
-  db: {},
-}));
+vi.mock("@/lib/firebase/client", () => ({ db: {} }));
 
 vi.mock("firebase/firestore", () => ({
   doc: vi.fn((db, ...pathSegments) => ({ path: pathSegments.join("/") })),
@@ -85,7 +88,7 @@ describe("Idea Lock Actions", () => {
           id: "idea-123",
           content: "Test idea",
           lockedById: "other-user",
-          lockedAt: { toDate: () => expiredTime },
+          lockedAt: expiredTime, // Pass Date directly, toDate() handles it
         }),
       );
 
@@ -111,7 +114,7 @@ describe("Idea Lock Actions", () => {
           id: "idea-123",
           content: "Test idea",
           lockedById: "other-user",
-          lockedAt: { toDate: () => recentTime },
+          lockedAt: recentTime, // Pass Date directly
         }),
       );
 
@@ -134,7 +137,7 @@ describe("Idea Lock Actions", () => {
           id: "idea-123",
           content: "Test idea",
           lockedById: "user-123",
-          lockedAt: { toDate: () => recentTime },
+          lockedAt: recentTime, // Pass Date directly
         }),
       );
 
@@ -283,7 +286,7 @@ describe("Idea Lock Actions", () => {
         createMockDocSnapshot("idea-123", {
           id: "idea-123",
           lockedById: "other-user",
-          lockedAt: { toDate: () => expiredTime },
+          lockedAt: expiredTime, // Pass Date directly
         }),
       );
 
@@ -304,7 +307,7 @@ describe("Idea Lock Actions", () => {
         createMockDocSnapshot("idea-123", {
           id: "idea-123",
           lockedById: "user-123",
-          lockedAt: { toDate: () => recentTime },
+          lockedAt: recentTime, // Pass Date directly
         }),
       );
 
@@ -325,7 +328,7 @@ describe("Idea Lock Actions", () => {
         createMockDocSnapshot("idea-123", {
           id: "idea-123",
           lockedById: "other-user",
-          lockedAt: { toDate: () => recentTime },
+          lockedAt: recentTime, // Pass Date directly
         }),
       );
 

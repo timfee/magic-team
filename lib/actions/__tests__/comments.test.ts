@@ -8,9 +8,7 @@ import {
 } from "./test-helpers";
 
 // Mock Firebase
-vi.mock("@/lib/firebase/client", () => ({
-  db: {},
-}));
+vi.mock("@/lib/firebase/client", () => ({ db: {} }));
 
 const mockTimestamp = { toDate: () => new Date("2024-01-01") };
 
@@ -196,9 +194,9 @@ describe("Comment Actions", () => {
       const mockDeleteDoc = vi.mocked(deleteDoc);
       mockDeleteDoc.mockRejectedValue(new Error("Comment not found"));
 
-      await expect(
-        deleteComment("nonexistent", "session-456"),
-      ).rejects.toThrow("Comment not found");
+      await expect(deleteComment("nonexistent", "session-456")).rejects.toThrow(
+        "Comment not found",
+      );
     });
   });
 

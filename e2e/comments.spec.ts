@@ -10,10 +10,7 @@ test.describe("Comments System", () => {
     // Create a new session first
     await page.click('a[href="/session/create"]');
     await page.fill('input[name="sessionName"]', "Test Session for Comments");
-    await page.fill(
-      'input[name="categoryName"]',
-      "Test Category",
-    );
+    await page.fill('input[name="categoryName"]', "Test Category");
     await page.click('button[type="submit"]');
 
     // Wait for redirect to session page
@@ -33,7 +30,10 @@ test.describe("Comments System", () => {
     await page.goto(`/session/${sessionId}`);
 
     // Submit an idea
-    await page.fill('textarea[placeholder*="idea"]', "Test idea for commenting");
+    await page.fill(
+      'textarea[placeholder*="idea"]',
+      "Test idea for commenting",
+    );
     await page.click('button:has-text("Submit")');
     await page.waitForTimeout(1000);
 
@@ -54,10 +54,7 @@ test.describe("Comments System", () => {
     await expect(page.locator('[data-testid="comment-thread"]')).toBeVisible();
 
     // Post a comment
-    await page.fill(
-      '[data-testid="comment-input"]',
-      "This is a test comment",
-    );
+    await page.fill('[data-testid="comment-input"]', "This is a test comment");
     await page.click('[data-testid="post-comment-button"]');
 
     // Verify comment appears
@@ -104,7 +101,7 @@ test.describe("Comments System", () => {
     await page.click('[data-testid="reply-button"]');
 
     // Verify "Replying to" indicator appears
-    await expect(page.locator('text=Replying to')).toBeVisible();
+    await expect(page.locator("text=Replying to")).toBeVisible();
 
     // Post reply
     await page.fill('[data-testid="comment-input"]', "This is a reply");
@@ -150,7 +147,7 @@ test.describe("Comments System", () => {
     await page.click('[data-testid="edit-button"]');
 
     // Edit the comment
-    const textarea = page.locator('textarea').last();
+    const textarea = page.locator("textarea").last();
     await textarea.clear();
     await textarea.fill("Edited comment text");
     await page.locator('button:has-text("Save")').click();
@@ -161,7 +158,7 @@ test.describe("Comments System", () => {
         hasText: "Edited comment text",
       }),
     ).toBeVisible({ timeout: 5000 });
-    await expect(page.locator('text=(edited)')).toBeVisible();
+    await expect(page.locator("text=(edited)")).toBeVisible();
   });
 
   test("should delete own comment", async ({ page }) => {

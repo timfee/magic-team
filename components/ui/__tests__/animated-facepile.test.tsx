@@ -56,9 +56,7 @@ describe("AnimatedFacepile", () => {
   it("should apply size classes correctly", () => {
     const users = [{ id: "1", name: "Alice", image: null }];
 
-    const { rerender } = render(
-      <AnimatedFacepile users={users} size="sm" />
-    );
+    const { rerender } = render(<AnimatedFacepile users={users} size="sm" />);
     let container = screen.getByText("A").parentElement;
     expect(container?.className).toContain("h-8");
 
@@ -73,10 +71,7 @@ describe("AnimatedFacepile", () => {
     const { rerender } = render(<AnimatedFacepile users={users} />);
 
     // Add a new user
-    const newUsers = [
-      ...users,
-      { id: "2", name: "Bob", image: null },
-    ];
+    const newUsers = [...users, { id: "2", name: "Bob", image: null }];
 
     rerender(<AnimatedFacepile users={newUsers} />);
 

@@ -81,7 +81,10 @@ const calculateNewOrder = (
 ): number => {
   // Get all ideas in the same context (same groupId or both ungrouped)
   const contextIdeas = ideas
-    .filter((i) => i.groupId === overIdea.groupId && i.categoryId === overIdea.categoryId)
+    .filter(
+      (i) =>
+        i.groupId === overIdea.groupId && i.categoryId === overIdea.categoryId,
+    )
     .sort((a, b) => a.order - b.order);
 
   const overIndex = contextIdeas.findIndex((i) => i.id === overIdea.id);
@@ -95,14 +98,18 @@ const calculateNewOrder = (
     if (overIndex === contextIdeas.length - 1) {
       return contextIdeas[overIndex].order + 1;
     }
-    return (contextIdeas[overIndex].order + contextIdeas[overIndex + 1].order) / 2;
+    return (
+      (contextIdeas[overIndex].order + contextIdeas[overIndex + 1].order) / 2
+    );
   }
 
   // Moving up (active after over)
   if (overIndex === 0) {
     return contextIdeas[0].order - 1;
   }
-  return (contextIdeas[overIndex - 1].order + contextIdeas[overIndex].order) / 2;
+  return (
+    (contextIdeas[overIndex - 1].order + contextIdeas[overIndex].order) / 2
+  );
 };
 
 // Ghost Placeholder Component
@@ -181,7 +188,9 @@ const DroppableGroup = ({
   // Load comments when modal opens
   useEffect(() => {
     if (isCommentsOpen) {
-      void getCommentsWithDetails(sessionId, undefined, group.id).then(setComments);
+      void getCommentsWithDetails(sessionId, undefined, group.id).then(
+        setComments,
+      );
     }
   }, [isCommentsOpen, sessionId, group.id]);
 
@@ -298,9 +307,11 @@ const DroppableGroup = ({
               currentUserId={currentUserId}
               isAdmin={isAdmin}
               onCommentAdded={() => {
-                void getCommentsWithDetails(sessionId, undefined, group.id).then(
-                  setComments,
-                );
+                void getCommentsWithDetails(
+                  sessionId,
+                  undefined,
+                  group.id,
+                ).then(setComments);
               }}
             />
           </DialogContent>
@@ -533,7 +544,9 @@ export const IdeaGrouping = ({
         const lockAcquired = await acquireLock(ideaId, userId, sessionId);
         if (!lockAcquired) {
           // Lock failed - another user is moving this idea
-          alert("Another user is currently moving this idea. Please try again in a moment.");
+          alert(
+            "Another user is currently moving this idea. Please try again in a moment.",
+          );
           setActiveId(null);
           return;
         }
@@ -681,7 +694,11 @@ export const IdeaGrouping = ({
       if (activeIdea.groupId && !overIdea.groupId) {
         startTransition(async () => {
           try {
-            await moveIdeaToGroup(overIdea.id, activeIdea.groupId ?? null, sessionId);
+            await moveIdeaToGroup(
+              overIdea.id,
+              activeIdea.groupId ?? null,
+              sessionId,
+            );
             router.refresh();
           } catch (error) {
             console.error("Failed to add to group:", error);
@@ -712,7 +729,12 @@ export const IdeaGrouping = ({
         startTransition(async () => {
           try {
             const newOrder = calculateNewOrder(activeIdea, overIdea, ideas);
-            await moveIdeaToGroup(activeIdea.id, overIdea.groupId ?? null, sessionId, newOrder);
+            await moveIdeaToGroup(
+              activeIdea.id,
+              overIdea.groupId ?? null,
+              sessionId,
+              newOrder,
+            );
 
             // Check if source group is empty and delete it
             const remainingInGroup = ideas.filter(

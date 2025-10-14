@@ -31,11 +31,7 @@ export const AnimatedFacepile = ({
   const sizeConfig = (() => {
     switch (size) {
       case "sm":
-        return {
-          avatarSize: "h-8 w-8",
-          textSize: "text-xs",
-          spacing: "gap-2",
-        };
+        return { avatarSize: "h-8 w-8", textSize: "text-xs", spacing: "gap-2" };
       case "lg":
         return {
           avatarSize: "h-16 w-16",
@@ -58,7 +54,7 @@ export const AnimatedFacepile = ({
 
     // Find newly added users
     const addedIds = new Set(
-      [...currentUserIds].filter((id) => !previousUserIds.has(id))
+      [...currentUserIds].filter((id) => !previousUserIds.has(id)),
     );
 
     if (addedIds.size > 0) {
@@ -86,9 +82,8 @@ export const AnimatedFacepile = ({
       className={cn(
         "flex flex-wrap items-center justify-center",
         sizeConfig.spacing,
-        className
-      )}
-    >
+        className,
+      )}>
       {visibleUsers.map((user, index) => {
         const isNew = newUserIds.has(user.id);
         return (
@@ -101,13 +96,9 @@ export const AnimatedFacepile = ({
               // Pop-in animation for new users
               isNew && "animate-[scale-in_0.5s_ease-out]",
               // Subtle floating animation
-              "animate-[float_3s_ease-in-out_infinite]"
+              "animate-[float_3s_ease-in-out_infinite]",
             )}
-            style={{
-              animationDelay: `${index * 0.1}s`,
-              zIndex: 10 + index,
-            }}
-          >
+            style={{ animationDelay: `${index * 0.1}s`, zIndex: 10 + index }}>
             {user.image ? (
               <Image
                 src={user.image}
@@ -134,13 +125,12 @@ export const AnimatedFacepile = ({
           className={cn(
             "flex items-center justify-center rounded-full border-4 border-white bg-blue-500 font-bold text-white shadow-lg transition-all duration-300 dark:border-zinc-900 animate-[float_3s_ease-in-out_infinite]",
             sizeConfig.avatarSize,
-            sizeConfig.textSize
+            sizeConfig.textSize,
           )}
           style={{
             animationDelay: `${visibleUsers.length * 0.1}s`,
             zIndex: 10 + visibleUsers.length,
-          }}
-        >
+          }}>
           +{remainingCount}
         </div>
       )}
