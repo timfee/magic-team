@@ -12,8 +12,10 @@ export const VoteHeatmap = ({ ideas, categoryColors }: VoteHeatmapProps) => {
   const maxVotes = Math.max(...ideas.map((idea) => idea._count.votes), 1);
 
   // Calculate opacity based on vote count (0.2 to 1.0)
+  const MIN_OPACITY = 0.2;
+  const OPACITY_RANGE = 0.8;
   const getOpacity = (voteCount: number) => {
-    return 0.2 + (voteCount / maxVotes) * 0.8;
+    return MIN_OPACITY + (voteCount / maxVotes) * OPACITY_RANGE;
   };
 
   // Sort ideas by vote count descending
