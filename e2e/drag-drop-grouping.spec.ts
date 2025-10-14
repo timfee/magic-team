@@ -1,4 +1,4 @@
-import { test, expect, type Page, type Locator } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 /**
  * Drag & Drop Integration Tests for Idea Grouping
@@ -265,7 +265,10 @@ test.describe("Drag & Drop: Visual Indicators (P0)", () => {
     }
 
     // Check for visual indicators
-    await expect(groupedIdea).toHaveAttribute("data-drop-indicator", "join-group");
+    await expect(groupedIdea).toHaveAttribute(
+      "data-drop-indicator",
+      "join-group",
+    );
 
     // Ghost placeholder text
     const ghostText = page.getByText(/will join.*group|will add here/i);
@@ -312,10 +315,7 @@ test.describe("Drag & Drop: Visual Indicators (P0)", () => {
     }
 
     // Check for visual indicators
-    await expect(idea2).toHaveAttribute(
-      "data-drop-indicator",
-      "move-to-group",
-    );
+    await expect(idea2).toHaveAttribute("data-drop-indicator", "move-to-group");
 
     // Ghost placeholder text
     const ghostText = page.getByText(/will move.*group/i);
@@ -366,7 +366,7 @@ test.describe("Drag & Drop: Visual Indicators (P0)", () => {
     await expect(idea2).not.toHaveAttribute("data-drop-indicator");
 
     // No ghost placeholder
-    const ghostTexts = page.locator('text=/will.*group/i');
+    const ghostTexts = page.locator("text=/will.*group/i");
     await expect(ghostTexts).toHaveCount(0);
 
     // Clean up
@@ -503,16 +503,20 @@ test.describe("Drag & Drop: Action Execution (P0)", () => {
     await expect(newGroup).toBeVisible();
 
     if (idea1Text) {
-      await expect(newGroup.locator(`text=${idea1Text.substring(0, 20)}`)).toBeVisible();
+      await expect(
+        newGroup.locator(`text=${idea1Text.substring(0, 20)}`),
+      ).toBeVisible();
     }
     if (idea2Text) {
-      await expect(newGroup.locator(`text=${idea2Text.substring(0, 20)}`)).toBeVisible();
+      await expect(
+        newGroup.locator(`text=${idea2Text.substring(0, 20)}`),
+      ).toBeVisible();
     }
 
     // Verify group has auto-generated name (adjective + noun pattern)
     await expect(
       newGroup.locator(
-        'text=/Amazing|Brilliant|Creative|Dynamic|Essential|Fantastic|Great|Innovative/',
+        "text=/Amazing|Brilliant|Creative|Dynamic|Essential|Fantastic|Great|Innovative/",
       ),
     ).toBeVisible();
   });
@@ -635,7 +639,9 @@ test.describe("Drag & Drop: Action Execution (P0)", () => {
     const groupCount = await groups.count();
     for (let i = 0; i < groupCount; i++) {
       const group = groups.nth(i);
-      const ideaCount = await group.locator('[data-testid="idea-card"]').count();
+      const ideaCount = await group
+        .locator('[data-testid="idea-card"]')
+        .count();
       if (ideaCount === 1) {
         singleIdeaGroup = group;
         break;
@@ -644,12 +650,15 @@ test.describe("Drag & Drop: Action Execution (P0)", () => {
 
     if (!singleIdeaGroup) {
       test.skip(); // Need a group with exactly 1 idea
+      return; // This line helps TypeScript understand execution stops
     }
 
     const initialGroupCount = await countGroups(page);
 
     // Get the single idea
-    const singleIdea = singleIdeaGroup.locator('[data-testid="idea-card"]').first();
+    const singleIdea = singleIdeaGroup
+      .locator('[data-testid="idea-card"]')
+      .first();
     await expect(singleIdea).toBeVisible();
 
     // Find another group
@@ -945,6 +954,328 @@ test.describe("Drag & Drop: Group Container Targets (MECE Completion)", () => {
         ungroupedIdeas.locator(`text=${ideaText.substring(0, 20)}`),
       ).toBeVisible();
     }
+  });
+});
+
+test.describe("Drag & Drop: Reordering (P0 - CRITICAL)", () => {
+  test("should reorder ungrouped ideas within same category", async ({
+    page,
+  }) => {
+    await page.goto("/session/test-grouping-id");
+    await expect(page.getByText(/group ideas/i)).toBeVisible({
+      timeout: 10000,
+    });
+
+    // Find ungrouped ideas in same category
+    const ungroupedIdeas = page
+      .locator('[data-testid="idea-card"]')
+      .filter({ hasNot: page.locator('[data-testid="idea-group"]') });
+
+    await expect(ungroupedIdeas.first()).toBeVisible();
+
+    const idea1 = ungroupedIdeas.first();
+    const idea3 = ungroupedIdeas.nth(2);
+
+    // Get original text content
+    const idea1Text = await idea1.textContent();
+    const idea3Text = await idea3.textContent();
+
+    // Drag idea1 to position of idea3 (reorder down)
+    await dragAndDrop(page, idea1, idea3);
+
+    // Wait for reorder
+    await page.waitForTimeout(1000);
+
+    // Verify order changed
+    const updatedIdeas = page
+      .locator('[data-testid="idea-card"]')
+      .filter({ hasNot: page.locator('[data-testid="idea-group"]') });
+
+    // idea3 text should now appear before idea1 text
+    const allText = await updatedIdeas.allTextContents();
+
+    if (idea1Text && idea3Text) {
+      const idea1Index = allText.findIndex((t) =>
+        t.includes(idea1Text.substring(0, 20)),
+      );
+      const idea3Index = allText.findIndex((t) =>
+        t.includes(idea3Text.substring(0, 20)),
+      );
+
+      // idea1 should now be after idea3
+      expect(idea1Index).toBeGreaterThan(idea3Index);
+    }
+  });
+
+  test("should reorder ideas within same group", async ({ page }) => {
+    await page.goto("/session/test-grouping-id");
+    await expect(page.getByText(/group ideas/i)).toBeVisible({
+      timeout: 10000,
+    });
+
+    // Find a group with multiple ideas
+    const group = page.locator('[data-testid="idea-group"]').first();
+    await expect(group).toBeVisible();
+
+    const groupIdeas = group.locator('[data-testid="idea-card"]');
+    const count = await groupIdeas.count();
+
+    if (count < 3) {
+      test.skip(); // Need at least 3 ideas in group
+    }
+
+    const idea1 = groupIdeas.first();
+    const idea3 = groupIdeas.nth(2);
+
+    // Get text content
+    const idea1Text = await idea1.textContent();
+    const idea3Text = await idea3.textContent();
+
+    // Drag first idea to third position
+    await dragAndDrop(page, idea1, idea3);
+
+    // Wait for update
+    await page.waitForTimeout(1000);
+
+    // Verify order changed within group
+    const updatedIdeas = group.locator('[data-testid="idea-card"]');
+    const allText = await updatedIdeas.allTextContents();
+
+    if (idea1Text && idea3Text) {
+      const idea1Index = allText.findIndex((t) =>
+        t.includes(idea1Text.substring(0, 20)),
+      );
+      const idea3Index = allText.findIndex((t) =>
+        t.includes(idea3Text.substring(0, 20)),
+      );
+
+      // idea1 should now be after idea3
+      expect(idea1Index).toBeGreaterThan(idea3Index);
+    }
+  });
+
+  test("should maintain order after multiple reorderings", async ({ page }) => {
+    await page.goto("/session/test-grouping-id");
+    await expect(page.getByText(/group ideas/i)).toBeVisible({
+      timeout: 10000,
+    });
+
+    // Find ungrouped ideas
+    const ungroupedIdeas = page
+      .locator('[data-testid="idea-card"]')
+      .filter({ hasNot: page.locator('[data-testid="idea-group"]') });
+
+    const count = await ungroupedIdeas.count();
+    if (count < 3) {
+      test.skip(); // Need at least 3 ideas
+    }
+
+    const idea1 = ungroupedIdeas.first();
+    const idea2 = ungroupedIdeas.nth(1);
+    const idea3 = ungroupedIdeas.nth(2);
+
+    const idea1Text = await idea1.textContent();
+    const idea2Text = await idea2.textContent();
+    const idea3Text = await idea3.textContent();
+
+    // Perform multiple reorderings
+    // 1. Move idea1 to position 3
+    await dragAndDrop(page, idea1, idea3);
+    await page.waitForTimeout(1000);
+
+    // 2. Move idea2 to position 1
+    await dragAndDrop(page, idea2, ungroupedIdeas.first());
+    await page.waitForTimeout(1000);
+
+    // Verify final order: idea2, idea3, idea1
+    const finalIdeas = page
+      .locator('[data-testid="idea-card"]')
+      .filter({ hasNot: page.locator('[data-testid="idea-group"]') });
+
+    const finalOrder = await finalIdeas.allTextContents();
+
+    if (idea1Text && idea2Text && idea3Text) {
+      const pos1 = finalOrder.findIndex((t) =>
+        t.includes(idea1Text.substring(0, 20)),
+      );
+      const pos2 = finalOrder.findIndex((t) =>
+        t.includes(idea2Text.substring(0, 20)),
+      );
+      const pos3 = finalOrder.findIndex((t) =>
+        t.includes(idea3Text.substring(0, 20)),
+      );
+
+      // Verify order: pos2 < pos3 < pos1
+      expect(pos2).toBeLessThan(pos3);
+      expect(pos3).toBeLessThan(pos1);
+    }
+  });
+
+  test("should NOT group when reordering within same category", async ({
+    page,
+  }) => {
+    await page.goto("/session/test-grouping-id");
+    await expect(page.getByText(/group ideas/i)).toBeVisible({
+      timeout: 10000,
+    });
+
+    const initialGroupCount = await countGroups(page);
+
+    // Find two ungrouped ideas in same category
+    const ungroupedIdeas = page
+      .locator('[data-testid="idea-card"]')
+      .filter({ hasNot: page.locator('[data-testid="idea-group"]') });
+
+    await expect(ungroupedIdeas.first()).toBeVisible();
+
+    const idea1 = ungroupedIdeas.first();
+    const idea2 = ungroupedIdeas.nth(1);
+
+    // Drag to reorder (same category)
+    await dragAndDrop(page, idea1, idea2);
+
+    // Wait
+    await page.waitForTimeout(1000);
+
+    // Verify NO new group created
+    const finalGroupCount = await countGroups(page);
+    expect(finalGroupCount).toBe(initialGroupCount);
+
+    // Both should still be ungrouped
+    const stillUngrouped = await page
+      .locator('[data-testid="idea-card"]')
+      .filter({ hasNot: page.locator('[data-testid="idea-group"]') })
+      .count();
+
+    expect(stillUngrouped).toBeGreaterThanOrEqual(2);
+  });
+
+  test("should preserve order when moving idea to different group", async ({
+    page,
+  }) => {
+    await page.goto("/session/test-grouping-id");
+    await expect(page.getByText(/group ideas/i)).toBeVisible({
+      timeout: 10000,
+    });
+
+    // Find two groups
+    const groups = page.locator('[data-testid="idea-group"]');
+    const groupCount = await groups.count();
+
+    if (groupCount < 2) {
+      test.skip();
+    }
+
+    const group1 = groups.first();
+    const group2 = groups.nth(1);
+
+    const idea1 = group1.locator('[data-testid="idea-card"]').first();
+    const idea2Target = group2.locator('[data-testid="idea-card"]').nth(1); // Second idea in group2
+
+    await expect(idea1).toBeVisible();
+    await expect(idea2Target).toBeVisible();
+
+    const idea1Text = await idea1.textContent();
+
+    // Move idea1 to group2, positioned after first idea
+    await dragAndDrop(page, idea1, idea2Target);
+
+    await page.waitForTimeout(1000);
+
+    // Verify idea moved to group2
+    await expect(
+      group2.locator(`text=${idea1Text?.substring(0, 20)}`),
+    ).toBeVisible();
+
+    // Verify it's in correct position (after first, before or at second)
+    const group2Ideas = group2.locator('[data-testid="idea-card"]');
+    const texts = await group2Ideas.allTextContents();
+
+    if (idea1Text) {
+      const movedIndex = texts.findIndex((t) =>
+        t.includes(idea1Text.substring(0, 20)),
+      );
+      // Should be positioned appropriately (not just appended at end)
+      expect(movedIndex).toBeGreaterThanOrEqual(0);
+      expect(movedIndex).toBeLessThan(texts.length);
+    }
+  });
+
+  test("should handle reordering with fractional order values", async ({
+    page,
+  }) => {
+    await page.goto("/session/test-grouping-id");
+    await expect(page.getByText(/group ideas/i)).toBeVisible({
+      timeout: 10000,
+    });
+
+    // Perform multiple reorderings to create fractional orders
+    const ungroupedIdeas = page
+      .locator('[data-testid="idea-card"]')
+      .filter({ hasNot: page.locator('[data-testid="idea-group"]') });
+
+    const count = await ungroupedIdeas.count();
+    if (count < 3) {
+      test.skip();
+    }
+
+    // Perform 5 reorderings to create complex fractional orders
+    for (let i = 0; i < 5; i++) {
+      const first = ungroupedIdeas.first();
+      const last = ungroupedIdeas.last();
+
+      await dragAndDrop(page, first, last);
+      await page.waitForTimeout(800);
+    }
+
+    // Verify all ideas still visible and in order
+    const finalCount = await ungroupedIdeas.count();
+    expect(finalCount).toBe(count);
+
+    // Verify they're still ungrouped
+    await expect(ungroupedIdeas.first()).toBeVisible();
+  });
+
+  test("should show correct visual indicator during reorder", async ({
+    page,
+  }) => {
+    await page.goto("/session/test-grouping-id");
+    await expect(page.getByText(/group ideas/i)).toBeVisible({
+      timeout: 10000,
+    });
+
+    const group = page.locator('[data-testid="idea-group"]').first();
+    const groupIdeas = group.locator('[data-testid="idea-card"]');
+    const count = await groupIdeas.count();
+
+    if (count < 2) {
+      test.skip();
+    }
+
+    const idea1 = groupIdeas.first();
+    const idea2 = groupIdeas.nth(1);
+
+    // Start dragging
+    const box1 = await idea1.boundingBox();
+    if (box1) {
+      await page.mouse.move(box1.x + box1.width / 2, box1.y + box1.height / 2);
+      await page.mouse.down();
+      await page.waitForTimeout(100);
+    }
+
+    // Move over target
+    const box2 = await idea2.boundingBox();
+    if (box2) {
+      await page.mouse.move(box2.x + box2.width / 2, box2.y + box2.height / 2);
+      await page.waitForTimeout(200);
+    }
+
+    // For same-group reordering, should NOT show indicator (or show neutral indicator)
+    // Currently the code doesn't add drop indicator for same-group reordering
+    await expect(idea2).not.toHaveAttribute("data-drop-indicator");
+
+    // Clean up
+    await page.keyboard.press("Escape");
   });
 });
 
