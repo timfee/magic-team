@@ -10,7 +10,7 @@ import {
 } from "firebase/firestore";
 
 // Lock duration in milliseconds (30 seconds)
-const LOCK_DURATION_MS = 30000;
+export const LOCK_DURATION_MS = 30000;
 
 // Firestore document type for ideas with lock fields
 interface IdeaDocumentData {
@@ -26,6 +26,9 @@ function toDate(timestamp: Timestamp | Date | undefined): Date | null {
   if (timestamp instanceof Date) return timestamp;
   return null;
 }
+
+// Helper to get current time (exported for testing)
+export const getCurrentTime = (): Date => new Date();
 
 /**
  * Attempts to acquire a lock on an idea for the specified user.
@@ -45,7 +48,7 @@ export const acquireLock = async (
     }
 
     const idea = ideaSnap.data() as IdeaDocumentData;
-    const now = new Date();
+    const now = getCurrentTime();
 
     // Check if idea is already locked
     if (idea.lockedById && idea.lockedAt) {
@@ -173,7 +176,7 @@ export const checkLock = async (
       return null;
     }
 
-    const now = new Date();
+    const now = getCurrentTime();
     const lockAge = now.getTime() - lockedAt.getTime();
 
     // Lock expired

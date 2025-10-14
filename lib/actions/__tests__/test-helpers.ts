@@ -3,6 +3,7 @@ import type {
   DocumentData,
   QuerySnapshot,
   QueryDocumentSnapshot,
+  DocumentSnapshot,
 } from "firebase/firestore";
 
 /**
@@ -21,6 +22,26 @@ export function createMockDocRef(id: string): DocumentReference<DocumentData> {
     }) as never,
     toJSON: () => ({ id, path: `mock/${id}` }),
   } as DocumentReference<DocumentData>;
+}
+
+/**
+ * Creates a properly typed mock DocumentSnapshot without using type assertions
+ */
+export function createMockDocSnapshot<T = DocumentData>(
+  id: string,
+  data: T | undefined,
+): DocumentSnapshot<DocumentData> {
+  const exists = data !== undefined;
+
+  return {
+    id,
+    ref: createMockDocRef(id),
+    data: () => (exists ? (data as DocumentData) : undefined),
+    exists: () => exists,
+    get: ((field: string) =>
+      exists ? (data as Record<string, unknown>)[field] : undefined) as never,
+    metadata: { hasPendingWrites: false, fromCache: false },
+  } as unknown as DocumentSnapshot<DocumentData>;
 }
 
 /**

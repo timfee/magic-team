@@ -1,22 +1,17 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-  createMockDocRef,
-  createMockDocSnapshot,
-  getCallArg,
-} from "./test-helpers";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { createMockDocSnapshot, getCallArg } from "./test-helpers";
+import { acquireLock, releaseLock, refreshLock, checkLock } from "../idea-locks";
 
 // Mock Firebase
 vi.mock("@/lib/firebase/client", () => ({
   db: {},
 }));
 
-const mockTimestamp = vi.fn(() => new Date("2024-01-01T12:00:00Z"));
-
 vi.mock("firebase/firestore", () => ({
   doc: vi.fn((db, ...pathSegments) => ({ path: pathSegments.join("/") })),
   getDoc: vi.fn(),
   updateDoc: vi.fn(),
-  serverTimestamp: mockTimestamp,
+  serverTimestamp: vi.fn(() => new Date()),
   Timestamp: class MockTimestamp {
     constructor(
       private seconds: number,
@@ -29,20 +24,27 @@ vi.mock("firebase/firestore", () => ({
 }));
 
 interface IdeaData {
-  lockedById?: string;
-  lockedAt?: { toDate: () => Date } | Date;
+  lockedById?: string | null;
+  lockedAt?: { toDate: () => Date } | Date | null;
   updatedAt?: Date;
 }
 
 describe("Idea Lock Actions", () => {
+  const mockDate = new Date("2024-01-01T12:00:00Z");
+
   beforeEach(() => {
     vi.clearAllMocks();
-    mockTimestamp.mockReturnValue(new Date("2024-01-01T12:00:00Z"));
+    // Mock Date globally
+    vi.useFakeTimers({ shouldAdvanceTime: false });
+    vi.setSystemTime(mockDate);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   describe("acquireLock", () => {
     it("should acquire lock on unlocked idea", async () => {
-      const { acquireLock } = await import("../idea-locks");
       const { getDoc, updateDoc } = await import("firebase/firestore");
 
       const mockGetDoc = vi.mocked(getDoc);
@@ -69,14 +71,14 @@ describe("Idea Lock Actions", () => {
     });
 
     it("should acquire lock on expired lock", async () => {
-      const { acquireLock } = await import("../idea-locks");
       const { getDoc, updateDoc } = await import("firebase/firestore");
 
       const mockGetDoc = vi.mocked(getDoc);
       const mockUpdateDoc = vi.mocked(updateDoc);
 
-      // Lock expired 31 seconds ago
-      const expiredTime = new Date("2024-01-01T11:59:29Z"); // 31s before current time
+      // Lock expired 31 seconds ago (current time is 2024-01-01T12:00:00Z)
+      const currentTime = new Date("2024-01-01T12:00:00Z");
+      const expiredTime = new Date(currentTime.getTime() - 31000); // 31s ago from mocked time
 
       mockGetDoc.mockResolvedValue(
         createMockDocSnapshot("idea-123", {
@@ -96,13 +98,13 @@ describe("Idea Lock Actions", () => {
     });
 
     it("should fail to acquire lock held by another user", async () => {
-      const { acquireLock } = await import("../idea-locks");
       const { getDoc } = await import("firebase/firestore");
 
       const mockGetDoc = vi.mocked(getDoc);
 
-      // Lock acquired 10 seconds ago (still fresh)
-      const recentTime = new Date("2024-01-01T11:59:50Z"); // 10s before current time
+      // Lock acquired 10 seconds ago (still fresh - within 30s window)
+      const currentTime = new Date("2024-01-01T12:00:00Z");
+      const recentTime = new Date(currentTime.getTime() - 10000); // 10s ago
 
       mockGetDoc.mockResolvedValue(
         createMockDocSnapshot("idea-123", {
@@ -119,13 +121,13 @@ describe("Idea Lock Actions", () => {
     });
 
     it("should refresh lock if already held by same user", async () => {
-      const { acquireLock } = await import("../idea-locks");
       const { getDoc, updateDoc } = await import("firebase/firestore");
 
       const mockGetDoc = vi.mocked(getDoc);
       const mockUpdateDoc = vi.mocked(updateDoc);
 
-      const recentTime = new Date("2024-01-01T11:59:50Z");
+      const currentTime = new Date("2024-01-01T12:00:00Z");
+      const recentTime = new Date(currentTime.getTime() - 10000); // 10s ago
 
       mockGetDoc.mockResolvedValue(
         createMockDocSnapshot("idea-123", {
@@ -145,7 +147,6 @@ describe("Idea Lock Actions", () => {
     });
 
     it("should handle idea not found", async () => {
-      const { acquireLock } = await import("../idea-locks");
       const { getDoc } = await import("firebase/firestore");
 
       const mockGetDoc = vi.mocked(getDoc);
@@ -162,7 +163,6 @@ describe("Idea Lock Actions", () => {
 
   describe("releaseLock", () => {
     it("should release lock held by user", async () => {
-      const { releaseLock } = await import("../idea-locks");
       const { getDoc, updateDoc } = await import("firebase/firestore");
 
       const mockGetDoc = vi.mocked(getDoc);
@@ -188,7 +188,6 @@ describe("Idea Lock Actions", () => {
     });
 
     it("should not release lock held by another user", async () => {
-      const { releaseLock } = await import("../idea-locks");
       const { getDoc, updateDoc } = await import("firebase/firestore");
 
       const mockGetDoc = vi.mocked(getDoc);
@@ -211,7 +210,6 @@ describe("Idea Lock Actions", () => {
 
   describe("refreshLock", () => {
     it("should refresh lock held by user", async () => {
-      const { refreshLock } = await import("../idea-locks");
       const { getDoc, updateDoc } = await import("firebase/firestore");
 
       const mockGetDoc = vi.mocked(getDoc);
@@ -237,7 +235,6 @@ describe("Idea Lock Actions", () => {
     });
 
     it("should fail to refresh lock held by another user", async () => {
-      const { refreshLock } = await import("../idea-locks");
       const { getDoc } = await import("firebase/firestore");
 
       const mockGetDoc = vi.mocked(getDoc);
@@ -258,7 +255,6 @@ describe("Idea Lock Actions", () => {
 
   describe("checkLock", () => {
     it("should return null for unlocked idea", async () => {
-      const { checkLock } = await import("../idea-locks");
       const { getDoc } = await import("firebase/firestore");
 
       const mockGetDoc = vi.mocked(getDoc);
@@ -276,12 +272,12 @@ describe("Idea Lock Actions", () => {
     });
 
     it("should return null for expired lock", async () => {
-      const { checkLock } = await import("../idea-locks");
       const { getDoc } = await import("firebase/firestore");
 
       const mockGetDoc = vi.mocked(getDoc);
 
-      const expiredTime = new Date("2024-01-01T11:59:29Z"); // 31s ago
+      const currentTime = new Date("2024-01-01T12:00:00Z");
+      const expiredTime = new Date(currentTime.getTime() - 31000); // 31s ago
 
       mockGetDoc.mockResolvedValue(
         createMockDocSnapshot("idea-123", {
@@ -297,12 +293,12 @@ describe("Idea Lock Actions", () => {
     });
 
     it("should return null for lock held by current user", async () => {
-      const { checkLock } = await import("../idea-locks");
       const { getDoc } = await import("firebase/firestore");
 
       const mockGetDoc = vi.mocked(getDoc);
 
-      const recentTime = new Date("2024-01-01T11:59:50Z");
+      const currentTime = new Date("2024-01-01T12:00:00Z");
+      const recentTime = new Date(currentTime.getTime() - 10000); // 10s ago
 
       mockGetDoc.mockResolvedValue(
         createMockDocSnapshot("idea-123", {
@@ -318,12 +314,12 @@ describe("Idea Lock Actions", () => {
     });
 
     it("should return user ID for lock held by another user", async () => {
-      const { checkLock } = await import("../idea-locks");
       const { getDoc } = await import("firebase/firestore");
 
       const mockGetDoc = vi.mocked(getDoc);
 
-      const recentTime = new Date("2024-01-01T11:59:50Z");
+      const currentTime = new Date("2024-01-01T12:00:00Z");
+      const recentTime = new Date(currentTime.getTime() - 10000); // 10s ago
 
       mockGetDoc.mockResolvedValue(
         createMockDocSnapshot("idea-123", {
@@ -339,7 +335,6 @@ describe("Idea Lock Actions", () => {
     });
 
     it("should return null for nonexistent idea", async () => {
-      const { checkLock } = await import("../idea-locks");
       const { getDoc } = await import("firebase/firestore");
 
       const mockGetDoc = vi.mocked(getDoc);
