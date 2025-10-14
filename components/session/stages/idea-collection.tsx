@@ -3,7 +3,7 @@
 import { useSession } from "@/lib/contexts/firebase-session-context";
 import type { Category, IdeaWithDetails } from "@/lib/types/session";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { IdeaCard } from "@/components/idea-card";
 
 // Simple client-side idea creation - will be replaced with proper Firebase client SDK
@@ -15,6 +15,8 @@ interface IdeaCollectionProps {
   categories: Category[];
   initialIdeas: IdeaWithDetails[];
   userId: string | null;
+  timerEnd?: Date | null;
+  submissionsEnabled?: boolean;
 }
 
 export const IdeaCollection = ({
@@ -22,8 +24,14 @@ export const IdeaCollection = ({
   categories,
   initialIdeas: _initialIdeas,
   userId,
+  timerEnd,
+  submissionsEnabled = true,
 }: IdeaCollectionProps) => {
   const { ideas } = useSession();
+  const [timeRemaining, setTimeRemaining] = useState<string | null>(
+    timerEnd ? "" : null
+  );
+  const [timerExpired, setTimerExpired] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>(
     categories[0]?.id ?? "",
   );
@@ -32,6 +40,39 @@ export const IdeaCollection = ({
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  // Timer countdown effect
+  useEffect(() => {
+    if (!timerEnd) {
+      return;
+    }
+
+    const updateTimer = () => {
+      const now = new Date();
+      const end = new Date(timerEnd);
+      const diff = end.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        setTimeRemaining("Time's up!");
+        setTimerExpired(true);
+        return;
+      }
+
+      const minutes = Math.floor(diff / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+
+      if (minutes > 0) {
+        setTimeRemaining(`${minutes}m ${seconds}s`);
+      } else {
+        setTimeRemaining(`${seconds}s`);
+      }
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+  }, [timerEnd]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,14 +119,48 @@ export const IdeaCollection = ({
     !selectedCategory?.maxEntriesPerPerson ||
     userIdeasInCategory.length < selectedCategory.maxEntriesPerPerson;
 
+  // Check if submissions are disabled (gracefully - can finish in-progress submissions)
+  const submissionsDisabled = !submissionsEnabled && !isPending;
+  const effectivelyDisabled =
+    submissionsDisabled || timerExpired || !canAddMore;
+
   return (
     <div className="grid gap-8 lg:grid-cols-3">
       {/* Submission Form */}
       <div className="lg:col-span-1">
         <div className="sticky top-8 rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
-          <h2 className="mb-4 text-xl font-semibold text-zinc-900 dark:text-zinc-50">
-            Share Your Ideas
-          </h2>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+              Share Your Ideas
+            </h2>
+            {timeRemaining && (
+              <div
+                className={`rounded-full px-3 py-1 text-sm font-medium ${
+                  timerExpired
+                    ? "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-300"
+                    : "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300"
+                }`}
+              >
+                {timeRemaining}
+              </div>
+            )}
+          </div>
+
+          {submissionsDisabled && !timerExpired && (
+            <div className="mb-4 rounded-md bg-amber-50 p-3 dark:bg-amber-900/20">
+              <p className="text-sm text-amber-800 dark:text-amber-300">
+                Idea submissions have been disabled by the facilitator.
+              </p>
+            </div>
+          )}
+
+          {timerExpired && (
+            <div className="mb-4 rounded-md bg-red-50 p-3 dark:bg-red-900/20">
+              <p className="text-sm text-red-800 dark:text-red-300">
+                Time for idea collection has ended.
+              </p>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Category Selector */}
@@ -169,13 +244,13 @@ export const IdeaCollection = ({
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isPending || !content.trim() || !canAddMore}
+              disabled={isPending || !content.trim() || effectivelyDisabled}
               className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isPending ? "Submitting..." : "Submit Idea"}
             </button>
 
-            {!canAddMore && (
+            {!canAddMore && !submissionsDisabled && !timerExpired && (
               <p className="text-center text-xs text-red-600 dark:text-red-400">
                 Maximum ideas reached for this category
               </p>

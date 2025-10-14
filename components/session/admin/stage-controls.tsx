@@ -186,6 +186,26 @@ export const StageControls = ({
           </button>
         )}
       </div>
+
+      {/* Stage-specific controls */}
+      {currentStage === "idea_collection" && (
+        <div className="mt-6 border-t border-zinc-200 pt-6 dark:border-zinc-800">
+          <h3 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+            Idea Collection Controls
+          </h3>
+          <p className="mb-3 text-xs text-zinc-600 dark:text-zinc-400">
+            Control when participants can submit ideas. This is a graceful
+            disable - participants can finish submitting ideas they started.
+          </p>
+          {/* Note: Actual implementation would require Firebase settings update */}
+          <div className="rounded-md bg-blue-50 p-3 dark:bg-blue-900/20">
+            <p className="text-xs text-blue-800 dark:text-blue-300">
+              💡 Tip: Use the timer to set a countdown, then disable submissions
+              before advancing to the next stage.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

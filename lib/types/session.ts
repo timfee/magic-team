@@ -109,6 +109,9 @@ export type SessionSettings = {
   maxIdeasPerPerson?: number;
   enableTimer: boolean;
   timerDuration?: number;
+  greenRoomStartTime?: Date | null; // When the session is scheduled to start
+  ideaCollectionTimerEnd?: Date | null; // When idea collection timer ends
+  ideaCollectionEnabled?: boolean; // Whether idea submission is enabled
   updatedAt: Date;
 };
 

@@ -141,7 +141,11 @@ export default function SessionBoard({ sessionId }: SessionBoardProps) {
         )}
 
         {currentStage === "green_room" && (
-          <GreenRoom sessionId={session.id} initialUserCount={userCount} />
+          <GreenRoom
+            sessionId={session.id}
+            initialUserCount={userCount}
+            startTime={session.settings?.greenRoomStartTime}
+          />
         )}
 
         {currentStage === "idea_collection" && (
@@ -150,6 +154,8 @@ export default function SessionBoard({ sessionId }: SessionBoardProps) {
             categories={session.categories}
             initialIdeas={ideas}
             userId={userId}
+            timerEnd={session.settings?.ideaCollectionTimerEnd}
+            submissionsEnabled={session.settings?.ideaCollectionEnabled ?? true}
           />
         )}
 

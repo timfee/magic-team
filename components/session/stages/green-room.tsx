@@ -1,22 +1,61 @@
 "use client";
 
 import { useSession } from "@/lib/contexts/firebase-session-context";
+import { AnimatedFacepile } from "@/components/ui/animated-facepile";
+import { useState, useEffect } from "react";
 
 interface GreenRoomProps {
   sessionId: string;
   initialUserCount: number;
+  startTime?: Date | null;
 }
 
 export const GreenRoom = ({
   sessionId: _sessionId,
   initialUserCount: _initialUserCount,
+  startTime,
 }: GreenRoomProps) => {
-  const { userCount } = useSession();
+  const { userCount, activeUsers } = useSession();
+  const [timeRemaining, setTimeRemaining] = useState<string | null>(
+    startTime ? "" : null
+  );
+
+  // Calculate time until start
+  useEffect(() => {
+    if (!startTime) {
+      return;
+    }
+
+    const updateTimer = () => {
+      const now = new Date();
+      const start = new Date(startTime);
+      const diff = start.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        setTimeRemaining("Starting now...");
+        return;
+      }
+
+      const minutes = Math.floor(diff / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+
+      if (minutes > 0) {
+        setTimeRemaining(`${minutes}m ${seconds}s`);
+      } else {
+        setTimeRemaining(`${seconds}s`);
+      }
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+  }, [startTime]);
 
   return (
     <div className="flex min-h-[400px] items-center justify-center">
-      <div className="text-center">
-        <div className="mb-6">
+      <div className="w-full max-w-2xl text-center">
+        <div className="mb-8">
           <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
             <svg
               className="h-12 w-12 text-blue-600 dark:text-blue-400"
@@ -37,10 +76,22 @@ export const GreenRoom = ({
           </h2>
         </div>
 
-        <p className="mb-6 text-lg text-zinc-600 dark:text-zinc-400">
+        {/* Timer display */}
+        {timeRemaining && (
+          <div className="mb-6 text-lg font-medium text-blue-600 dark:text-blue-400">
+            Time until start: {timeRemaining}
+          </div>
+        )}
+
+        {/* Animated Facepile */}
+        <div className="mb-6 flex flex-col items-center">
+          <AnimatedFacepile users={activeUsers} maxVisible={8} size="lg" />
+        </div>
+
+        <p className="mb-4 text-lg text-zinc-600 dark:text-zinc-400">
           {userCount === 1
             ? "You're the first one here!"
-            : `${userCount} participants are ready`}
+            : `${userCount} ${userCount === 1 ? "participant" : "participants"} ready`}
         </p>
 
         <p className="text-sm text-zinc-500 dark:text-zinc-500">
