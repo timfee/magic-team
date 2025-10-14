@@ -402,6 +402,12 @@ export const IdeaGrouping = ({
     setOverId(event.over?.id as string | null);
   };
 
+  const handleDragCancel = () => {
+    // Reset state when drag is cancelled (ESC key or drag outside)
+    setActiveId(null);
+    setOverId(null);
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveId(null);
@@ -598,7 +604,8 @@ export const IdeaGrouping = ({
       collisionDetection={closestCorners}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}>
+      onDragEnd={handleDragEnd}
+      onDragCancel={handleDragCancel}>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
