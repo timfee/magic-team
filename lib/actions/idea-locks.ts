@@ -12,6 +12,21 @@ import {
 // Lock duration in milliseconds (30 seconds)
 const LOCK_DURATION_MS = 30000;
 
+// Firestore document type for ideas with lock fields
+interface IdeaDocumentData {
+  lockedById?: string;
+  lockedAt?: Timestamp | Date;
+  [key: string]: unknown;
+}
+
+// Helper to safely convert Firestore timestamp to Date
+function toDate(timestamp: Timestamp | Date | undefined): Date | null {
+  if (!timestamp) return null;
+  if (timestamp instanceof Timestamp) return timestamp.toDate();
+  if (timestamp instanceof Date) return timestamp;
+  return null;
+}
+
 /**
  * Attempts to acquire a lock on an idea for the specified user.
  * Returns true if lock was acquired, false if idea is already locked by someone else.
@@ -29,15 +44,17 @@ export const acquireLock = async (
       throw new Error("Idea not found");
     }
 
-    const idea = ideaSnap.data();
+    const idea = ideaSnap.data() as IdeaDocumentData;
     const now = new Date();
 
     // Check if idea is already locked
     if (idea.lockedById && idea.lockedAt) {
-      const lockedAt =
-        idea.lockedAt instanceof Timestamp
-          ? idea.lockedAt.toDate()
-          : new Date(idea.lockedAt as string | number);
+      const lockedAt = toDate(idea.lockedAt);
+      if (!lockedAt) {
+        // Invalid timestamp, treat as unlocked
+        return true;
+      }
+
       const lockAge = now.getTime() - lockedAt.getTime();
 
       // If locked by someone else and lock is still fresh, deny
@@ -76,7 +93,7 @@ export const releaseLock = async (
       throw new Error("Idea not found");
     }
 
-    const idea = ideaSnap.data();
+    const idea = ideaSnap.data() as IdeaDocumentData;
 
     // Only release if the current user holds the lock
     if (idea.lockedById === userId) {
@@ -109,7 +126,7 @@ export const refreshLock = async (
       throw new Error("Idea not found");
     }
 
-    const idea = ideaSnap.data();
+    const idea = ideaSnap.data() as IdeaDocumentData;
 
     // Only refresh if the current user holds the lock
     if (idea.lockedById === userId) {
@@ -144,16 +161,18 @@ export const checkLock = async (
       return null;
     }
 
-    const idea = ideaSnap.data();
+    const idea = ideaSnap.data() as IdeaDocumentData;
 
     if (!idea.lockedById || !idea.lockedAt) {
       return null;
     }
 
-    const lockedAt =
-      idea.lockedAt instanceof Timestamp
-        ? idea.lockedAt.toDate()
-        : new Date(idea.lockedAt as string | number);
+    const lockedAt = toDate(idea.lockedAt);
+    if (!lockedAt) {
+      // Invalid timestamp, treat as unlocked
+      return null;
+    }
+
     const now = new Date();
     const lockAge = now.getTime() - lockedAt.getTime();
 
@@ -168,7 +187,7 @@ export const checkLock = async (
     }
 
     // Locked by someone else
-    return idea.lockedById as string;
+    return idea.lockedById;
   } catch (error) {
     console.error("Error checking lock:", error);
     return null;
