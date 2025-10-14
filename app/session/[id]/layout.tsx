@@ -2,13 +2,16 @@
 
 import { useAuth } from "@/lib/contexts/auth-context";
 import { SessionProvider } from "@/lib/contexts/firebase-session-context";
-import SessionBoard from "./session-board";
+import { use } from "react";
 
-interface SessionWrapperProps {
-  sessionId: string;
-}
-
-export const SessionWrapper = ({ sessionId }: SessionWrapperProps) => {
+export default function SessionLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ id: string }>;
+}) {
+  const { id: sessionId } = use(params);
   const { userId, userName, userPhoto } = useAuth();
 
   return (
@@ -17,7 +20,7 @@ export const SessionWrapper = ({ sessionId }: SessionWrapperProps) => {
       userId={userId ?? "anonymous"}
       userName={userName ?? "Anonymous User"}
       userPhoto={userPhoto}>
-      <SessionBoard sessionId={sessionId} />
+      {children}
     </SessionProvider>
   );
-};
+}

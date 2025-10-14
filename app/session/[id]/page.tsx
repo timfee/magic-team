@@ -1,4 +1,4 @@
-import { SessionWrapper } from "@/components/session/session-wrapper";
+import SessionBoard from "@/components/session/session-board";
 
 export default async function SessionPage({
   params,
@@ -7,5 +7,5 @@ export default async function SessionPage({
 }) {
   const { id: sessionId } = await params;
 
-  return <SessionWrapper sessionId={sessionId} />;
+  return <SessionBoard sessionId={sessionId} />;
 }
