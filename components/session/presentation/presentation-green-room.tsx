@@ -4,6 +4,7 @@ import type { MagicSessionWithDetails } from "@/lib/types/session";
 import { AnimatedFacepile } from "@/components/ui/animated-facepile";
 import { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
+import { generateJoinCode } from "@/lib/utils/session-utils";
 
 interface ActiveUser {
   id: string;
@@ -66,7 +67,7 @@ export function PresentationGreenRoom({
     typeof window !== "undefined"
       ? `${window.location.origin}/session/${session.id}`
       : "";
-  const shortCode = session.id.slice(-6).toUpperCase();
+  const shortCode = generateJoinCode(session.id);
 
   return (
     <div className="flex h-full flex-col items-center justify-center text-white">

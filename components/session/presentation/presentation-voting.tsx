@@ -4,6 +4,7 @@ import type { MagicSessionWithDetails, Idea, IdeaGroup } from "@/lib/types/sessi
 import { useEffect, useState } from "react";
 import { collection, query, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
+import { calculateMaxPossibleVotes } from "@/lib/utils/session-utils";
 
 interface PresentationVotingProps {
   session: MagicSessionWithDetails;
@@ -39,9 +40,7 @@ export function PresentationVoting({
   }, [session.id, ideas, groups]);
 
   // Calculate vote progress
-  const maxPossibleVotes = session.settings?.votesPerUser
-    ? session.settings.votesPerUser * userCount
-    : undefined;
+  const maxPossibleVotes = calculateMaxPossibleVotes(session, userCount);
 
   const voteProgress = maxPossibleVotes
     ? (totalVotesCast / maxPossibleVotes) * 100

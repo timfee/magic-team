@@ -6,6 +6,9 @@ import { collection, query, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Auto-advance duration in seconds (configurable)
+const AUTO_ADVANCE_DURATION_SECONDS = 8;
+
 interface PresentationFinalizationProps {
   session: MagicSessionWithDetails;
   ideas: Idea[];
@@ -41,7 +44,12 @@ export function PresentationFinalization({
       const voteCounts: Record<string, number> = {};
       votesSnapshot.forEach((doc) => {
         const vote = doc.data();
-        const key = (vote.ideaId ?? vote.groupId) as string | undefined;
+        let key: string | undefined;
+        if (typeof vote.ideaId === "string") {
+          key = vote.ideaId;
+        } else if (typeof vote.groupId === "string") {
+          key = vote.groupId;
+        }
         if (key) {
           voteCounts[key] = (voteCounts[key] ?? 0) + 1;
         }
@@ -98,7 +106,7 @@ export function PresentationFinalization({
         );
         setShowDetails(true);
       }, 500);
-    }, 8000); // 8 seconds per item
+    }, AUTO_ADVANCE_DURATION_SECONDS * 1000);
 
     return () => clearInterval(interval);
   }, [itemsWithVotes.length]);
