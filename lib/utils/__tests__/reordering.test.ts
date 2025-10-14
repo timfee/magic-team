@@ -264,7 +264,7 @@ describe("Reordering Logic", () => {
     });
 
     it("should maintain sort order after multiple reorderings", () => {
-      let ideas = [
+      const ideas = [
         createMockIdea({ id: "1", order: 0, groupId: null, categoryId: "cat-1" }),
         createMockIdea({ id: "2", order: 1, groupId: null, categoryId: "cat-1" }),
         createMockIdea({ id: "3", order: 2, groupId: null, categoryId: "cat-1" }),

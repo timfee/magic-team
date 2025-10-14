@@ -6,10 +6,13 @@ import type { Category, SessionSettings } from "@/lib/types/session";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { IdeaCard } from "@/components/idea-card";
+import { VoteBar } from "@/components/ui/vote-bar";
+import { VoteHeatmap } from "@/components/ui/vote-heatmap";
 
 interface VoteData {
   ideaId: string;
   voteId: string;
+  categoryId: string;
 }
 
 interface IdeaVotingProps {
@@ -35,7 +38,13 @@ export const IdeaVoting = ({
   useEffect(() => {
     startTransition(async () => {
       const votes = await getUserVotes(sessionId, userId);
-      setMyVotes(votes.map((v) => ({ ideaId: v.ideaId ?? "", voteId: v.id })));
+      setMyVotes(
+        votes.map((v) => ({
+          ideaId: v.ideaId ?? "",
+          voteId: v.id,
+          categoryId: v.categoryId,
+        })),
+      );
     });
   }, [sessionId, userId]);
 
@@ -44,13 +53,19 @@ export const IdeaVoting = ({
 
     startTransition(async () => {
       try {
-        const result = await castVote({
-          sessionId,
-          categoryId,
-          ideaId,
-        }, userId);
+        const result = await castVote(
+          {
+            sessionId,
+            categoryId,
+            ideaId,
+          },
+          userId,
+        );
 
-        setMyVotes((prev) => [...prev, { ideaId, voteId: result.voteId }]);
+        setMyVotes((prev) => [
+          ...prev,
+          { ideaId, voteId: result.voteId, categoryId },
+        ]);
         router.refresh();
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to cast vote");
@@ -80,9 +95,30 @@ export const IdeaVoting = ({
     ? settings.votesPerUser - myVotes.length
     : Infinity;
 
+  // Calculate votes per category
+  const getVotesInCategory = (categoryId: string) => {
+    return myVotes.filter((v) => v.categoryId === categoryId).length;
+  };
+
+  // Get category vote limit
+  const getCategoryVotesRemaining = (categoryId: string) => {
+    if (!settings.maxVotesPerCategory) return Infinity;
+    const used = getVotesInCategory(categoryId);
+    return Math.max(0, settings.maxVotesPerCategory - used);
+  };
+
   // Sort ideas by vote count
   const sortedIdeas = [...ideas].sort(
     (a, b) => b._count.votes - a._count.votes,
+  );
+
+  // Create category color map for heatmap
+  const categoryColorMap = categories.reduce(
+    (acc, cat) => {
+      acc[cat.id] = cat.color;
+      return acc;
+    },
+    {} as Record<string, string>,
   );
 
   return (
@@ -114,7 +150,30 @@ export const IdeaVoting = ({
             {error}
           </div>
         )}
+
+        {/* Vote Distribution Visualization */}
+        {settings.votesPerUser && settings.votesPerUser > 0 && (
+          <div className="mt-6">
+            <VoteBar
+              voteCount={myVotes.length}
+              maxVotes={settings.votesPerUser}
+              color="#3b82f6"
+              showLabel={true}
+              label="Your Vote Usage"
+            />
+          </div>
+        )}
       </div>
+
+      {/* Vote Heatmap */}
+      {ideas.length > 0 && (
+        <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+          <h3 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+            Vote Distribution
+          </h3>
+          <VoteHeatmap ideas={ideas} categoryColors={categoryColorMap} />
+        </div>
+      )}
 
       {/* Ideas by Category */}
       {categories.map((category) => {
@@ -123,9 +182,13 @@ export const IdeaVoting = ({
         );
         if (categoryIdeas.length === 0) return null;
 
+        const categoryVotesUsed = getVotesInCategory(category.id);
+        const categoryVotesRemaining = getCategoryVotesRemaining(category.id);
+        const hasCategoryLimit = settings.maxVotesPerCategory !== undefined;
+
         return (
           <div key={category.id}>
-            <div className="mb-3 flex items-center gap-2">
+            <div className="mb-3 flex flex-wrap items-center gap-2">
               <div
                 className="h-3 w-3 rounded-full"
                 style={{ backgroundColor: category.color }}
@@ -136,7 +199,24 @@ export const IdeaVoting = ({
               <span className="text-sm text-zinc-500 dark:text-zinc-500">
                 ({categoryIdeas.length} ideas)
               </span>
+              {hasCategoryLimit && (
+                <span className="ml-auto text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                  {categoryVotesUsed} / {settings.maxVotesPerCategory} votes
+                  used
+                </span>
+              )}
             </div>
+
+            {hasCategoryLimit && settings.maxVotesPerCategory && (
+              <div className="mb-3">
+                <VoteBar
+                  voteCount={categoryVotesUsed}
+                  maxVotes={settings.maxVotesPerCategory}
+                  color={category.color}
+                  showLabel={false}
+                />
+              </div>
+            )}
 
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {categoryIdeas.map((idea) => {
@@ -171,7 +251,11 @@ export const IdeaVoting = ({
                       ) : (
                         <button
                           onClick={() => handleVote(idea.id, category.id)}
-                          disabled={isPending || votesRemaining <= 0}
+                          disabled={
+                            isPending ||
+                            votesRemaining <= 0 ||
+                            categoryVotesRemaining <= 0
+                          }
                           className="flex items-center gap-1 rounded-full bg-blue-600 px-3 py-1 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <svg
