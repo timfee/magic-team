@@ -37,7 +37,7 @@ export const acquireLock = async (
       const lockedAt =
         idea.lockedAt instanceof Timestamp
           ? idea.lockedAt.toDate()
-          : new Date(idea.lockedAt);
+          : new Date(idea.lockedAt as string | number);
       const lockAge = now.getTime() - lockedAt.getTime();
 
       // If locked by someone else and lock is still fresh, deny
@@ -153,7 +153,7 @@ export const checkLock = async (
     const lockedAt =
       idea.lockedAt instanceof Timestamp
         ? idea.lockedAt.toDate()
-        : new Date(idea.lockedAt);
+        : new Date(idea.lockedAt as string | number);
     const now = new Date();
     const lockAge = now.getTime() - lockedAt.getTime();
 
