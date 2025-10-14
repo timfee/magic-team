@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorBoundary } from "@/components/error-boundary";
 import { useAuth } from "@/lib/contexts/auth-context";
 import { SessionProvider } from "@/lib/contexts/firebase-session-context";
 import { use } from "react";
@@ -15,12 +16,14 @@ export default function SessionLayout({
   const { userId, userName, userPhoto } = useAuth();
 
   return (
-    <SessionProvider
-      sessionId={sessionId}
-      userId={userId ?? "anonymous"}
-      userName={userName ?? "Anonymous User"}
-      userPhoto={userPhoto}>
-      {children}
-    </SessionProvider>
+    <ErrorBoundary>
+      <SessionProvider
+        sessionId={sessionId}
+        userId={userId ?? "anonymous"}
+        userName={userName ?? "Anonymous User"}
+        userPhoto={userPhoto}>
+        {children}
+      </SessionProvider>
+    </ErrorBoundary>
   );
 }
