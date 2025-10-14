@@ -6,6 +6,7 @@ import {
   createIdeaGroup,
   deleteIdeaGroup,
   moveIdeaToGroup,
+  updateIdea,
 } from "@/lib/actions/ideas";
 import type {
   Category,
@@ -61,6 +62,38 @@ const generateGroupTitle = () => {
   const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
   const noun = nouns[Math.floor(Math.random() * nouns.length)];
   return `${adj} ${noun}`;
+};
+
+// Calculate new order for reordering within same context
+const calculateNewOrder = (
+  activeIdea: IdeaWithDetails,
+  overIdea: IdeaWithDetails,
+  ideas: IdeaWithDetails[],
+): number => {
+  // Get all ideas in the same context (same groupId or both ungrouped)
+  const contextIdeas = ideas
+    .filter((i) => i.groupId === overIdea.groupId && i.categoryId === overIdea.categoryId)
+    .sort((a, b) => a.order - b.order);
+
+  const overIndex = contextIdeas.findIndex((i) => i.id === overIdea.id);
+  const activeIndex = contextIdeas.findIndex((i) => i.id === activeIdea.id);
+
+  if (overIndex === -1) return overIdea.order;
+
+  // Moving down (active before over)
+  if (activeIndex < overIndex) {
+    // Place after overIdea
+    if (overIndex === contextIdeas.length - 1) {
+      return contextIdeas[overIndex].order + 1;
+    }
+    return (contextIdeas[overIndex].order + contextIdeas[overIndex + 1].order) / 2;
+  }
+
+  // Moving up (active after over)
+  if (overIndex === 0) {
+    return contextIdeas[0].order - 1;
+  }
+  return (contextIdeas[overIndex - 1].order + contextIdeas[overIndex].order) / 2;
 };
 
 // Ghost Placeholder Component
@@ -176,19 +209,22 @@ const DroppableGroup = ({
           </div>
         ) : (
           <>
-            {ideas.map((idea) => (
-              <IdeaCard
-                key={idea.id}
-                idea={idea}
-                categoryColor={getCategoryColor(idea.categoryId)}
-                draggable
-                isDraggedOver={dragOverId === idea.id}
-                dropIndicator={
-                  dragOverId === idea.id ? getDropIndicator(idea) : null
-                }
-                showVotes={false}
-              />
-            ))}
+            {ideas
+              .slice()
+              .sort((a, b) => a.order - b.order)
+              .map((idea) => (
+                <IdeaCard
+                  key={idea.id}
+                  idea={idea}
+                  categoryColor={getCategoryColor(idea.categoryId)}
+                  draggable
+                  isDraggedOver={dragOverId === idea.id}
+                  dropIndicator={
+                    dragOverId === idea.id ? getDropIndicator(idea) : null
+                  }
+                  showVotes={false}
+                />
+              ))}
             {showGhostPlaceholder && <GhostPlaceholder text="Will add here" />}
           </>
         )}
@@ -261,19 +297,22 @@ const UngroupedDropZone = ({
         </div>
       ) : (
         <>
-          {ideas.map((idea) => (
-            <IdeaCard
-              key={idea.id}
-              idea={idea}
-              categoryColor={categoryColor}
-              draggable
-              isDraggedOver={dragOverId === idea.id}
-              dropIndicator={
-                dragOverId === idea.id ? getDropIndicator(idea) : null
-              }
-              showVotes={false}
-            />
-          ))}
+          {ideas
+            .slice()
+            .sort((a, b) => a.order - b.order)
+            .map((idea) => (
+              <IdeaCard
+                key={idea.id}
+                idea={idea}
+                categoryColor={categoryColor}
+                draggable
+                isDraggedOver={dragOverId === idea.id}
+                dropIndicator={
+                  dragOverId === idea.id ? getDropIndicator(idea) : null
+                }
+                showVotes={false}
+              />
+            ))}
           {isDragging && ideas.length === 0 && (
             <div className="flex h-24 items-center justify-center rounded-md border-2 border-dashed border-zinc-300 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900">
               <p className="text-sm text-zinc-500">
@@ -456,8 +495,23 @@ export const IdeaGrouping = ({
       const overIdea = ideas.find((i) => i.id === over.id);
       if (!overIdea) return;
 
-      // Case 1: Both ideas are ungrouped → create new group
+      // Case 1: Both ideas are ungrouped
       if (!overIdea.groupId && !activeIdea.groupId) {
+        // Same category → reorder (don't create group)
+        if (activeIdea.categoryId === overIdea.categoryId) {
+          startTransition(async () => {
+            try {
+              const newOrder = calculateNewOrder(activeIdea, overIdea, ideas);
+              await updateIdea(activeIdea.id, sessionId, { order: newOrder });
+              router.refresh();
+            } catch (error) {
+              console.error("Failed to reorder ungrouped ideas:", error);
+            }
+          });
+          return;
+        }
+
+        // Different categories → create new group
         startTransition(async () => {
           try {
             const groupTitle = generateGroupTitle();
@@ -511,15 +565,29 @@ export const IdeaGrouping = ({
         return;
       }
 
-      // Case 4: Both grouped → move active to target's group
+      // Case 4: Both grouped
       if (activeIdea.groupId && overIdea.groupId) {
-        if (activeIdea.groupId === overIdea.groupId) return;
+        // Same group → reorder
+        if (activeIdea.groupId === overIdea.groupId) {
+          startTransition(async () => {
+            try {
+              const newOrder = calculateNewOrder(activeIdea, overIdea, ideas);
+              await updateIdea(activeIdea.id, sessionId, { order: newOrder });
+              router.refresh();
+            } catch (error) {
+              console.error("Failed to reorder within group:", error);
+            }
+          });
+          return;
+        }
 
+        // Different groups → move active to target's group
         const fromGroupId = activeIdea.groupId;
 
         startTransition(async () => {
           try {
-            await moveIdeaToGroup(activeIdea.id, overIdea.groupId ?? null, sessionId);
+            const newOrder = calculateNewOrder(activeIdea, overIdea, ideas);
+            await moveIdeaToGroup(activeIdea.id, overIdea.groupId ?? null, sessionId, newOrder);
 
             // Check if source group is empty and delete it
             const remainingInGroup = ideas.filter(
