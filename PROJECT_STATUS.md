@@ -47,8 +47,11 @@ A real-time multiplayer retrospective application built with Next.js 15, Firebas
 
 ### Phase 4: Stage-Specific UIs
 
-- Green Room stage - Waiting area with live participant count
+- Green Room stage - Waiting area with live participant count and animated facepile
+- Green Room timer - Optional countdown to session start time
 - Idea Collection stage - Anonymous idea submission with real-time display
+- Idea Collection timer - Countdown timer with graceful expiration
+- Admin submission controls - Enable/disable idea submissions
 - Idea Voting stage - Vote allocation with real-time updates
 - Idea Grouping stage - Drag-and-drop with real-time sync
 - Idea Card component - Display individual ideas with vote counts
@@ -58,6 +61,7 @@ A real-time multiplayer retrospective application built with Next.js 15, Firebas
 - Vote rules enforcement (votes per user, per category, per idea)
 - Optimistic UI updates for ideas and votes
 - Drag-and-drop grouping with @dnd-kit
+- Animated Facepile component with pop-in animations and continuous motion
 
 ## 🚧 TODO
 
@@ -68,7 +72,10 @@ A real-time multiplayer retrospective application built with Next.js 15, Firebas
 - [x] User count with live updates
 - [x] "Waiting for facilitator" message
 - [x] Animated waiting indicator
-- [ ] Optional timer display
+- [x] Optional timer display with countdown
+- [x] Animated facepile showing participant avatars
+- [x] Pop-in animation for new participants
+- [x] Continuous subtle floating motion for avatars
 
 **Idea Collection** ✅
 
@@ -78,8 +85,9 @@ A real-time multiplayer retrospective application built with Next.js 15, Firebas
 - [x] Character limit validation (500 chars)
 - [x] Optimistic updates
 - [x] Max entries per person enforcement
+- [x] Countdown timer with graceful expiration
+- [x] Admin control to disable submissions
 - [ ] Pre-submit functionality (if enabled)
-- [ ] Countdown timer
 
 **Idea Grouping** ✅
 
