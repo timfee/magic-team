@@ -27,8 +27,14 @@ export const createSession = async (
   try {
     // Create the session document without categories
     const { categories, settings, ...sessionData } = input;
+
+    // Filter out undefined values to prevent Firestore errors
+    const cleanSessionData = Object.fromEntries(
+      Object.entries(sessionData).filter(([_, value]) => value !== undefined)
+    );
+
     const sessionRef = await addDoc(collection(db, "sessions"), {
-      ...sessionData,
+      ...cleanSessionData,
       ownerId,
       currentStage: "pre_session" as SessionStage,
       visibility: input.visibility ?? "public",

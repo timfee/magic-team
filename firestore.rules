@@ -62,7 +62,7 @@ service cloud.firestore {
                          (!resource.data.keys().hasAll(['lockedById']) ||
                           resource.data.lockedById == null ||
                           resource.data.lockedById == request.auth.uid ||
-                          request.time > resource.data.lockedAt + duration.from(30, 's'));
+                          request.time > resource.data.lockedAt + duration.value(30, 's'));
         allow delete: if isOwnerOrAdmin(get(/databases/$(database)/documents/sessions/$(sessionId)).data, sessionId) ||
                         (isAuthenticated() && resource.data.authorId == request.auth.uid);
       }
