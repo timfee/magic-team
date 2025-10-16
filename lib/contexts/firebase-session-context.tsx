@@ -29,6 +29,27 @@ import React, {
 } from "react";
 import { useThrottle } from "@/lib/hooks/use-throttle";
 
+// Type guards for Firestore data
+function isValidStage(value: unknown): value is SessionStage {
+  const validStages = [
+    "pre_session",
+    "green_room",
+    "idea_collection",
+    "idea_voting",
+    "idea_grouping",
+    "idea_finalization",
+    "post_session",
+  ];
+  return typeof value === "string" && validStages.includes(value);
+}
+
+function isValidVisibility(value: unknown): value is SessionVisibility {
+  return (
+    typeof value === "string" &&
+    ["public", "private", "protected"].includes(value)
+  );
+}
+
 interface ActiveUser {
   id: string;
   name: string | null;
@@ -53,12 +74,6 @@ interface SessionContextValue {
     updates: Partial<IdeaWithDetails>,
   ) => Promise<void>;
   deleteIdea: (ideaId: string) => Promise<void>;
-  moveIdea: (
-    ideaId: string,
-    categoryId: string,
-    groupId: string | null,
-    order: number,
-  ) => Promise<void>;
   updateGroup: (
     groupId: string,
     updates: Partial<IdeaGroupWithDetails>,
@@ -111,13 +126,23 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
     const unsubscribe = onSnapshot(sessionRef, (doc) => {
       if (doc.exists()) {
         const data = doc.data();
+        const ownerId =
+          typeof data.ownerId === "string" ? data.ownerId : userName;
+        const visibility = isValidVisibility(data.visibility) ?
+          data.visibility
+        : "public";
+        const stage = isValidStage(data.currentStage) ?
+          data.currentStage
+        : "pre_session";
+
         setSession({
           id: doc.id,
-          name: (data.name as string) ?? "Untitled Session",
-          description: (data.description as string) ?? undefined,
-          ownerId: data.ownerId as string,
-          visibility: (data.visibility as SessionVisibility) ?? "public",
-          currentStage: (data.currentStage as SessionStage) ?? "pre_session",
+          name: typeof data.name === "string" ? data.name : "Untitled Session",
+          description:
+            typeof data.description === "string" ? data.description : undefined,
+          ownerId,
+          visibility,
+          currentStage: stage,
           createdAt:
             data.createdAt instanceof Timestamp ?
               data.createdAt.toDate()
@@ -127,10 +152,15 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
             : data.updatedAt ?
               new Date(data.updatedAt as string | number | Date)
             : new Date(),
-          categories: [], // Will be loaded separately
-          settings: null, // Will be loaded separately
+          /**
+           * Categories and settings are loaded via Server Actions in parent components.
+           * This context provides real-time updates only, not initial data fetching.
+           * See: lib/actions/session.ts:createSession for where these are created in subcollections.
+           */
+          categories: [], // Populated by parent component (not real-time listener)
+          settings: null, // Populated by parent component (not real-time listener)
           owner: {
-            id: data.ownerId as string,
+            id: ownerId,
             name: userName,
             email: "",
             image: null,
@@ -138,7 +168,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
           admins: [],
           _count: { ideas: 0, presence: 0 },
         } as unknown as MagicSessionWithDetails);
-        setCurrentStage(data.currentStage as SessionStage);
+        setCurrentStage(stage);
         setIsLoading(false);
       } else {
         setIsLoading(false);
@@ -148,9 +178,14 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
     return () => unsubscribe();
   }, [sessionId, userName]);
 
-  // Set up presence tracking (only for authenticated users)
+  /**
+   * Set up presence tracking for authenticated users only.
+   * Anonymous users are intentionally excluded because:
+   * 1. Firebase security rules require authentication for presence writes
+   * 2. Anonymous sessions don't provide meaningful user identification
+   * 3. The app requires auth for all core functionality (ideas, votes, comments)
+   */
   useEffect(() => {
-    // Don't track presence for anonymous users since it requires authentication
     if (!userId || userId === "anonymous") return;
 
     const presenceRef = doc(db, "sessions", sessionId, "presence", userId);
@@ -206,18 +241,24 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
     );
 
     const unsubscribe = onSnapshot(presenceQuery, (snapshot) => {
-      const users = snapshot.docs.map((doc) => {
-        const data = doc.data();
-        return {
-          id: data.userId as string,
-          name: data.userName as string | null,
-          image: data.userPhoto as string | null,
-          lastSeenAt:
-            data.lastSeenAt instanceof Timestamp ?
-              data.lastSeenAt.toDate()
-            : new Date(),
-        };
-      });
+      const users = snapshot.docs
+        .map((doc) => {
+          const data = doc.data();
+          // Validate required fields
+          if (typeof data.userId !== "string") return null;
+
+          return {
+            id: data.userId,
+            name: typeof data.userName === "string" ? data.userName : null,
+            image: typeof data.userPhoto === "string" ? data.userPhoto : null,
+            lastSeenAt:
+              data.lastSeenAt instanceof Timestamp ?
+                data.lastSeenAt.toDate()
+              : new Date(),
+          };
+        })
+        .filter((user): user is ActiveUser => user !== null);
+
       setActiveUsers(users);
       setUserCount(users.length);
     });
@@ -232,8 +273,8 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
     const unsubscribe = onSnapshot(sessionRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.data();
-        if (data.currentStage) {
-          setCurrentStage(data.currentStage as SessionStage);
+        if (isValidStage(data.currentStage)) {
+          setCurrentStage(data.currentStage);
         }
       }
     });
@@ -358,24 +399,6 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
     [sessionId],
   );
 
-  const moveIdea = useCallback(
-    async (
-      _ideaId: string,
-      _categoryId: string,
-      _groupId: string | null,
-      _order: number,
-    ) => {
-      try {
-        // Move idea functionality will be implemented later
-        console.log("Move idea not implemented yet");
-      } catch (error) {
-        console.error("Error moving idea:", error);
-        throw error;
-      }
-    },
-    [],
-  );
-
   const updateGroup = useCallback(
     async (groupId: string, updates: Partial<IdeaGroupWithDetails>) => {
       try {
@@ -444,7 +467,6 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
     userName,
     updateIdea,
     deleteIdea,
-    moveIdea,
     updateGroup,
     deleteGroup,
     changeStage,

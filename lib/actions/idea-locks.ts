@@ -29,8 +29,10 @@ function toDate(timestamp: Timestamp | Date | undefined): Date | null {
 export const getCurrentTime = (): Date => new Date();
 
 /**
- * Attempts to acquire a lock on an idea for the specified user.
- * Returns true if lock was acquired, false if idea is already locked by someone else.
+ * Acquires a distributed lock on an idea to prevent concurrent drag operations.
+ * Lock expires after 30 seconds to prevent deadlocks from disconnected clients.
+ *
+ * @returns true if lock acquired, false if already locked by another user
  */
 export const acquireLock = async (
   ideaId: string,
