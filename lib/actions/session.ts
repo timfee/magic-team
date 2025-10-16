@@ -30,7 +30,7 @@ export const createSession = async (
 
     // Filter out undefined values to prevent Firestore errors
     const cleanSessionData = Object.fromEntries(
-      Object.entries(sessionData).filter(([_, value]) => value !== undefined)
+      Object.entries(sessionData).filter(([_, value]) => value !== undefined),
     );
 
     const sessionRef = await addDoc(collection(db, "sessions"), {
@@ -130,15 +130,21 @@ export const getUserSessions = async (
   userId: string,
 ): Promise<MagicSession[]> => {
   try {
+    console.log("DEBUG: getUserSessions called with userId:", userId);
+
+    // First try a simple query without the isArchived filter
     const sessionsQuery = query(
       collection(db, "sessions"),
       where("ownerId", "==", userId),
-      where("isArchived", "!=", true),
     );
-    const snapshot = await getDocs(sessionsQuery);
 
-    return snapshot.docs.map((doc) => {
+    console.log("DEBUG: Executing query...");
+    const snapshot = await getDocs(sessionsQuery);
+    console.log("DEBUG: Query successful, got", snapshot.docs.length, "docs");
+
+    const sessions = snapshot.docs.map((doc) => {
       const data = doc.data();
+      console.log("DEBUG: Processing doc", doc.id, "with data:", data);
       return {
         id: doc.id,
         ...data,
@@ -152,6 +158,12 @@ export const getUserSessions = async (
           : new Date(),
       } as MagicSession;
     });
+
+    // Filter out archived sessions in memory for now
+    const activeSessions = sessions.filter((session) => !session.isArchived);
+    console.log("DEBUG: Returning", activeSessions.length, "active sessions");
+
+    return activeSessions;
   } catch (error) {
     console.error("Error getting user sessions:", error);
     throw error;

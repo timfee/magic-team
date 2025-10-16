@@ -1,33 +1,78 @@
 "use client";
 
-import Link from "next/link";
-import { useAuth } from "@/lib/contexts/auth-context";
-import { useEffect, useState } from "react";
+import { ErrorDisplay } from "@/components/ui/error-display";
 import { getUserSessions } from "@/lib/actions/session";
+import { useAuth } from "@/lib/contexts/auth-context";
 import type { MagicSession } from "@/lib/types/session";
+import {
+  handleFirebaseError,
+  logError,
+  type AppError,
+} from "@/lib/utils/firebase-errors";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const { user, userId, isLoading, signIn, signOut } = useAuth();
   const [sessions, setSessions] = useState<MagicSession[]>([]);
   const [loadingSessions, setLoadingSessions] = useState(false);
+  const [error, setError] = useState<AppError | null>(null);
+
+  // Debug state changes
+  useEffect(() => {
+    console.log(
+      "DEBUG: State changed - sessions.length:",
+      sessions.length,
+      "loadingSessions:",
+      loadingSessions,
+      "error:",
+      error,
+    );
+  }, [sessions, loadingSessions, error]);
+
+  const fetchSessions = async () => {
+    if (!userId) {
+      console.log("DEBUG: No userId, skipping fetch");
+      return;
+    }
+    console.log("DEBUG: Fetching sessions for userId:", userId);
+    setLoadingSessions(true);
+    setError(null);
+
+    try {
+      const userSessions = await getUserSessions(userId);
+      console.log("DEBUG: Got sessions:", userSessions);
+      console.log("DEBUG: Sessions length:", userSessions.length);
+      console.log("DEBUG: Setting sessions state...");
+      setSessions(userSessions);
+    } catch (err) {
+      console.log("DEBUG: Error fetching sessions:", err);
+      const appError = handleFirebaseError(err);
+      logError(appError, "Home page - getUserSessions");
+      setError(appError);
+    } finally {
+      setLoadingSessions(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchSessions = async () => {
-      if (!userId) return;
-      setLoadingSessions(true);
-      try {
-        const userSessions = await getUserSessions(userId);
-        setSessions(userSessions);
-      } catch (error) {
-        console.error("Error fetching sessions:", error);
-      } finally {
-        setLoadingSessions(false);
-      }
-    };
-
+    console.log(
+      "DEBUG: useEffect triggered with userId:",
+      userId,
+      "isLoading:",
+      isLoading,
+    );
     void fetchSessions();
   }, [userId]);
+
+  const handleRetry = () => {
+    void fetchSessions();
+  };
+
+  const handleNavigateHome = () => {
+    window.location.href = "/";
+  };
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
@@ -91,6 +136,13 @@ export default function Home() {
               Sign In to Get Started
             </button>
           </div>
+        : error ?
+          <ErrorDisplay
+            error={error}
+            onRetry={handleRetry}
+            onSignIn={signIn}
+            onNavigateHome={handleNavigateHome}
+          />
         : loadingSessions ?
           <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center dark:border-zinc-800 dark:bg-zinc-900">
             <p className="text-zinc-600 dark:text-zinc-400">
@@ -105,6 +157,12 @@ export default function Home() {
             <p className="mt-4 text-zinc-600 dark:text-zinc-400">
               You haven&apos;t created any sessions yet. Start by creating your
               first retrospective session!
+            </p>
+            {/* DEBUG INFO */}
+            <p className="mt-2 text-xs text-red-500">
+              DEBUG: sessions.length = {sessions.length}, loadingSessions ={" "}
+              {loadingSessions.toString()}, error ={" "}
+              {error ? "has error" : "null"}
             </p>
             <Link
               href="/session/create"

@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
-import { Geist_Mono, Roboto } from "next/font/google";
+import { GlobalErrorBoundary } from "@/components/global-error-boundary";
 import { AuthProvider } from "@/lib/contexts/auth-context";
 import { ToastProvider } from "@/lib/contexts/toast-context";
+import type { Metadata } from "next";
+import { Geist_Mono, Roboto } from "next/font/google";
 import "./globals.css";
 
 const roboto = Roboto({
@@ -26,9 +27,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${roboto.variable} ${geistMono.variable} antialiased`}>
-        <AuthProvider>
-          <ToastProvider>{children}</ToastProvider>
-        </AuthProvider>
+        <GlobalErrorBoundary>
+          <AuthProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </AuthProvider>
+        </GlobalErrorBoundary>
       </body>
     </html>
   );

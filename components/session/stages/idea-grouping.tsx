@@ -1,19 +1,23 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { IdeaCard } from "@/components/idea-card";
+import { CommentThread } from "@/components/session/comment-thread";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { getCommentsWithDetails } from "@/lib/actions/comments";
+import { acquireLock, releaseLock } from "@/lib/actions/idea-locks";
 import {
   createIdeaGroup,
   deleteIdeaGroup,
   moveIdeaToGroup,
   updateIdea,
 } from "@/lib/actions/ideas";
-import { acquireLock, releaseLock } from "@/lib/actions/idea-locks";
+import { db } from "@/lib/firebase/client";
 import type {
   Category,
+  CommentWithDetails,
   IdeaGroupWithDetails,
   IdeaWithDetails,
-  CommentWithDetails,
 } from "@/lib/types/session";
 import {
   closestCorners,
@@ -29,13 +33,9 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { CommentThread } from "@/components/session/comment-thread";
-import { getCommentsWithDetails } from "@/lib/actions/comments";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { db } from "@/lib/firebase/client";
 
 interface IdeaGroupingProps {
   sessionId: string;
@@ -598,30 +598,62 @@ export const IdeaGrouping = ({
       | { type: string; categoryId?: string }
       | undefined;
 
-    // Dropped on ungrouped zone - ungroup the idea
+    // Dropped on ungrouped zone - ungroup the idea OR move to different category
     if (overData?.type === "ungrouped-zone") {
-      if (!activeIdea.groupId) return;
+      const targetCategoryId = overData.categoryId;
 
-      const fromGroupId = activeIdea.groupId;
+      // If idea is grouped, ungroup it
+      if (activeIdea.groupId) {
+        const fromGroupId = activeIdea.groupId;
 
-      startTransition(async () => {
-        try {
-          await moveIdeaToGroup(activeIdea.id, null, sessionId);
+        startTransition(async () => {
+          try {
+            // Move to new category if different, otherwise just ungroup
+            if (
+              targetCategoryId
+              && activeIdea.categoryId !== targetCategoryId
+            ) {
+              await moveIdeaToGroup(activeIdea.id, null, sessionId);
+              await updateIdea(activeIdea.id, sessionId, {
+                categoryId: targetCategoryId,
+              });
+            } else {
+              await moveIdeaToGroup(activeIdea.id, null, sessionId);
+            }
 
-          // Check if source group is empty and delete it
-          const remainingInGroup = ideas.filter(
-            (i) => i.groupId === fromGroupId && i.id !== activeIdea.id,
-          );
+            // Check if source group is empty and delete it
+            const remainingInGroup = ideas.filter(
+              (i) => i.groupId === fromGroupId && i.id !== activeIdea.id,
+            );
 
-          if (remainingInGroup.length === 0) {
-            await deleteIdeaGroup(fromGroupId, sessionId);
+            if (remainingInGroup.length === 0) {
+              await deleteIdeaGroup(fromGroupId, sessionId);
+            }
+
+            router.refresh();
+          } catch (error) {
+            console.error("Failed to ungroup idea:", error);
           }
+        });
+        return;
+      }
 
-          router.refresh();
-        } catch (error) {
-          console.error("Failed to ungroup idea:", error);
-        }
-      });
+      // If idea is not grouped but dropped on different category, move it
+      if (targetCategoryId && activeIdea.categoryId !== targetCategoryId) {
+        startTransition(async () => {
+          try {
+            await updateIdea(activeIdea.id, sessionId, {
+              categoryId: targetCategoryId,
+            });
+            router.refresh();
+          } catch (error) {
+            console.error("Failed to move idea to different category:", error);
+          }
+        });
+        return;
+      }
+
+      // Same category, no group change needed - this is a no-op
       return;
     }
 

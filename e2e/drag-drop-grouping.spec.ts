@@ -904,7 +904,62 @@ test.describe("Drag & Drop: Group Container Targets (MECE Completion)", () => {
     }
   });
 
-  test("should NOT move ungrouped idea when dropped on empty ungrouped zone", async ({
+  test("should move ungrouped idea between categories", async ({ page }) => {
+    await page.goto("/session/test-grouping-id");
+    await expect(page.getByText(/group ideas/i)).toBeVisible({
+      timeout: 10000,
+    });
+
+    // Find ungrouped idea
+    const ungroupedIdea = page
+      .locator('[data-testid="idea-card"]')
+      .filter({ hasNot: page.locator('[data-testid="idea-group"]') })
+      .first();
+    await expect(ungroupedIdea).toBeVisible();
+
+    const ideaText = await ungroupedIdea.textContent();
+
+    // Find a different category's ungrouped zone
+    const ungroupedZones = page.locator('[data-testid="ungrouped-zone"]');
+    await expect(ungroupedZones).toHaveCount(3); // Assuming 3 categories
+
+    // Get the source zone (where the idea currently is)
+    const sourceZone = ungroupedIdea.locator(
+      'xpath=ancestor::*[@data-testid="ungrouped-zone"]',
+    );
+
+    // Find a different ungrouped zone (different category)
+    let targetZone = null;
+    for (let i = 0; i < (await ungroupedZones.count()); i++) {
+      const zone = ungroupedZones.nth(i);
+      const isSameZone = await zone.evaluate(
+        (el, sourceEl) => el === sourceEl,
+        await sourceZone.elementHandle(),
+      );
+      if (!isSameZone) {
+        targetZone = zone;
+        break;
+      }
+    }
+
+    expect(targetZone).toBeTruthy();
+
+    // Drag to different category's ungrouped zone
+    await dragAndDrop(page, ungroupedIdea, targetZone!);
+
+    // Wait for update
+    await page.waitForTimeout(1000);
+
+    // Verify idea moved to target category
+    // The idea should now be in the target zone
+    if (ideaText) {
+      await expect(
+        targetZone!.locator(`text=${ideaText.substring(0, 20)}`),
+      ).toBeVisible({ timeout: 3000 });
+    }
+  });
+
+  test("should NOT move ungrouped idea when dropped on same category zone", async ({
     page,
   }) => {
     await page.goto("/session/test-grouping-id");

@@ -1,12 +1,15 @@
 "use client";
 
-import { useSession } from "@/lib/contexts/firebase-session-context";
 import { SessionLoading } from "@/components/session/session-loading";
+import { getSessionCategories } from "@/lib/actions/categories";
+import { useSession } from "@/lib/contexts/firebase-session-context";
+import type { Category } from "@/lib/types/session";
+import { useEffect, useState } from "react";
+import { PresentationFinalization } from "./presentation-finalization";
 import { PresentationGreenRoom } from "./presentation-green-room";
+import { PresentationGrouping } from "./presentation-grouping";
 import { PresentationIdeaCollection } from "./presentation-idea-collection";
 import { PresentationVoting } from "./presentation-voting";
-import { PresentationGrouping } from "./presentation-grouping";
-import { PresentationFinalization } from "./presentation-finalization";
 
 interface PresentationViewProps {
   sessionId: string;
@@ -23,8 +26,31 @@ export function PresentationView({ sessionId }: PresentationViewProps) {
     activeUsers,
   } = useSession();
 
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+
+  // Load categories
+  useEffect(() => {
+    const loadCategories = async () => {
+      if (!session?.id) return;
+
+      try {
+        setCategoriesLoading(true);
+        const sessionCategories = await getSessionCategories(session.id);
+        setCategories(sessionCategories);
+      } catch (error) {
+        console.error("Error loading categories:", error);
+        setCategories([]);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+
+    void loadCategories();
+  }, [session?.id]);
+
   // Show loading state while session data is being fetched
-  if (isLoading || !session) {
+  if (isLoading || !session || categoriesLoading) {
     return <SessionLoading sessionId={sessionId} />;
   }
 
@@ -43,7 +69,7 @@ export function PresentationView({ sessionId }: PresentationViewProps) {
 
         {currentStage === "idea_collection" && (
           <PresentationIdeaCollection
-            session={session}
+            session={{ ...session, categories }}
             ideas={ideas}
             userCount={userCount}
             timerEnd={session.settings?.ideaCollectionTimerEnd}
@@ -53,7 +79,7 @@ export function PresentationView({ sessionId }: PresentationViewProps) {
 
         {currentStage === "idea_voting" && (
           <PresentationVoting
-            session={session}
+            session={{ ...session, categories }}
             ideas={ideas}
             groups={groups}
             userCount={userCount}
@@ -62,7 +88,7 @@ export function PresentationView({ sessionId }: PresentationViewProps) {
 
         {currentStage === "idea_grouping" && (
           <PresentationGrouping
-            session={session}
+            session={{ ...session, categories }}
             ideas={ideas}
             groups={groups}
           />
@@ -70,7 +96,7 @@ export function PresentationView({ sessionId }: PresentationViewProps) {
 
         {currentStage === "idea_finalization" && (
           <PresentationFinalization
-            session={session}
+            session={{ ...session, categories }}
             ideas={ideas}
             groups={groups}
           />

@@ -1,6 +1,7 @@
 "use client";
 
 import { db } from "@/lib/firebase/client";
+import { useThrottle } from "@/lib/hooks/use-throttle";
 import type {
   IdeaGroupWithDetails,
   IdeaWithDetails,
@@ -8,6 +9,7 @@ import type {
   SessionStage,
   SessionVisibility,
 } from "@/lib/types/session";
+import { handleFirebaseError, logError } from "@/lib/utils/firebase-errors";
 import {
   collection,
   deleteDoc,
@@ -27,7 +29,6 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { useThrottle } from "@/lib/hooks/use-throttle";
 
 // Type guards for Firestore data
 function isValidStage(value: unknown): value is SessionStage {
@@ -45,8 +46,8 @@ function isValidStage(value: unknown): value is SessionStage {
 
 function isValidVisibility(value: unknown): value is SessionVisibility {
   return (
-    typeof value === "string" &&
-    ["public", "private", "protected"].includes(value)
+    typeof value === "string"
+    && ["public", "private", "protected"].includes(value)
   );
 }
 
@@ -128,12 +129,10 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
         const data = doc.data();
         const ownerId =
           typeof data.ownerId === "string" ? data.ownerId : userName;
-        const visibility = isValidVisibility(data.visibility) ?
-          data.visibility
-        : "public";
-        const stage = isValidStage(data.currentStage) ?
-          data.currentStage
-        : "pre_session";
+        const visibility =
+          isValidVisibility(data.visibility) ? data.visibility : "public";
+        const stage =
+          isValidStage(data.currentStage) ? data.currentStage : "pre_session";
 
         setSession({
           id: doc.id,
@@ -159,12 +158,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
            */
           categories: [], // Populated by parent component (not real-time listener)
           settings: null, // Populated by parent component (not real-time listener)
-          owner: {
-            id: ownerId,
-            name: userName,
-            email: "",
-            image: null,
-          },
+          owner: { id: ownerId, name: userName, email: "", image: null },
           admins: [],
           _count: { ideas: 0, presence: 0 },
         } as unknown as MagicSessionWithDetails);
@@ -201,7 +195,8 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
           lastSeenAt: serverTimestamp(),
         });
       } catch (error) {
-        console.error("Error setting presence:", error);
+        const appError = handleFirebaseError(error);
+        logError(appError, "SessionProvider - setPresence");
       }
     };
 
@@ -219,7 +214,10 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
           lastSeenAt: serverTimestamp(),
         },
         { merge: true },
-      ).catch(console.error);
+      ).catch((error) => {
+        const appError = handleFirebaseError(error);
+        logError(appError, "SessionProvider - updatePresence");
+      });
     }, 30000); // Update every 30 seconds
 
     // Mark user as inactive on cleanup
@@ -229,7 +227,10 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
         presenceRef,
         { isActive: false, lastSeenAt: serverTimestamp() },
         { merge: true },
-      ).catch(console.error);
+      ).catch((error) => {
+        const appError = handleFirebaseError(error);
+        logError(appError, "SessionProvider - cleanupPresence");
+      });
     };
   }, [sessionId, userId, userName, userPhoto]);
 
@@ -379,7 +380,8 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
         };
         await updateIdea(ideaId, sessionId, updateInput);
       } catch (error) {
-        console.error("Error updating idea:", error);
+        const appError = handleFirebaseError(error);
+        logError(appError, "SessionProvider - updateIdea");
         throw error;
       }
     },
@@ -392,7 +394,8 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
         const { deleteIdea } = await import("@/lib/actions/ideas");
         await deleteIdea(ideaId, sessionId);
       } catch (error) {
-        console.error("Error deleting idea:", error);
+        const appError = handleFirebaseError(error);
+        logError(appError, "SessionProvider - deleteIdea");
         throw error;
       }
     },
@@ -405,7 +408,8 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
         const groupRef = doc(db, "sessions", sessionId, "groups", groupId);
         await updateDoc(groupRef, { ...updates, updatedAt: serverTimestamp() });
       } catch (error) {
-        console.error("Error updating group:", error);
+        const appError = handleFirebaseError(error);
+        logError(appError, "SessionProvider - updateGroup");
         throw error;
       }
     },
@@ -418,7 +422,8 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
         const groupRef = doc(db, "sessions", sessionId, "groups", groupId);
         await deleteDoc(groupRef);
       } catch (error) {
-        console.error("Error deleting group:", error);
+        const appError = handleFirebaseError(error);
+        logError(appError, "SessionProvider - deleteGroup");
         throw error;
       }
     },
@@ -431,7 +436,8 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
         const { updateSessionStage } = await import("@/lib/actions/session");
         await updateSessionStage(sessionId, _newStage);
       } catch (error) {
-        console.error("Error changing stage:", error);
+        const appError = handleFirebaseError(error);
+        logError(appError, "SessionProvider - changeStage");
         throw error;
       }
     },

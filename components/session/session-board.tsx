@@ -4,14 +4,17 @@ import { ParticipantsList } from "@/components/participants-list";
 import { SessionLoading } from "@/components/session/session-loading";
 import { GreenRoom } from "@/components/session/stages/green-room";
 import { IdeaCollection } from "@/components/session/stages/idea-collection";
-import { LazyIdeaGrouping } from "@/lib/utils/lazy-load";
-import { IdeaVoting } from "@/components/session/stages/idea-voting";
 import { IdeaFinalization } from "@/components/session/stages/idea-finalization";
+import { IdeaVoting } from "@/components/session/stages/idea-voting";
 import { PostSession } from "@/components/session/stages/post-session";
 import { Facepile } from "@/components/ui/facepile";
+import { getSessionCategories } from "@/lib/actions/categories";
 import { useSession } from "@/lib/contexts/firebase-session-context";
+import type { Category } from "@/lib/types/session";
+import { LazyIdeaGrouping } from "@/lib/utils/lazy-load";
 import { getUserRole } from "@/lib/utils/permissions";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 interface SessionBoardProps {
   sessionId: string;
@@ -30,8 +33,37 @@ export default function SessionBoard({ sessionId }: SessionBoardProps) {
     activeUsers,
   } = useSession();
 
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+
+  // Load categories
+  useEffect(() => {
+    const loadCategories = async () => {
+      if (!session?.id) return;
+
+      try {
+        setCategoriesLoading(true);
+        const sessionCategories = await getSessionCategories(session.id);
+        console.log(
+          "DEBUG: Loaded categories for session",
+          session.id,
+          ":",
+          sessionCategories,
+        );
+        setCategories(sessionCategories);
+      } catch (error) {
+        console.error("Error loading categories:", error);
+        setCategories([]);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+
+    void loadCategories();
+  }, [session?.id]);
+
   // Show loading state while session data is being fetched
-  if (isLoading || !session) {
+  if (isLoading || !session || categoriesLoading) {
     return <SessionLoading sessionId={sessionId} />;
   }
 
@@ -158,7 +190,7 @@ export default function SessionBoard({ sessionId }: SessionBoardProps) {
         {currentStage === "idea_collection" && (
           <IdeaCollection
             sessionId={session.id}
-            categories={session.categories}
+            categories={categories}
             initialIdeas={ideas}
             userId={userId}
             timerEnd={session.settings?.ideaCollectionTimerEnd}
@@ -178,7 +210,7 @@ export default function SessionBoard({ sessionId }: SessionBoardProps) {
         {currentStage === "idea_grouping" && (
           <LazyIdeaGrouping
             sessionId={session.id}
-            categories={session.categories}
+            categories={categories}
             initialIdeas={ideas}
             initialGroups={groups}
             userId={userId}

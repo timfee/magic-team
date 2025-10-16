@@ -2,6 +2,7 @@
 
 import { useSession } from "@/lib/contexts/firebase-session-context";
 import Link from "next/link";
+import { SessionConfig } from "./session-config";
 import { StageControls } from "./stage-controls";
 
 interface AdminControlsProps {
@@ -47,6 +48,9 @@ export const AdminControls = ({ sessionId }: AdminControlsProps) => {
           userId="anonymous-user"
         />
 
+        {/* Session Configuration */}
+        <SessionConfig sessionId={sessionId} />
+
         {/* Quick Stats */}
         <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
@@ -71,7 +75,7 @@ export const AdminControls = ({ sessionId }: AdminControlsProps) => {
             </div>
             <div>
               <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-                {session.categories.length}
+                {session.categories?.length || 0}
               </div>
               <div className="text-sm text-zinc-600 dark:text-zinc-400">
                 Categories
