@@ -72,7 +72,6 @@ const SingleComment = ({
       {/* User Avatar */}
       <div className="flex-shrink-0">
         {comment.user.image ?
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={comment.user.image}
             alt={comment.user.name ?? "User"}

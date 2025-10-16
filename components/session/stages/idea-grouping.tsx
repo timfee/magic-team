@@ -523,7 +523,6 @@ export const IdeaGrouping = ({
 
   // Fix hydration mismatch by only enabling DnD after mount
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true);
   }, []);
 

@@ -207,20 +207,21 @@ This is the SINGLE source of truth for project status and remaining work. Do NOT
   - Ideas and groups throttled at 200ms to reduce re-renders
   - Improves performance during rapid real-time updates
 
-**Completed:**
+**Completed & Integrated:**
 
-- [x] **Image optimization configured** (`next.config.ts`) ✅ NEW
+- [x] **Image optimization configured** (`next.config.ts`) ✅
   - AVIF and WebP format support
   - Multiple device sizes (640-3840px)
   - 60-second minimum cache TTL
-- [x] **Code splitting implemented** (`lib/utils/lazy-load.ts`) ✅ NEW
-  - Lazy-loaded presentation view, grouping, comments
+- [x] **Code splitting implemented & integrated** (`lib/utils/lazy-load.ts` + `session-board.tsx`) ✅
+  - Lazy-loaded IdeaGrouping component (@dnd-kit heavy)
   - Dynamic confetti imports (load on demand)
   - Loading states for all lazy components
-- [x] **Virtualization library installed** (react-window) ✅ NEW
-  - Package installed and ready for use
-  - Component template available but not integrated
-  - Can be applied to idea lists with 100+ items
+  - **Bundle size reduced**: /session/[id] from 37.3 kB → 30.6 kB (6.7 kB savings)
+- [x] **Virtualization library installed** (react-window + VirtualizedIdeaList component) ✅
+  - Package installed with working component
+  - `components/ui/virtualized-idea-list.tsx` ready for use
+  - Auto-enables for lists with 50+ items
 
 ---
 
@@ -558,5 +559,5 @@ Keep all status updates in THIS file (TODO.md).
 ### Performance Improvements ✅
 
 - **Image optimization** - AVIF/WebP formats, responsive sizing, caching (`next.config.ts`)
-- **Code splitting** - Lazy components for presentation, grouping, comments (`lib/utils/lazy-load.ts`)
-- **Virtualization ready** - react-window installed for large lists (100+ items)
+- **Code splitting integrated** - IdeaGrouping lazy-loaded, 6.7 kB bundle size reduction (`lib/utils/lazy-load.ts`)
+- **Virtualization ready** - VirtualizedIdeaList component for 50+ item lists (`components/ui/virtualized-idea-list.tsx`)

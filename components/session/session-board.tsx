@@ -4,7 +4,7 @@ import { ParticipantsList } from "@/components/participants-list";
 import { SessionLoading } from "@/components/session/session-loading";
 import { GreenRoom } from "@/components/session/stages/green-room";
 import { IdeaCollection } from "@/components/session/stages/idea-collection";
-import { IdeaGrouping } from "@/components/session/stages/idea-grouping";
+import { LazyIdeaGrouping } from "@/lib/utils/lazy-load";
 import { IdeaVoting } from "@/components/session/stages/idea-voting";
 import { IdeaFinalization } from "@/components/session/stages/idea-finalization";
 import { PostSession } from "@/components/session/stages/post-session";
@@ -176,7 +176,7 @@ export default function SessionBoard({ sessionId }: SessionBoardProps) {
         )}
 
         {currentStage === "idea_grouping" && (
-          <IdeaGrouping
+          <LazyIdeaGrouping
             sessionId={session.id}
             categories={session.categories}
             initialIdeas={ideas}

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
 import { AnimatedFacepile } from "../animated-facepile";
 
 describe("AnimatedFacepile", () => {
@@ -73,13 +73,17 @@ describe("AnimatedFacepile", () => {
     // Add a new user
     const newUsers = [...users, { id: "2", name: "Bob", image: null }];
 
-    rerender(<AnimatedFacepile users={newUsers} />);
+    act(() => {
+      rerender(<AnimatedFacepile users={newUsers} />);
+    });
 
     // New user should be rendered
     expect(screen.getByText("B")).toBeInTheDocument();
 
     // Animation class should be removed after timeout
-    vi.advanceTimersByTime(1000);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
   });
 
   it("should handle users with no name gracefully", () => {
