@@ -46,4 +46,5 @@ next-env.d.ts
 bin/
 
 # firebase
-/firebase-debug.log
+*-debug.log
+.claude
