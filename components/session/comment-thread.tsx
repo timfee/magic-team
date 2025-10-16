@@ -71,18 +71,17 @@ const SingleComment = ({
       data-testid="comment">
       {/* User Avatar */}
       <div className="flex-shrink-0">
-        {comment.user.image ? (
+        {comment.user.image ?
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={comment.user.image}
             alt={comment.user.name ?? "User"}
             className="h-8 w-8 rounded-full"
           />
-        ) : (
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-xs font-medium text-white">
+        : <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-xs font-medium text-white">
             {(comment.user.name ?? "U").charAt(0).toUpperCase()}
           </div>
-        )}
+        }
       </div>
 
       {/* Comment Content */}
@@ -108,7 +107,7 @@ const SingleComment = ({
         )}
 
         {/* Content or edit form */}
-        {isEditing ? (
+        {isEditing ?
           <div className="space-y-2">
             <textarea
               value={editContent}
@@ -136,11 +135,10 @@ const SingleComment = ({
               </Button>
             </div>
           </div>
-        ) : (
-          <p className="text-sm whitespace-pre-wrap text-zinc-700 dark:text-zinc-300">
+        : <p className="text-sm whitespace-pre-wrap text-zinc-700 dark:text-zinc-300">
             {comment.content}
           </p>
-        )}
+        }
 
         {/* Actions */}
         {!isEditing && (
@@ -225,8 +223,9 @@ export const CommentThread = ({
           ...(replyingTo && { replyToId: replyingTo.id }),
         };
 
-        const commentInput = ideaId
-          ? { ...baseInput, ideaId }
+        const commentInput =
+          ideaId ?
+            { ...baseInput, ideaId }
           : { ...baseInput, groupId: groupId! };
 
         await createComment(commentInput, currentUserId);
@@ -303,11 +302,11 @@ export const CommentThread = ({
             size="sm"
             disabled={isPending || !newComment.trim()}
             data-testid="post-comment-button">
-            {isPending
-              ? "Posting..."
-              : replyingTo
-                ? "Post Reply"
-                : "Post Comment"}
+            {isPending ?
+              "Posting..."
+            : replyingTo ?
+              "Post Reply"
+            : "Post Comment"}
           </Button>
         </form>
       )}
@@ -319,14 +318,13 @@ export const CommentThread = ({
       )}
 
       {/* Comments List */}
-      {comments.length === 0 ? (
+      {comments.length === 0 ?
         <div className="rounded-md border-2 border-dashed border-zinc-200 p-8 text-center dark:border-zinc-800">
           <p className="text-sm text-zinc-500">
             No comments yet. Be the first to comment!
           </p>
         </div>
-      ) : (
-        <div className="space-y-4">
+      : <div className="space-y-4">
           {comments.map((comment) => (
             <SingleComment
               key={comment.id}
@@ -340,7 +338,7 @@ export const CommentThread = ({
             />
           ))}
         </div>
-      )}
+      }
     </div>
   );
 };

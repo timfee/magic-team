@@ -111,13 +111,13 @@ export const IdeaCollection = ({
   const selectedCategory = categories.find((c) => c.id === selectedCategoryId);
   const userIdeasInCategory = ideas.filter(
     (idea) =>
-      idea.categoryId === selectedCategoryId &&
-      (!idea.isAnonymous ? idea.authorId === userId : false),
+      idea.categoryId === selectedCategoryId
+      && (!idea.isAnonymous ? idea.authorId === userId : false),
   );
 
   const canAddMore =
-    !selectedCategory?.maxEntriesPerPerson ||
-    userIdeasInCategory.length < selectedCategory.maxEntriesPerPerson;
+    !selectedCategory?.maxEntriesPerPerson
+    || userIdeasInCategory.length < selectedCategory.maxEntriesPerPerson;
 
   // Check if submissions are disabled (gracefully - can finish in-progress submissions)
   const submissionsDisabled = !submissionsEnabled && !isPending;
@@ -136,9 +136,9 @@ export const IdeaCollection = ({
             {timeRemaining && (
               <div
                 className={`rounded-full px-3 py-1 text-sm font-medium ${
-                  timerExpired
-                    ? "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-300"
-                    : "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300"
+                  timerExpired ?
+                    "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-300"
+                  : "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300"
                 }`}>
                 {timeRemaining}
               </div>
@@ -177,8 +177,8 @@ export const IdeaCollection = ({
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
-                    {category.maxEntriesPerPerson &&
-                      ` (max ${category.maxEntriesPerPerson})`}
+                    {category.maxEntriesPerPerson
+                      && ` (max ${category.maxEntriesPerPerson})`}
                   </option>
                 ))}
               </select>

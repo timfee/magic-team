@@ -44,9 +44,9 @@ export const ParticipantsList = ({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        isSticky &&
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        isSticky
+        && dropdownRef.current
+        && !dropdownRef.current.contains(event.target as Node)
       ) {
         setIsSticky(false);
         setIsVisible(false);
@@ -105,7 +105,7 @@ export const ParticipantsList = ({
               return (
                 <div key={user.id} className="flex items-center gap-3">
                   <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-zinc-100 text-sm font-medium dark:bg-zinc-800">
-                    {user.image ? (
+                    {user.image ?
                       <Image
                         src={user.image}
                         alt={user.name ?? "User"}
@@ -113,11 +113,10 @@ export const ParticipantsList = ({
                         height={32}
                         className="h-full w-full rounded-full object-cover"
                       />
-                    ) : (
-                      <span className="text-zinc-600 dark:text-zinc-400">
+                    : <span className="text-zinc-600 dark:text-zinc-400">
                         {(user.name ?? "U").charAt(0).toUpperCase()}
                       </span>
-                    )}
+                    }
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-50">

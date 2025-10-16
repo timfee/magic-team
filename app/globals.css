@@ -64,3 +64,75 @@ select:focus-visible {
   outline-color: #2563eb;
   outline-width: 2px;
 }
+
+/* Screen reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Skip to main content link */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #3b82f6;
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --background: #000000;
+    --foreground: #ffffff;
+  }
+
+  *:focus-visible {
+    outline-width: 3px;
+    outline-color: #ffff00;
+    outline-offset: 3px;
+  }
+
+  /* Increase border contrast */
+  button,
+  input,
+  textarea,
+  select {
+    border-width: 2px;
+    border-color: currentColor;
+  }
+
+  /* Ensure sufficient contrast for links */
+  a {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+
+  /* Make interactive elements more visible */
+  button:hover,
+  a:hover {
+    background-color: #ffff00;
+    color: #000000;
+  }
+}
+
+@media (prefers-contrast: high) and (prefers-color-scheme: light) {
+  :root {
+    --background: #ffffff;
+    --foreground: #000000;
+  }
+}

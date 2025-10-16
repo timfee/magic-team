@@ -88,9 +88,10 @@ export const GreenRoom = ({
         </div>
 
         <p className="mb-4 text-lg text-zinc-600 dark:text-zinc-400">
-          {userCount === 1
-            ? "You're the first one here!"
-            : `${userCount} ${userCount === 1 ? "participant" : "participants"} ready`}
+          {userCount === 1 ?
+            "You're the first one here!"
+          : `${userCount} ${userCount === 1 ? "participant" : "participants"} ready`
+          }
         </p>
 
         <p className="text-sm text-zinc-500 dark:text-zinc-500">

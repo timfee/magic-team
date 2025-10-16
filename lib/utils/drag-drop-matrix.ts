@@ -53,9 +53,9 @@ export function getDropAction(state: DragDropState): DropAction {
 
   // Both grouped, different groups → Move active to target's group
   if (
-    activeGrouped &&
-    targetGrouped &&
-    state.activeGroupId !== state.targetGroupId
+    activeGrouped
+    && targetGrouped
+    && state.activeGroupId !== state.targetGroupId
   ) {
     return "move-to-group";
   }
@@ -78,13 +78,14 @@ export function isValidDragDropState(
   state: Partial<DragDropState>,
 ): state is DragDropState {
   return (
-    typeof state.activeId === "string" &&
-    state.activeId.length > 0 &&
-    typeof state.targetId === "string" &&
-    state.targetId.length > 0 &&
-    (isNullish(state.activeGroupId) ||
-      typeof state.activeGroupId === "string") &&
-    (isNullish(state.targetGroupId) || typeof state.targetGroupId === "string")
+    typeof state.activeId === "string"
+    && state.activeId.length > 0
+    && typeof state.targetId === "string"
+    && state.targetId.length > 0
+    && (isNullish(state.activeGroupId)
+      || typeof state.activeGroupId === "string")
+    && (isNullish(state.targetGroupId)
+      || typeof state.targetGroupId === "string")
   );
 }
 

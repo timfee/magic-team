@@ -99,19 +99,28 @@ export const AnimatedFacepile = ({
               "animate-[float_3s_ease-in-out_infinite]",
             )}
             style={{ animationDelay: `${index * 0.1}s`, zIndex: 10 + index }}>
-            {user.image ? (
+            {user.image ?
               <Image
                 src={user.image}
                 alt={user.name ?? "User"}
-                width={size === "sm" ? 32 : size === "lg" ? 64 : 48}
-                height={size === "sm" ? 32 : size === "lg" ? 64 : 48}
+                width={
+                  size === "sm" ? 32
+                  : size === "lg" ?
+                    64
+                  : 48
+                }
+                height={
+                  size === "sm" ? 32
+                  : size === "lg" ?
+                    64
+                  : 48
+                }
                 className="h-full w-full rounded-full object-cover"
               />
-            ) : (
-              <span className="text-zinc-600 dark:text-zinc-400">
+            : <span className="text-zinc-600 dark:text-zinc-400">
                 {(user.name ?? "U").charAt(0).toUpperCase()}
               </span>
-            )}
+            }
             {/* Ripple effect for new users */}
             {isNew && (
               <div className="absolute inset-0 animate-[ping_1s_ease-out] rounded-full border-4 border-blue-400" />

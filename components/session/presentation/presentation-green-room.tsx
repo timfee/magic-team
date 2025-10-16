@@ -64,9 +64,9 @@ export function PresentationGreenRoom({
 
   // Generate join URL
   const joinUrl =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/session/${session.id}`
-      : "";
+    typeof window !== "undefined" ?
+      `${window.location.origin}/session/${session.id}`
+    : "";
   const shortCode = generateJoinCode(session.id);
 
   return (

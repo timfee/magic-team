@@ -59,8 +59,9 @@ export const IdeaVoting = ({
 
     startTransition(async () => {
       try {
-        const voteInput = target.ideaId
-          ? { sessionId, categoryId, ideaId: target.ideaId }
+        const voteInput =
+          target.ideaId ?
+            { sessionId, categoryId, ideaId: target.ideaId }
           : { sessionId, categoryId, groupId: target.groupId! };
 
         const result = await castVote(voteInput, userId);
@@ -104,9 +105,8 @@ export const IdeaVoting = ({
       target.ideaId ? v.ideaId === target.ideaId : v.groupId === target.groupId,
     )?.voteId;
 
-  const votesRemaining = settings.votesPerUser
-    ? settings.votesPerUser - myVotes.length
-    : Infinity;
+  const votesRemaining =
+    settings.votesPerUser ? settings.votesPerUser - myVotes.length : Infinity;
 
   // Calculate votes per category
   const getVotesInCategory = (categoryId: string) => {
@@ -217,8 +217,8 @@ export const IdeaVoting = ({
               </h3>
               <span className="text-sm text-zinc-500 dark:text-zinc-500">
                 ({categoryIdeas.length} ideas
-                {categoryGroups.length > 0 &&
-                  `, ${categoryGroups.length} groups`}
+                {categoryGroups.length > 0
+                  && `, ${categoryGroups.length} groups`}
                 )
               </span>
               {hasCategoryLimit && (
@@ -260,7 +260,7 @@ export const IdeaVoting = ({
 
                         {/* Vote Button Overlay */}
                         <div className="absolute right-3 bottom-3">
-                          {voted ? (
+                          {voted ?
                             <button
                               onClick={() => handleUnvote(voteId!)}
                               disabled={isPending}
@@ -277,15 +277,14 @@ export const IdeaVoting = ({
                               </svg>
                               Voted
                             </button>
-                          ) : (
-                            <button
+                          : <button
                               onClick={() =>
                                 handleVote(category.id, { groupId: group.id })
                               }
                               disabled={
-                                isPending ||
-                                votesRemaining <= 0 ||
-                                categoryVotesRemaining <= 0
+                                isPending
+                                || votesRemaining <= 0
+                                || categoryVotesRemaining <= 0
                               }
                               className="flex items-center gap-1 rounded-full bg-blue-600 px-3 py-1 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
                               <svg
@@ -302,7 +301,7 @@ export const IdeaVoting = ({
                               </svg>
                               Vote
                             </button>
-                          )}
+                          }
                         </div>
                       </div>
                     );
@@ -331,7 +330,7 @@ export const IdeaVoting = ({
 
                         {/* Vote Button Overlay */}
                         <div className="absolute right-3 bottom-3">
-                          {voted ? (
+                          {voted ?
                             <button
                               onClick={() => handleUnvote(voteId!)}
                               disabled={isPending}
@@ -348,15 +347,14 @@ export const IdeaVoting = ({
                               </svg>
                               Voted
                             </button>
-                          ) : (
-                            <button
+                          : <button
                               onClick={() =>
                                 handleVote(category.id, { ideaId: idea.id })
                               }
                               disabled={
-                                isPending ||
-                                votesRemaining <= 0 ||
-                                categoryVotesRemaining <= 0
+                                isPending
+                                || votesRemaining <= 0
+                                || categoryVotesRemaining <= 0
                               }
                               className="flex items-center gap-1 rounded-full bg-blue-600 px-3 py-1 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
                               <svg
@@ -373,7 +371,7 @@ export const IdeaVoting = ({
                               </svg>
                               Vote
                             </button>
-                          )}
+                          }
                         </div>
                       </div>
                     );

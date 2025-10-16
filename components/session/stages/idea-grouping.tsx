@@ -213,9 +213,9 @@ const DroppableGroup = ({
     if (targetGrouped && !activeGrouped) return "join-group";
     if (activeGrouped && !targetGrouped) return "join-group";
     if (
-      activeGrouped &&
-      targetGrouped &&
-      activeIdea.groupId !== targetIdea.groupId
+      activeGrouped
+      && targetGrouped
+      && activeIdea.groupId !== targetIdea.groupId
     )
       return "move-to-group";
 
@@ -227,9 +227,9 @@ const DroppableGroup = ({
       ref={setNodeRef}
       data-testid="idea-group"
       className={`rounded-lg border-2 p-4 transition-all ${
-        isOver
-          ? "border-blue-500 bg-blue-50 ring-4 ring-blue-200 dark:bg-blue-950/30 dark:ring-blue-900"
-          : "border-dashed border-zinc-300 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900/50"
+        isOver ?
+          "border-blue-500 bg-blue-50 ring-4 ring-blue-200 dark:bg-blue-950/30 dark:ring-blue-900"
+        : "border-dashed border-zinc-300 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900/50"
       }`}>
       <div className="mb-3 flex items-center justify-between">
         <h3 className="font-semibold text-zinc-900 dark:text-zinc-50">
@@ -269,12 +269,11 @@ const DroppableGroup = ({
       </div>
 
       <div className="space-y-2">
-        {ideas.length === 0 && !showGhostPlaceholder ? (
+        {ideas.length === 0 && !showGhostPlaceholder ?
           <div className="flex h-24 items-center justify-center rounded-md border border-dashed border-zinc-300 dark:border-zinc-700">
             <p className="text-sm text-zinc-500">Drop ideas here</p>
           </div>
-        ) : (
-          <>
+        : <>
             {ideas
               .slice()
               .sort((a, b) => a.order - b.order)
@@ -293,7 +292,7 @@ const DroppableGroup = ({
               ))}
             {showGhostPlaceholder && <GhostPlaceholder text="Will add here" />}
           </>
-        )}
+        }
       </div>
 
       {/* Comments Dialog */}
@@ -361,9 +360,9 @@ const UngroupedDropZone = ({
     if (targetGrouped && !activeGrouped) return "join-group";
     if (activeGrouped && !targetGrouped) return "join-group";
     if (
-      activeGrouped &&
-      targetGrouped &&
-      activeIdea.groupId !== targetIdea.groupId
+      activeGrouped
+      && targetGrouped
+      && activeIdea.groupId !== targetIdea.groupId
     )
       return "move-to-group";
 
@@ -375,16 +374,15 @@ const UngroupedDropZone = ({
       ref={setNodeRef}
       data-testid="ungrouped-zone"
       className={`space-y-2 ${isDragging ? "min-h-32" : ""} ${
-        isOver && isActiveIdeaGrouped
-          ? "rounded-lg border-2 border-blue-500 bg-blue-50 p-2 ring-4 ring-blue-200 dark:bg-blue-950/30 dark:ring-blue-900"
-          : ""
+        isOver && isActiveIdeaGrouped ?
+          "rounded-lg border-2 border-blue-500 bg-blue-50 p-2 ring-4 ring-blue-200 dark:bg-blue-950/30 dark:ring-blue-900"
+        : ""
       }`}>
-      {ideas.length === 0 && !isDragging ? (
+      {ideas.length === 0 && !isDragging ?
         <div className="flex h-24 items-center justify-center rounded-md border border-dashed border-zinc-200 dark:border-zinc-800">
           <p className="text-sm text-zinc-500">No ungrouped ideas</p>
         </div>
-      ) : (
-        <>
+      : <>
           {ideas
             .slice()
             .sort((a, b) => a.order - b.order)
@@ -404,9 +402,9 @@ const UngroupedDropZone = ({
           {isDragging && ideas.length === 0 && (
             <div className="flex h-24 items-center justify-center rounded-md border-2 border-dashed border-zinc-300 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900">
               <p className="text-sm text-zinc-500">
-                {isActiveIdeaGrouped
-                  ? "Drop here to ungroup"
-                  : "Drop ideas here"}
+                {isActiveIdeaGrouped ?
+                  "Drop here to ungroup"
+                : "Drop ideas here"}
               </p>
             </div>
           )}
@@ -414,7 +412,7 @@ const UngroupedDropZone = ({
             <GhostPlaceholder text="Will ungroup here" />
           )}
         </>
-      )}
+      }
     </div>
   );
 };
@@ -865,8 +863,8 @@ export const IdeaGrouping = ({
           <IdeaCard
             idea={activeIdea}
             categoryColor={
-              categories.find((c) => c.id === activeIdea.categoryId)?.color ??
-              "#000"
+              categories.find((c) => c.id === activeIdea.categoryId)?.color
+              ?? "#000"
             }
             draggable
             isOverlay

@@ -4,6 +4,7 @@ import { useSession } from "@/lib/contexts/firebase-session-context";
 import type { SessionStage } from "@/lib/types/session";
 import { cn } from "@/lib/utils/cn";
 import { useState, useTransition } from "react";
+import { announce } from "@/lib/utils/a11y";
 
 const STAGES: { value: SessionStage; label: string; description: string }[] = [
   {
@@ -67,9 +68,17 @@ export const StageControls = ({
         // Use Firebase context method which handles both DB update and real-time sync
         await changeStage(newStage);
         console.log("✅ Stage changed successfully via Firebase");
+
+        // Announce stage change to screen readers
+        const stageLabel =
+          STAGES.find((s) => s.value === newStage)?.label ?? newStage;
+        announce(`Stage changed to ${stageLabel}`, "polite");
       } catch (err) {
         console.error("🔴 Stage change error:", err);
-        setError(err instanceof Error ? err.message : "Failed to change stage");
+        const errorMsg =
+          err instanceof Error ? err.message : "Failed to change stage";
+        setError(errorMsg);
+        announce(`Error: ${errorMsg}`, "assertive");
       }
     });
   };
@@ -77,7 +86,10 @@ export const StageControls = ({
   const currentIndex = STAGES.findIndex((s) => s.value === currentStage);
 
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+    <div
+      className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900"
+      role="region"
+      aria-label="Stage management controls">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
           Stage Management
@@ -105,16 +117,18 @@ export const StageControls = ({
               key={stage.value}
               onClick={() => handleStageChange(stage.value)}
               disabled={isPending}
+              aria-label={`Change to ${stage.label} stage: ${stage.description}`}
+              aria-current={isCurrent ? "true" : undefined}
               className={cn(
                 "w-full rounded-lg border p-4 text-left transition-all",
-                isCurrent &&
-                  "border-blue-500 bg-blue-50 dark:border-blue-500 dark:bg-blue-950",
-                !isCurrent &&
-                  isPast &&
-                  "border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800/50",
-                !isCurrent &&
-                  !isPast &&
-                  "border-zinc-200 bg-white hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700",
+                isCurrent
+                  && "border-blue-500 bg-blue-50 dark:border-blue-500 dark:bg-blue-950",
+                !isCurrent
+                  && isPast
+                  && "border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800/50",
+                !isCurrent
+                  && !isPast
+                  && "border-zinc-200 bg-white hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700",
                 isPending && "cursor-not-allowed opacity-50",
               )}>
               <div className="flex items-center justify-between">
@@ -123,12 +137,12 @@ export const StageControls = ({
                     className={cn(
                       "flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium",
                       isCurrent && "bg-blue-500 text-white",
-                      !isCurrent &&
-                        isPast &&
-                        "bg-zinc-300 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-300",
-                      !isCurrent &&
-                        !isPast &&
-                        "bg-zinc-200 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400",
+                      !isCurrent
+                        && isPast
+                        && "bg-zinc-300 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-300",
+                      !isCurrent
+                        && !isPast
+                        && "bg-zinc-200 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400",
                     )}>
                     {index + 1}
                   </div>
@@ -167,6 +181,7 @@ export const StageControls = ({
           <button
             onClick={() => handleStageChange(STAGES[currentIndex - 1].value)}
             disabled={isPending}
+            aria-label={`Go to previous stage: ${STAGES[currentIndex - 1].label}`}
             className="flex-1 rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
             ← Previous Stage
           </button>
@@ -175,6 +190,7 @@ export const StageControls = ({
           <button
             onClick={() => handleStageChange(STAGES[currentIndex + 1].value)}
             disabled={isPending}
+            aria-label={`Go to next stage: ${STAGES[currentIndex + 1].label}`}
             className="flex-1 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50">
             Next Stage →
           </button>

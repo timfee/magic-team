@@ -46,9 +46,8 @@ export function PresentationVoting({
   // Calculate vote progress
   const maxPossibleVotes = calculateMaxPossibleVotes(session, userCount);
 
-  const voteProgress = maxPossibleVotes
-    ? (totalVotesCast / maxPossibleVotes) * 100
-    : 0;
+  const voteProgress =
+    maxPossibleVotes ? (totalVotesCast / maxPossibleVotes) * 100 : 0;
 
   // Check if voting is complete (simplified - could be more sophisticated)
   const votingComplete = Boolean(
@@ -65,7 +64,7 @@ export function PresentationVoting({
 
       {/* Vote Progress */}
       <div className="mb-12">
-        {maxPossibleVotes ? (
+        {maxPossibleVotes ?
           <>
             <div className="mb-4 flex items-center justify-between text-2xl">
               <span className="text-zinc-400">Voting Progress</span>
@@ -80,8 +79,7 @@ export function PresentationVoting({
               />
             </div>
           </>
-        ) : (
-          <>
+        : <>
             <div className="mb-4 text-2xl text-zinc-400">Votes Cast</div>
             <div className="text-center">
               <div className="text-8xl font-bold">{totalVotesCast}</div>
@@ -90,7 +88,7 @@ export function PresentationVoting({
               </div>
             </div>
           </>
-        )}
+        }
       </div>
 
       {/* Participation Stats */}
@@ -117,7 +115,7 @@ export function PresentationVoting({
 
       {/* Voting Status Message */}
       <div className="flex flex-1 items-center justify-center">
-        {votingComplete ? (
+        {votingComplete ?
           <div className="text-center">
             <div className="mb-6 text-9xl">✅</div>
             <h2 className="text-6xl font-bold">Voting Complete!</h2>
@@ -125,8 +123,7 @@ export function PresentationVoting({
               Waiting for facilitator to reveal results...
             </p>
           </div>
-        ) : (
-          <div className="text-center">
+        : <div className="text-center">
             <div className="mb-6 text-9xl">🗳️</div>
             <h2 className="text-6xl font-bold">Voting in Progress</h2>
             <p className="mt-4 text-3xl text-zinc-400">
@@ -138,7 +135,7 @@ export function PresentationVoting({
               </div>
             )}
           </div>
-        )}
+        }
       </div>
 
       {/* Note about hidden results */}

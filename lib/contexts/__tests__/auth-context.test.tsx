@@ -16,17 +16,17 @@ vi.mock("firebase/auth", () => ({
     callback: (user: User | null) => void,
   ): (() => void) => {
     const result: unknown = mockOnAuthStateChanged(auth, callback);
-    return typeof result === "function"
-      ? (result as () => void)
+    return typeof result === "function" ?
+        (result as () => void)
       : () => {
           // Mock unsubscribe function
         };
   },
   signInWithPopup: (auth: unknown, provider: unknown): Promise<unknown> => {
     const result: unknown = mockSignInWithPopup(auth, provider);
-    return result instanceof Promise
-      ? result
-      : Promise.resolve(undefined as unknown);
+    return result instanceof Promise ? result : (
+        Promise.resolve(undefined as unknown)
+      );
   },
   signOut: (auth: unknown): Promise<void> => {
     const result: unknown = mockSignOut(auth);

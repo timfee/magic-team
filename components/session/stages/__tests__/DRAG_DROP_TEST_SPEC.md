@@ -241,8 +241,8 @@ test("should create new group when dropping ungrouped on ungrouped", async ({
   // Wait for group creation
   await page.waitForFunction(
     (count) =>
-      document.querySelectorAll('[data-testid="idea-group"]').length ===
-      count + 1,
+      document.querySelectorAll('[data-testid="idea-group"]').length
+      === count + 1,
     initialGroups,
   );
 

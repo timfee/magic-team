@@ -106,13 +106,13 @@ export const getSession = async (
       id: sessionDoc.id,
       ...data,
       createdAt:
-        data.createdAt instanceof Timestamp
-          ? data.createdAt.toDate()
-          : new Date(),
+        data.createdAt instanceof Timestamp ?
+          data.createdAt.toDate()
+        : new Date(),
       updatedAt:
-        data.updatedAt instanceof Timestamp
-          ? data.updatedAt.toDate()
-          : new Date(),
+        data.updatedAt instanceof Timestamp ?
+          data.updatedAt.toDate()
+        : new Date(),
     } as MagicSession;
   } catch (error) {
     console.error("Error getting session:", error);
@@ -127,6 +127,7 @@ export const getUserSessions = async (
     const sessionsQuery = query(
       collection(db, "sessions"),
       where("ownerId", "==", userId),
+      where("isArchived", "!=", true),
     );
     const snapshot = await getDocs(sessionsQuery);
 
@@ -136,13 +137,13 @@ export const getUserSessions = async (
         id: doc.id,
         ...data,
         createdAt:
-          data.createdAt instanceof Timestamp
-            ? data.createdAt.toDate()
-            : new Date(),
+          data.createdAt instanceof Timestamp ?
+            data.createdAt.toDate()
+          : new Date(),
         updatedAt:
-          data.updatedAt instanceof Timestamp
-            ? data.updatedAt.toDate()
-            : new Date(),
+          data.updatedAt instanceof Timestamp ?
+            data.updatedAt.toDate()
+          : new Date(),
       } as MagicSession;
     });
   } catch (error) {
@@ -220,6 +221,72 @@ export const updateSessionStage = async (
     return { success: true };
   } catch (error) {
     console.error("Error updating session stage:", error);
+    throw error;
+  }
+};
+
+export const archiveSession = async (sessionId: string) => {
+  try {
+    const sessionRef = doc(db, "sessions", sessionId);
+    await updateDoc(sessionRef, {
+      isArchived: true,
+      archivedAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error archiving session:", error);
+    throw error;
+  }
+};
+
+export const unarchiveSession = async (sessionId: string) => {
+  try {
+    const sessionRef = doc(db, "sessions", sessionId);
+    await updateDoc(sessionRef, {
+      isArchived: false,
+      archivedAt: null,
+      updatedAt: serverTimestamp(),
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error unarchiving session:", error);
+    throw error;
+  }
+};
+
+export const getArchivedSessions = async (
+  userId: string,
+): Promise<MagicSession[]> => {
+  try {
+    const sessionsQuery = query(
+      collection(db, "sessions"),
+      where("ownerId", "==", userId),
+      where("isArchived", "==", true),
+    );
+    const snapshot = await getDocs(sessionsQuery);
+
+    return snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt:
+          data.createdAt instanceof Timestamp ?
+            data.createdAt.toDate()
+          : new Date(),
+        updatedAt:
+          data.updatedAt instanceof Timestamp ?
+            data.updatedAt.toDate()
+          : new Date(),
+        archivedAt:
+          data.archivedAt instanceof Timestamp ?
+            data.archivedAt.toDate()
+          : undefined,
+      } as MagicSession;
+    });
+  } catch (error) {
+    console.error("Error getting archived sessions:", error);
     throw error;
   }
 };

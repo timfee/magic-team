@@ -18,17 +18,18 @@ export function useKeyboardShortcuts(shortcuts: KeyboardShortcut[]) {
       // Don't trigger shortcuts when typing in inputs
       const target = event.target as HTMLElement;
       if (
-        target.tagName === "INPUT" ||
-        target.tagName === "TEXTAREA" ||
-        target.isContentEditable
+        target.tagName === "INPUT"
+        || target.tagName === "TEXTAREA"
+        || target.isContentEditable
       ) {
         return;
       }
 
       shortcuts.forEach((shortcut) => {
         const keyMatch = event.key.toLowerCase() === shortcut.key.toLowerCase();
-        const ctrlMatch = shortcut.ctrl
-          ? event.ctrlKey || event.metaKey
+        const ctrlMatch =
+          shortcut.ctrl ?
+            event.ctrlKey || event.metaKey
           : !event.ctrlKey && !event.metaKey;
         const shiftMatch = shortcut.shift ? event.shiftKey : !event.shiftKey;
         const altMatch = shortcut.alt ? event.altKey : !event.altKey;

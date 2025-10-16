@@ -96,13 +96,13 @@ export const getSessionComments = async (
         id: doc.id,
         ...data,
         createdAt:
-          data.createdAt instanceof Timestamp
-            ? data.createdAt.toDate()
-            : new Date(),
+          data.createdAt instanceof Timestamp ?
+            data.createdAt.toDate()
+          : new Date(),
         updatedAt:
-          data.updatedAt instanceof Timestamp
-            ? data.updatedAt.toDate()
-            : new Date(),
+          data.updatedAt instanceof Timestamp ?
+            data.updatedAt.toDate()
+          : new Date(),
       } as Comment;
     });
   } catch (error) {
@@ -183,13 +183,13 @@ export const getCommentsWithDetails = async (
         groupId: data.groupId as string | undefined,
         replyToId: data.replyToId as string | undefined,
         createdAt:
-          data.createdAt instanceof Timestamp
-            ? data.createdAt.toDate()
-            : new Date(),
+          data.createdAt instanceof Timestamp ?
+            data.createdAt.toDate()
+          : new Date(),
         updatedAt:
-          data.updatedAt instanceof Timestamp
-            ? data.updatedAt.toDate()
-            : new Date(),
+          data.updatedAt instanceof Timestamp ?
+            data.updatedAt.toDate()
+          : new Date(),
       } as Comment;
     });
 

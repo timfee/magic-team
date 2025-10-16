@@ -27,6 +27,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import { useThrottle } from "@/lib/hooks/use-throttle";
 
 interface ActiveUser {
   id: string;
@@ -99,6 +100,10 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
   const [userCount, setUserCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Throttle state updates for ideas and groups to reduce re-renders (200ms)
+  const throttledIdeas = useThrottle(ideas, 200);
+  const throttledGroups = useThrottle(groups, 200);
+
   // Load session data from Firebase
   useEffect(() => {
     const sessionRef = doc(db, "sessions", sessionId);
@@ -114,15 +119,14 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
           visibility: (data.visibility as SessionVisibility) ?? "public",
           currentStage: (data.currentStage as SessionStage) ?? "pre_session",
           createdAt:
-            data.createdAt instanceof Timestamp
-              ? data.createdAt.toDate()
-              : new Date(data.createdAt as string | number | Date),
+            data.createdAt instanceof Timestamp ?
+              data.createdAt.toDate()
+            : new Date(data.createdAt as string | number | Date),
           updatedAt:
-            data.updatedAt instanceof Timestamp
-              ? data.updatedAt.toDate()
-              : data.updatedAt
-                ? new Date(data.updatedAt as string | number | Date)
-                : new Date(),
+            data.updatedAt instanceof Timestamp ? data.updatedAt.toDate()
+            : data.updatedAt ?
+              new Date(data.updatedAt as string | number | Date)
+            : new Date(),
           categories: [], // Will be loaded separately
           settings: null, // Will be loaded separately
           owner: {
@@ -209,9 +213,9 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
           name: data.userName as string | null,
           image: data.userPhoto as string | null,
           lastSeenAt:
-            data.lastSeenAt instanceof Timestamp
-              ? data.lastSeenAt.toDate()
-              : new Date(),
+            data.lastSeenAt instanceof Timestamp ?
+              data.lastSeenAt.toDate()
+            : new Date(),
         };
       });
       setActiveUsers(users);
@@ -257,17 +261,15 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
           priority: data.priority as number | undefined,
           assignedToId: data.assignedToId as string | undefined,
           createdAt:
-            data.createdAt instanceof Timestamp
-              ? data.createdAt.toDate()
-              : data.createdAt
-                ? new Date(data.createdAt as string | number | Date)
-                : new Date(),
+            data.createdAt instanceof Timestamp ? data.createdAt.toDate()
+            : data.createdAt ?
+              new Date(data.createdAt as string | number | Date)
+            : new Date(),
           updatedAt:
-            data.updatedAt instanceof Timestamp
-              ? data.updatedAt.toDate()
-              : data.updatedAt
-                ? new Date(data.updatedAt as string | number | Date)
-                : new Date(),
+            data.updatedAt instanceof Timestamp ? data.updatedAt.toDate()
+            : data.updatedAt ?
+              new Date(data.updatedAt as string | number | Date)
+            : new Date(),
           // Simplified - real-time listeners don't need full relational data
           author: null,
           group: null,
@@ -297,17 +299,15 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
           order: (data.order as number) ?? 0,
           maxCards: data.maxCards as number | undefined,
           createdAt:
-            data.createdAt instanceof Timestamp
-              ? data.createdAt.toDate()
-              : data.createdAt
-                ? new Date(data.createdAt as string | number | Date)
-                : new Date(),
+            data.createdAt instanceof Timestamp ? data.createdAt.toDate()
+            : data.createdAt ?
+              new Date(data.createdAt as string | number | Date)
+            : new Date(),
           updatedAt:
-            data.updatedAt instanceof Timestamp
-              ? data.updatedAt.toDate()
-              : data.updatedAt
-                ? new Date(data.updatedAt as string | number | Date)
-                : new Date(),
+            data.updatedAt instanceof Timestamp ? data.updatedAt.toDate()
+            : data.updatedAt ?
+              new Date(data.updatedAt as string | number | Date)
+            : new Date(),
           // Simplified - real-time listeners don't need full relational data
           ideas: [],
           comments: [],
@@ -417,8 +417,8 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
 
   const value: SessionContextValue = {
     session:
-      session ??
-      ({
+      session
+      ?? ({
         id: sessionId,
         name: "Loading...",
         description: undefined,
@@ -433,8 +433,8 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
         admins: [],
         _count: { ideas: 0, presence: 0 },
       } as unknown as MagicSessionWithDetails),
-    ideas,
-    groups,
+    ideas: throttledIdeas,
+    groups: throttledGroups,
     currentStage,
     activeUsers,
     userCount,

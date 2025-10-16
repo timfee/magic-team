@@ -97,13 +97,13 @@ export const getSessionIdeas = async (sessionId: string): Promise<Idea[]> => {
         id: doc.id,
         ...data,
         createdAt:
-          data.createdAt instanceof Timestamp
-            ? data.createdAt.toDate()
-            : new Date(),
+          data.createdAt instanceof Timestamp ?
+            data.createdAt.toDate()
+          : new Date(),
         updatedAt:
-          data.updatedAt instanceof Timestamp
-            ? data.updatedAt.toDate()
-            : new Date(),
+          data.updatedAt instanceof Timestamp ?
+            data.updatedAt.toDate()
+          : new Date(),
       } as Idea;
     });
   } catch (error) {
@@ -124,13 +124,13 @@ export const getSessionGroups = async (
         id: doc.id,
         ...data,
         createdAt:
-          data.createdAt instanceof Timestamp
-            ? data.createdAt.toDate()
-            : new Date(),
+          data.createdAt instanceof Timestamp ?
+            data.createdAt.toDate()
+          : new Date(),
         updatedAt:
-          data.updatedAt instanceof Timestamp
-            ? data.updatedAt.toDate()
-            : new Date(),
+          data.updatedAt instanceof Timestamp ?
+            data.updatedAt.toDate()
+          : new Date(),
       } as IdeaGroup;
     });
   } catch (error) {

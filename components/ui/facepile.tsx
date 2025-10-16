@@ -101,19 +101,28 @@ export const Facepile = ({
             transform: `translateX(${index * -4}px)`,
             zIndex: 10 + index,
           }}>
-          {user.image ? (
+          {user.image ?
             <Image
               src={user.image}
               alt={user.name ?? "User"}
-              width={size === "sm" ? 24 : size === "lg" ? 40 : 32}
-              height={size === "sm" ? 24 : size === "lg" ? 40 : 32}
+              width={
+                size === "sm" ? 24
+                : size === "lg" ?
+                  40
+                : 32
+              }
+              height={
+                size === "sm" ? 24
+                : size === "lg" ?
+                  40
+                : 32
+              }
               className="h-full w-full rounded-full object-cover"
             />
-          ) : (
-            <span className="text-zinc-600 dark:text-zinc-400">
+          : <span className="text-zinc-600 dark:text-zinc-400">
               {(user.name ?? "U").charAt(0).toUpperCase()}
             </span>
-          )}
+          }
         </div>
       ))}
 

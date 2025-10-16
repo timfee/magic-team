@@ -155,12 +155,11 @@ export const IdeaCardWithComments = ({
               </div>
 
               {/* Comments */}
-              {isLoading ? (
+              {isLoading ?
                 <div className="flex items-center justify-center py-8">
                   <div className="h-8 w-8 animate-spin rounded-full border-4 border-zinc-200 border-t-blue-600 dark:border-zinc-800 dark:border-t-blue-400" />
                 </div>
-              ) : (
-                <CommentThread
+              : <CommentThread
                   sessionId={sessionId}
                   ideaId={idea.id}
                   comments={comments}
@@ -170,7 +169,7 @@ export const IdeaCardWithComments = ({
                     // Refresh will happen via real-time listener
                   }}
                 />
-              )}
+              }
             </div>
           </DialogContent>
         </Dialog>

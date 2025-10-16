@@ -26,8 +26,9 @@ export const IdeaCard = ({
   // Always call hooks unconditionally (React rules)
   const sortable = useSortable({ id: idea.id, data: { type: "idea", idea } });
 
-  const style = draggable
-    ? {
+  const style =
+    draggable ?
+      {
         transform: CSS.Transform.toString(sortable.transform),
         transition: sortable.transition,
         opacity: sortable.isDragging && !isOverlay ? 0.3 : 1,
@@ -56,9 +57,9 @@ export const IdeaCard = ({
       data-testid="idea-card"
       data-drop-indicator={dropIndicator ?? undefined}
       className={`group relative rounded-lg border bg-white p-4 transition-all hover:shadow-md ${
-        isDraggedOver || dropIndicator
-          ? "border-2 border-blue-500 ring-4 ring-blue-200 dark:ring-blue-900"
-          : "border-zinc-200 dark:border-zinc-800"
+        isDraggedOver || dropIndicator ?
+          "border-2 border-blue-500 ring-4 ring-blue-200 dark:ring-blue-900"
+        : "border-zinc-200 dark:border-zinc-800"
       } ${isOverlay ? "shadow-2xl" : ""} dark:bg-zinc-900`}
       style={{ borderLeftWidth: "3px", borderLeftColor: categoryColor }}>
       <p

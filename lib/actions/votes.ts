@@ -47,9 +47,9 @@ export const getSessionVotes = async (sessionId: string): Promise<Vote[]> => {
         id: doc.id,
         ...data,
         createdAt:
-          data.createdAt instanceof Timestamp
-            ? data.createdAt.toDate()
-            : new Date(),
+          data.createdAt instanceof Timestamp ?
+            data.createdAt.toDate()
+          : new Date(),
       } as Vote;
     });
   } catch (error) {
@@ -75,9 +75,9 @@ export const getUserVotes = async (
         id: doc.id,
         ...data,
         createdAt:
-          data.createdAt instanceof Timestamp
-            ? data.createdAt.toDate()
-            : new Date(),
+          data.createdAt instanceof Timestamp ?
+            data.createdAt.toDate()
+          : new Date(),
       } as Vote;
     });
   } catch (error) {

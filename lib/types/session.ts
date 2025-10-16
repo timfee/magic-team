@@ -24,6 +24,8 @@ export type MagicSession = {
   visibility: SessionVisibility;
   currentStage: SessionStage;
   ownerId: string;
+  isArchived?: boolean;
+  archivedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
   // Note: categories and settings are in subcollections, not in this document

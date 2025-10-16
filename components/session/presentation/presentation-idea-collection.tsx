@@ -83,9 +83,9 @@ export function PresentationIdeaCollection({
         {timeRemaining && (
           <div
             className={`rounded-2xl px-8 py-4 text-center ${
-              isExpired
-                ? "bg-red-500/20 text-red-400"
-                : "bg-blue-500/20 text-blue-400"
+              isExpired ?
+                "bg-red-500/20 text-red-400"
+              : "bg-blue-500/20 text-blue-400"
             }`}>
             <div className="text-lg font-semibold">
               {isExpired ? "Time's up!" : "Time remaining"}

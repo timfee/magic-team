@@ -1,24 +1,34 @@
 "use client";
 
 import { useSession } from "@/lib/contexts/firebase-session-context";
-import type { Category } from "@/lib/types/session";
+import type { Category, MagicSession } from "@/lib/types/session";
 import { EmptyState } from "@/components/ui/empty-state";
 import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { archiveSession, unarchiveSession } from "@/lib/actions/session";
+import { useState } from "react";
+import { useToast } from "@/lib/contexts/toast-context";
 
 interface PostSessionProps {
   sessionId: string;
   sessionName: string;
   categories: Category[];
   createdAt: Date;
+  session: MagicSession;
+  canArchive: boolean;
 }
 
 export const PostSession = ({
-  sessionId: _sessionId,
+  sessionId,
   sessionName,
   categories,
   createdAt,
+  session,
+  canArchive,
 }: PostSessionProps) => {
   const { ideas, groups, activeUsers, userCount } = useSession();
+  const [isArchiving, setIsArchiving] = useState(false);
+  const { addToast } = useToast();
 
   // Calculate statistics
   const totalIdeas = ideas.length;
@@ -41,6 +51,28 @@ export const PostSession = ({
   const topIdeas = [...ideas]
     .sort((a, b) => (b._count?.votes ?? 0) - (a._count?.votes ?? 0))
     .slice(0, 5);
+
+  const handleArchiveToggle = async () => {
+    setIsArchiving(true);
+    try {
+      if (session.isArchived) {
+        await unarchiveSession(sessionId);
+        addToast("Session unarchived successfully", "success");
+      } else {
+        await archiveSession(sessionId);
+        addToast("Session archived successfully", "success");
+      }
+      window.location.reload();
+    } catch (error) {
+      console.error("Error toggling archive:", error);
+      addToast(
+        `Failed to ${session.isArchived ? "unarchive" : "archive"} session`,
+        "error",
+      );
+    } finally {
+      setIsArchiving(false);
+    }
+  };
 
   if (totalIdeas === 0) {
     return (
@@ -65,16 +97,79 @@ export const PostSession = ({
         <p className="mt-2 text-zinc-600 dark:text-zinc-400">
           Session completed on {createdAt.toLocaleDateString()}
         </p>
-        <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-green-100 px-4 py-2 text-sm font-medium text-green-800 dark:bg-green-900/30 dark:text-green-300">
-          <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              fillRule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-              clipRule="evenodd"
-            />
-          </svg>
-          Session Complete
+        <div className="mt-4 flex items-center justify-center gap-3">
+          <div className="inline-flex items-center gap-2 rounded-full bg-green-100 px-4 py-2 text-sm font-medium text-green-800 dark:bg-green-900/30 dark:text-green-300">
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Session Complete
+          </div>
+          {session.isArchived && (
+            <div className="inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-2 text-sm font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+                />
+              </svg>
+              Archived
+            </div>
+          )}
         </div>
+        {canArchive && (
+          <div className="mt-4">
+            <Button
+              onClick={handleArchiveToggle}
+              disabled={isArchiving}
+              variant="outline"
+              size="sm">
+              {isArchiving ?
+                <span>Processing...</span>
+              : session.isArchived ?
+                <>
+                  <svg
+                    className="mr-2 h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                    />
+                  </svg>
+                  Unarchive Session
+                </>
+              : <>
+                  <svg
+                    className="mr-2 h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+                    />
+                  </svg>
+                  Archive Session
+                </>
+              }
+            </Button>
+          </div>
+        )}
       </motion.div>
 
       {/* Statistics Grid */}
@@ -198,12 +293,11 @@ export const PostSession = ({
               </span>
             </div>
 
-            {category.ideas.length === 0 ? (
+            {category.ideas.length === 0 ?
               <p className="text-sm text-zinc-500 dark:text-zinc-500">
                 No ideas in this category
               </p>
-            ) : (
-              <div className="grid gap-3 sm:grid-cols-2">
+            : <div className="grid gap-3 sm:grid-cols-2">
                 {category.ideas.map((idea) => (
                   <div
                     key={idea.id}
@@ -250,7 +344,7 @@ export const PostSession = ({
                   </div>
                 ))}
               </div>
-            )}
+            }
           </motion.div>
         ))}
       </motion.div>

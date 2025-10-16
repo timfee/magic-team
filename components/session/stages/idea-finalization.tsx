@@ -259,9 +259,9 @@ export const IdeaFinalization = ({
       <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex items-center justify-between text-sm">
           <span className="text-zinc-600 dark:text-zinc-400">
-            {selectedItems.size > 0
-              ? `${selectedItems.size} selected`
-              : `${actionItems.length} total items`}
+            {selectedItems.size > 0 ?
+              `${selectedItems.size} selected`
+            : `${actionItems.length} total items`}
           </span>
           {selectedItems.size > 0 && (
             <button
@@ -309,9 +309,9 @@ function SortableActionItem({
       ref={setNodeRef}
       style={style}
       className={`rounded-lg border bg-white p-4 transition-all dark:bg-zinc-900 ${
-        isSelected
-          ? "ring-opacity-50 border-blue-500 ring-2 ring-blue-500"
-          : "border-zinc-200 dark:border-zinc-800"
+        isSelected ?
+          "ring-opacity-50 border-blue-500 ring-2 ring-blue-500"
+        : "border-zinc-200 dark:border-zinc-800"
       }`}>
       <div className="flex items-start gap-4">
         {/* Drag Handle */}

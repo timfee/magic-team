@@ -23,9 +23,9 @@ export const GroupCard = ({
       style={{ borderLeftWidth: "3px", borderLeftColor: categoryColor }}>
       <div className="space-y-2">
         <h4 className="font-semibold text-zinc-900 dark:text-zinc-50">
-          {group.title && group.title.trim() !== ""
-            ? group.title
-            : "Untitled Group"}
+          {group.title && group.title.trim() !== "" ?
+            group.title
+          : "Untitled Group"}
         </h4>
 
         <div className="text-sm text-zinc-600 dark:text-zinc-400">

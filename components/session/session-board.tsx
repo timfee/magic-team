@@ -199,6 +199,8 @@ export default function SessionBoard({ sessionId }: SessionBoardProps) {
             sessionName={session.name}
             categories={session.categories}
             createdAt={session.createdAt}
+            session={session}
+            canArchive={isAdmin}
           />
         )}
       </main>

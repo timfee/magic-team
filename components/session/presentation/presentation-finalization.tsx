@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { collection, query, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import { motion, AnimatePresence } from "framer-motion";
+import { PresentationControls } from "./presentation-controls";
 
 // Auto-advance duration in seconds (configurable)
 const AUTO_ADVANCE_DURATION_SECONDS = 8;
@@ -37,6 +38,7 @@ export function PresentationFinalization({
   const [itemsWithVotes, setItemsWithVotes] = useState<ItemWithVotes[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showDetails, setShowDetails] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
   // Fetch vote counts and build sorted list
   useEffect(() => {
@@ -98,9 +100,9 @@ export function PresentationFinalization({
     void fetchVotesAndSort();
   }, [session.id, ideas, groups, session.categories]);
 
-  // Auto-advance through items
+  // Auto-advance through items (only when not paused)
   useEffect(() => {
-    if (itemsWithVotes.length === 0) return;
+    if (itemsWithVotes.length === 0 || isPaused) return;
 
     const interval = setInterval(() => {
       setShowDetails(false);
@@ -113,13 +115,37 @@ export function PresentationFinalization({
     }, AUTO_ADVANCE_DURATION_SECONDS * 1000);
 
     return () => clearInterval(interval);
-  }, [itemsWithVotes.length]);
+  }, [itemsWithVotes.length, isPaused]);
 
   useEffect(() => {
     // Show details after a brief delay when index changes
     const timeout = setTimeout(() => setShowDetails(true), 500);
     return () => clearTimeout(timeout);
   }, [currentIndex]);
+
+  const handlePrevious = () => {
+    setShowDetails(false);
+    setTimeout(() => {
+      setCurrentIndex((prev) =>
+        prev === 0 ? itemsWithVotes.length - 1 : prev - 1,
+      );
+      setShowDetails(true);
+    }, 200);
+  };
+
+  const handleNext = () => {
+    setShowDetails(false);
+    setTimeout(() => {
+      setCurrentIndex((prev) =>
+        prev >= itemsWithVotes.length - 1 ? 0 : prev + 1,
+      );
+      setShowDetails(true);
+    }, 200);
+  };
+
+  const handlePauseToggle = () => {
+    setIsPaused((prev) => !prev);
+  };
 
   if (itemsWithVotes.length === 0) {
     return (
@@ -194,7 +220,7 @@ export function PresentationFinalization({
                 <h2 className="mb-6 text-4xl font-bold">{currentItem.title}</h2>
               )}
 
-              {currentItem.type === "group" && currentItem.ideas ? (
+              {currentItem.type === "group" && currentItem.ideas ?
                 <AnimatePresence>
                   {showDetails && (
                     <motion.div
@@ -217,11 +243,10 @@ export function PresentationFinalization({
                     </motion.div>
                   )}
                 </AnimatePresence>
-              ) : (
-                <p className="text-3xl leading-relaxed">
+              : <p className="text-3xl leading-relaxed">
                   {currentItem.content}
                 </p>
-              )}
+              }
             </div>
           </motion.div>
         </AnimatePresence>
@@ -241,6 +266,17 @@ export function PresentationFinalization({
           <span className="text-zinc-500">+{itemsWithVotes.length - 10}</span>
         )}
       </div>
+
+      {/* Presentation Controls */}
+      <PresentationControls
+        isFinalizationStage
+        onPrevious={handlePrevious}
+        onNext={handleNext}
+        onPauseToggle={handlePauseToggle}
+        isPaused={isPaused}
+        currentIndex={currentIndex}
+        totalItems={itemsWithVotes.length}
+      />
     </div>
   );
 }

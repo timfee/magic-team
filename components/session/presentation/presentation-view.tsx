@@ -76,15 +76,15 @@ export function PresentationView({ sessionId }: PresentationViewProps) {
           />
         )}
 
-        {(currentStage === "pre_session" ||
-          currentStage === "post_session") && (
+        {(currentStage === "pre_session"
+          || currentStage === "post_session") && (
           <div className="flex h-full items-center justify-center">
             <div className="text-center">
               <h1 className="text-6xl font-bold text-white">{session.name}</h1>
               <p className="mt-4 text-2xl text-zinc-400">
-                {currentStage === "pre_session"
-                  ? "Session not started yet"
-                  : "Session completed"}
+                {currentStage === "pre_session" ?
+                  "Session not started yet"
+                : "Session completed"}
               </p>
             </div>
           </div>
