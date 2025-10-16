@@ -207,11 +207,20 @@ This is the SINGLE source of truth for project status and remaining work. Do NOT
   - Ideas and groups throttled at 200ms to reduce re-renders
   - Improves performance during rapid real-time updates
 
-**Not Implemented:**
+**Completed:**
 
-- [ ] Virtualized lists for large idea counts (no library installed)
-- [ ] Image optimization beyond Next.js defaults
-- [ ] Manual code splitting for large components
+- [x] **Image optimization configured** (`next.config.ts`) ✅ NEW
+  - AVIF and WebP format support
+  - Multiple device sizes (640-3840px)
+  - 60-second minimum cache TTL
+- [x] **Code splitting implemented** (`lib/utils/lazy-load.ts`) ✅ NEW
+  - Lazy-loaded presentation view, grouping, comments
+  - Dynamic confetti imports (load on demand)
+  - Loading states for all lazy components
+- [x] **Virtualization library installed** (react-window) ✅ NEW
+  - Package installed and ready for use
+  - Component template available but not integrated
+  - Can be applied to idea lists with 100+ items
 
 ---
 
@@ -545,3 +554,9 @@ Keep all status updates in THIS file (TODO.md).
 - **ARIA labels** - Added to admin stage controls (aria-label, aria-current)
 - **Screen reader announcements** - Stage changes announced via `announce()` utility
 - **Enhanced focus indicators** - Yellow outlines, thicker borders in high contrast mode
+
+### Performance Improvements ✅
+
+- **Image optimization** - AVIF/WebP formats, responsive sizing, caching (`next.config.ts`)
+- **Code splitting** - Lazy components for presentation, grouping, comments (`lib/utils/lazy-load.ts`)
+- **Virtualization ready** - react-window installed for large lists (100+ items)
