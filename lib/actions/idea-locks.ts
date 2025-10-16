@@ -80,9 +80,6 @@ export const acquireLock = async (
   }
 };
 
-/**
- * Releases a lock on an idea. Only the user who holds the lock can release it.
- */
 export const releaseLock = async (
   ideaId: string,
   userId: string,
@@ -112,10 +109,6 @@ export const releaseLock = async (
   }
 };
 
-/**
- * Refreshes an existing lock to extend its duration.
- * Returns true if refresh was successful, false if lock was lost or expired.
- */
 export const refreshLock = async (
   ideaId: string,
   userId: string,
@@ -147,10 +140,6 @@ export const refreshLock = async (
   }
 };
 
-/**
- * Checks if an idea is currently locked by another user.
- * Returns the ID of the user who holds the lock, or null if unlocked/expired.
- */
 export const checkLock = async (
   ideaId: string,
   currentUserId: string,

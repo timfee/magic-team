@@ -25,9 +25,6 @@ export async function setupFirebaseTest() {
   return testEnv;
 }
 
-/**
- * Get test environment
- */
 export function getTestEnv(): RulesTestEnvironment {
   if (!testEnv) {
     throw new Error(
@@ -37,34 +34,22 @@ export function getTestEnv(): RulesTestEnvironment {
   return testEnv;
 }
 
-/**
- * Cleanup test environment
- */
 export async function cleanupFirebaseTest() {
   if (testEnv) {
     await testEnv.cleanup();
   }
 }
 
-/**
- * Clear Firestore data between tests
- */
 export async function clearFirestoreData() {
   if (testEnv) {
     await testEnv.clearFirestore();
   }
 }
 
-/**
- * Create an authenticated test context
- */
 export function getAuthenticatedContext(userId: string, email?: string) {
   return getTestEnv().authenticatedContext(userId, { email });
 }
 
-/**
- * Create an unauthenticated test context
- */
 export function getUnauthenticatedContext() {
   return getTestEnv().unauthenticatedContext();
 }
