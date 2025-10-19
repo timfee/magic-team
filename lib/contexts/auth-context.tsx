@@ -40,6 +40,50 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // E2E Test Mode: Sign in anonymously to Firebase Auth emulator
+    if (typeof window !== 'undefined' && (window as any).__E2E_TEST_MODE) {
+      const mockUser = (window as any).__E2E_MOCK_USER || {
+        uid: 'test-e2e-user-12345',
+        email: 'e2e-test@example.com',
+        displayName: 'E2E Test User',
+        photoURL: 'https://i.pravatar.cc/150?img=10',
+      };
+
+      console.log('[E2E] Attempting to sign in to Firebase Auth emulator...');
+
+      // Sign in anonymously to Firebase Auth emulator
+      // This gives us a real Firebase auth token that works with Firestore
+      import('firebase/auth').then(({ signInAnonymously }) => {
+        signInAnonymously(auth)
+          .then((userCredential) => {
+            console.log('[E2E] Successfully signed in to emulator:', userCredential.user.uid);
+            // User is automatically set via onAuthStateChanged below
+          })
+          .catch((error) => {
+            console.error('[E2E] Failed to sign in to emulator:', error);
+            // Fall back to mock user if emulator sign-in fails
+            const e2eUser = {
+              ...mockUser,
+              emailVerified: true,
+              isAnonymous: false,
+              metadata: {},
+              providerData: [],
+              refreshToken: 'mock-refresh',
+              tenantId: null,
+              delete: async () => {},
+              getIdToken: async () => 'mock-token',
+              getIdTokenResult: async () => ({} as any),
+              reload: async () => {},
+              toJSON: () => ({}),
+              providerId: 'google.com',
+            } as unknown as User;
+
+            setUser(e2eUser);
+            setIsLoading(false);
+          });
+      });
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setIsLoading(false);
